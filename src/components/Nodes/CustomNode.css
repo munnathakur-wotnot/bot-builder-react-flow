@@ -1,0 +1,154 @@
+.custom-node {
+  position: relative;
+  width: 320px;
+  border: 1px solid #cfd4d8;
+  border-radius: 14px;
+  background: #f3f5f4;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+  overflow: visible;
+}
+
+.custom-node--carouselCard,
+.custom-node--carouselButton {
+  width: 130px;
+  background: #fff;
+}
+
+.custom-node--start {
+  width: fit-content;
+  min-width: 140px;
+  border: none;
+  border-radius: 999px;
+  background: #1fb26a;
+  box-shadow: 0 4px 10px rgba(17, 24, 39, 0.14);
+  cursor: pointer;
+}
+
+.custom-node--start .custom-node__header {
+  padding: 10px 16px;
+  background: transparent;
+}
+
+.custom-node--start .custom-node__icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 0;
+  background: #fff;
+  clip-path: polygon(0 0, 82% 0, 62% 50%, 82% 100%, 0 100%);
+}
+
+.custom-node--start .custom-node__icon::before {
+  content: none;
+}
+
+.custom-node--start .custom-node__title {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.custom-node--start .custom-node__description {
+  display: none;
+}
+
+.custom-node--start .custom-node__handle--source {
+  bottom: -8px;
+}
+
+.custom-node--carouselCard .custom-node__header,
+.custom-node--carouselButton .custom-node__header {
+  background: #fff;
+  padding: 10px 12px;
+}
+
+.custom-node--carouselCard .custom-node__icon,
+.custom-node--carouselButton .custom-node__icon {
+  display: none;
+}
+
+.custom-node--carouselCard .custom-node__title,
+.custom-node--carouselButton .custom-node__title {
+  font-size: 28px;
+}
+
+.custom-node--carouselCard .custom-node__add-button {
+  display: none;
+}
+
+.custom-node__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 16px 12px;
+  background: linear-gradient(90deg, #deefe5 0%, #f3f5f4 40%);
+}
+
+.custom-node__icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: #1fb26a;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.custom-node__icon::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 2px solid #fff;
+  border-radius: 2px;
+}
+
+.custom-node__title {
+  margin: 0;
+  color: #101828;
+  font-size: 31px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.custom-node__description {
+  margin: 0;
+  padding: 10px 16px 16px;
+  color: #667085;
+  font-size: 14px;
+  border-top: 1px solid #d8dde2;
+}
+
+.custom-node__handle {
+  width: 12px;
+  height: 12px;
+  border: 1px solid #b8bfc5;
+  background: #eef0f2;
+}
+
+.custom-node__handle--target {
+  top: -7px;
+}
+
+.custom-node__handle--source {
+  bottom: -7px;
+}
+
+.custom-node__add-button {
+  position: absolute;
+  left: 50%;
+  bottom: -18px;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 28px;
+  border: 1px solid #d0d5dd;
+  border-radius: 50%;
+  background: #fff;
+  color: #667085;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.12);
+}
+
+.custom-node__add-button:hover {
+  color: #344054;
+  border-color: #98a2b3;
+}

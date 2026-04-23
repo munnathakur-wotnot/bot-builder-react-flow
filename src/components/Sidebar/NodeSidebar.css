@@ -1,0 +1,93 @@
+.node-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 360px;
+  height: 100vh;
+  overflow: auto;
+  border-left: 1px solid #e4e7ec;
+  background: #fff;
+  padding: 18px 16px;
+  box-shadow: -8px 0 24px rgba(15, 23, 42, 0.12);
+  z-index: 50;
+  animation: node-sidebar-slide-in 180ms ease-out;
+}
+
+@keyframes node-sidebar-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.node-sidebar__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.node-sidebar__title {
+  margin: 0;
+  color: #101828;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.node-sidebar__close {
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  width: 28px;
+  height: 28px;
+  background: #fff;
+  color: #475467;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.node-sidebar__label {
+  display: block;
+  margin-bottom: 14px;
+  color: #344054;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.node-sidebar__input,
+.node-sidebar__textarea {
+  width: 100%;
+  margin-top: 6px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 9px 10px;
+  font-size: 14px;
+  color: #101828;
+  box-sizing: border-box;
+}
+
+.node-sidebar__textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.node-sidebar__add-card-button {
+  width: 100%;
+  border: 1px solid #12b76a;
+  border-radius: 8px;
+  padding: 9px 10px;
+  background: #ecfdf3;
+  color: #027a48;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.node-sidebar__add-card-button:hover {
+  background: #d1fadf;
+}
