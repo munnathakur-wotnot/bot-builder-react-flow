@@ -124,11 +124,11 @@
 }
 
 .custom-node__handle--target {
-  top: -7px;
+  top: -3px;
 }
 
 .custom-node__handle--source {
-  bottom: -7px;
+  bottom: -8px;
 }
 
 .custom-node__add-button {

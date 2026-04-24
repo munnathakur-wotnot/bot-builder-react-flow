@@ -1,9 +1,28 @@
-export function createFlowNode(id, x, y) {
+export function createFlowNode({
+  id,
+  x,
+  y,
+  type = "custom",
+  inPorts = [],
+  outPorts = [],
+  connected = false,
+  title = "",
+  description = "",
+  metaType = "", // your custom type (carousel, card, etc.)
+}) {
   return {
     id,
-    type: "custom",
+    type,
     position: { x, y },
-    data: { id },
+    data: {
+      id,
+      inPorts,
+      outPorts,
+      connected,
+      title,
+      description,
+      type: metaType,
+    },
   };
 }
 
@@ -12,7 +31,7 @@ export function createEdge(source, target) {
     id: `edge_${source}_${target}`,
     source,
     target,
-    type: "smoothstep",
+    type: "custom",
   };
 }
 
@@ -23,23 +42,33 @@ export function buildSingleNodePayload({
   getNextNodeId,
 }) {
   const newNodeId = getNextNodeId();
-  const newNode = createFlowNode(
-    newNodeId,
-    sourceNode.position.x,
-    sourceNode.position.y + 220,
-  );
+  console.log(sourceNode, "Hello");
+
+  const newNode = createFlowNode({
+    id: newNodeId,
+    x: sourceNode.position.x,
+    y: sourceNode.position.y + 220,
+    inPorts: [sourceNodeId],
+    title: "Enter Input",
+    description: "Enter Description",
+  });
+  console.log(newNode, "New Node");
 
   return {
     nodesToAdd: [newNode],
     edgesToAdd: [createEdge(sourceNodeId, newNodeId)],
     dataPatch: {
-      [newNodeId]: nodeData,
+      [newNodeId]: { ...nodeData, inPorts: [sourceNodeId] },
     },
     selectedNodeId: newNodeId,
   };
 }
 
-export function buildCarouselPayload({ sourceNode, sourceNodeId, getNextNodeId }) {
+export function buildCarouselPayload({
+  sourceNode,
+  sourceNodeId,
+  getNextNodeId,
+}) {
   const carouselId = getNextNodeId();
   const cardOneId = getNextNodeId();
   const cardTwoId = getNextNodeId();
@@ -53,11 +82,49 @@ export function buildCarouselPayload({ sourceNode, sourceNodeId, getNextNodeId }
 
   return {
     nodesToAdd: [
-      createFlowNode(carouselId, carouselX, carouselY),
-      createFlowNode(cardOneId, carouselX - 120, cardY),
-      createFlowNode(cardTwoId, carouselX + 120, cardY),
-      createFlowNode(buttonOneId, carouselX - 120, buttonY),
-      createFlowNode(buttonTwoId, carouselX + 120, buttonY),
+      createFlowNode({
+        id: carouselId,
+        x: carouselX,
+        y: carouselY,
+        inPorts: [sourceNodeId],
+        title: "Carousel",
+        description: "Carousel Node",
+        metaType: "carousel",
+      }),
+      createFlowNode({
+        id: cardOneId,
+        x: carouselX - 120,
+        y: cardY,
+        title: "Card 1",
+        description: "Carousel Node",
+        inPorts: [carouselId],
+        metaType: "carouselCard",
+      }),
+      createFlowNode({
+        id: cardTwoId,
+        x: carouselX + 120,
+        y: cardY,
+        inPorts: [carouselId],
+        metaType: "carouselCard",
+        title: "Card 2",
+        description: "Carousel Node",
+      }),
+      createFlowNode({
+        id: buttonOneId,
+        x: carouselX - 120,
+        y: buttonY,
+        inPorts: [cardOneId],
+        metaType: "carouselButton",
+        title: "Button",
+      }),
+      createFlowNode({
+        id: buttonTwoId,
+        x: carouselX + 120,
+        y: buttonY,
+        inPorts: [cardTwoId],
+        metaType: "carouselButton",
+        title: "Button",
+      }),
     ],
     edgesToAdd: [
       createEdge(sourceNodeId, carouselId),
@@ -72,26 +139,31 @@ export function buildCarouselPayload({ sourceNode, sourceNodeId, getNextNodeId }
         title: "Carousel 1",
         description: "Swipe to explore cards",
         cards: [cardOneId, cardTwoId],
+        inPorts: [sourceNodeId],
       },
       [cardOneId]: {
         type: "carouselCard",
         title: "Card 1",
         description: "",
+        inPorts: [carouselId],
       },
       [cardTwoId]: {
         type: "carouselCard",
         title: "Card 2",
         description: "",
+        inPorts: [carouselId],
       },
       [buttonOneId]: {
         type: "carouselButton",
         title: "Button 1",
         description: "",
+        inPorts: [cardOneId],
       },
       [buttonTwoId]: {
         type: "carouselButton",
         title: "Button 1",
         description: "",
+        inPorts: [cardTwoId],
       },
     },
     selectedNodeId: carouselId,
@@ -116,6 +188,8 @@ export function buildAddCarouselCardPayload({
   carouselNode,
   getNextNodeId,
 }) {
+  console.log(carouselNodeData, "SSSS");
+
   const nextCardIndex = (carouselNodeData.cards?.length ?? 0) + 1;
   const cardId = getNextNodeId();
   const buttonId = getNextNodeId();
@@ -128,7 +202,10 @@ export function buildAddCarouselCardPayload({
       createFlowNode(cardId, cardX, cardY),
       createFlowNode(buttonId, cardX, buttonY),
     ],
-    edgesToAdd: [createEdge(selectedNodeId, cardId), createEdge(cardId, buttonId)],
+    edgesToAdd: [
+      createEdge(selectedNodeId, cardId),
+      createEdge(cardId, buttonId),
+    ],
     dataPatch: {
       [selectedNodeId]: {
         cards: [...(carouselNodeData.cards ?? []), cardId],

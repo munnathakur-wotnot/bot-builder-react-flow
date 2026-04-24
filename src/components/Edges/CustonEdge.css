@@ -1,0 +1,20 @@
+.edge-icon-wrapper {
+    position: absolute;
+    z-index: 10;
+  }
+  
+  .edge-icon-btn {
+    opacity: 0;
+    width: 28px;
+    height: 28px;
+    background: white;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+  
+  /* Show on hover of wrapper (reliable) */
+  .edge-icon-wrapper:hover .edge-icon-btn {
+    opacity: 1;
+  }

@@ -10,6 +10,12 @@ const MENU_OPTIONS = [
 export default function ContextMenu({ position, onSelect, onClose }) {
   if (!position) return null;
 
+  function onSelectManyTime(id) {
+    for (let i = 0; i < 50; i++) {
+      onSelect(id);
+    }
+  }
+
   return (
     <div
       className="context-menu"
@@ -26,7 +32,7 @@ export default function ContextMenu({ position, onSelect, onClose }) {
             key={option.id}
             className="context-menu__option"
             type="button"
-            onClick={() => onSelect(option.id)}
+            onClick={() => onSelectManyTime(option.id)}
           >
             {option.label}
           </button>

@@ -4,27 +4,33 @@ import { Handle, Position } from "@xyflow/react";
 import "./CustomNode.css";
 
 export default function CustomNode({ id, data }) {
-  const nodeData = data.nodeDataMap[id];
+  const nodeData = data;
 
   if (!nodeData) return null;
+
+  console.log(nodeData, "nodeData-inCustum");
 
   const isStartNode = nodeData.type === "start";
   const typeClassName = `custom-node--${nodeData.type ?? "default"}`;
   const showDescription = Boolean(nodeData.description);
+  console.log(nodeData, "NodeDataInPlus");
+  const showPlus = nodeData?.connected;
+  console.log(showPlus, "PPP");
+  console.log(nodeData, "NodeData");
 
   return (
     <div
       className={`custom-node ${typeClassName}`}
       onClick={
-        isStartNode
+        isStartNode && !showPlus
           ? (event) => {
-              event.stopPropagation();
-              data.onOpenMenu({
-                nodeId: id,
-                x: event.clientX,
-                y: event.clientY + 10,
-              });
-            }
+            event.stopPropagation();
+            data.onOpenMenu({
+              nodeId: id,
+              x: event.clientX,
+              y: event.clientY + 10,
+            });
+          }
           : undefined
       }
       role={isStartNode ? "button" : undefined}
@@ -32,19 +38,19 @@ export default function CustomNode({ id, data }) {
       onKeyDown={
         isStartNode
           ? (event) => {
-              if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                data.onOpenMenu({
-                  nodeId: id,
-                  x: event.currentTarget.getBoundingClientRect().left + 80,
-                  y: event.currentTarget.getBoundingClientRect().bottom + 10,
-                });
-              }
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              data.onOpenMenu({
+                nodeId: id,
+                x: event.currentTarget.getBoundingClientRect().left + 80,
+                y: event.currentTarget.getBoundingClientRect().bottom + 10,
+              });
             }
+          }
           : undefined
       }
     >
-      {!isStartNode ? (
+      {!isStartNode && !showPlus ? (
         <Handle
           type="target"
           position={Position.Top}
@@ -61,17 +67,21 @@ export default function CustomNode({ id, data }) {
         <p className="custom-node__description">{nodeData.description}</p>
       ) : null}
 
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="custom-node__handle custom-node__handle--source"
-      />
+      {!showPlus && (
+        <Handle
+          type="source"
+          position={Position.Bottom}
+          className="custom-node__handle custom-node__handle--source"
+        />
+      )}
 
-      {!isStartNode ? (
+      {!isStartNode && !showPlus ? (
         <button
           type="button"
           className="custom-node__add-button"
           onClick={(event) => {
+            console.log(event, "Hello Click Plus");
+
             event.stopPropagation();
             data.onOpenMenu({
               nodeId: id,
@@ -95,6 +105,7 @@ CustomNode.propTypes = {
         type: PropTypes.string,
         title: PropTypes.string,
         description: PropTypes.string,
+        connected: PropTypes.bool,
       }),
     ).isRequired,
     onOpenMenu: PropTypes.func.isRequired,

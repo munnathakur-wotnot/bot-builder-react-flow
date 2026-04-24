@@ -12,28 +12,25 @@ import {
 import "@xyflow/react/dist/style.css";
 import "./Canvas.css";
 import CustomNode from "../Nodes/CustomNode";
-import useNodeDataMap from "../../hooks/useNodeDataMap";
 import ContextMenu from "../Menu/ContextMenu";
 import NodeSidebar from "../Sidebar/NodeSidebar";
 import { INITIAL_EDGES, INITIAL_NODES, MENU_NODE_TEMPLATES } from "./constants";
 import { buildAddCarouselCardPayload, buildMenuActionMap } from "./utils";
+import useUpdateNode from "../../hooks/useUpdateNode";
+import CustomEdge from "../Edges/CustumEdges";
 
 const nodeTypes = { custom: CustomNode };
+const edgeTypes = {
+  custom: CustomEdge,
+};
 
 export default function CanvasFlow() {
   const [nodes, setNodes, onNodesChange] = useNodesState(INITIAL_NODES);
   const [edges, setEdges, onEdgesChange] = useEdgesState(INITIAL_EDGES);
-  const [selectedNodeId, setSelectedNodeId] = useState(null);
+  const [selectedNode, setSelectedNode] = useState(null);
   const [menuState, setMenuState] = useState(null);
-  const { nodeDataMap, updateNodeData, setNodeDataMap } = useNodeDataMap();
+  const { updateSingleNode } = useUpdateNode(setNodes);
   const nextIdRef = useRef(2);
-
-  const onConnect = useCallback(
-    (params) => setEdges((currentEdges) => addEdge(params, currentEdges)),
-    [setEdges],
-  );
-
-  const getNextNodeId = useCallback(() => `node_${nextIdRef.current++}`, []);
 
   const nodesWithMappedData = useMemo(
     () =>
@@ -41,18 +38,24 @@ export default function CanvasFlow() {
         ...node,
         data: {
           ...node.data,
-          nodeDataMap,
           onOpenMenu: setMenuState,
         },
       })),
-    [nodes, nodeDataMap],
+    [nodes],
+  );
+  const onConnect = useCallback(
+    (params) => setEdges((eds) => addEdge({ ...params, type: "custom" }, eds)),
+    [],
   );
 
-  const selectedNodeData = selectedNodeId ? nodeDataMap[selectedNodeId] : null;
+  const getNextNodeId = useCallback(() => `node_${nextIdRef.current++}`, []);
+
+  const selectedNodeData = selectedNode ?? null;
 
   const handleMenuSelect = useCallback(
     (optionId) => {
       if (!menuState?.nodeId) return;
+      console.log("HandleManusElected", menuState);
 
       const sourceNode = nodes.find((node) => node.id === menuState.nodeId);
       if (!sourceNode) return;
@@ -73,54 +76,61 @@ export default function CanvasFlow() {
       }
 
       const payload = buildPayload();
+      console.log(payload, "Payload", sourceNode);
+
+      updateSingleNode(sourceNode.id, (node) => ({
+        ...node,
+        data: {
+          ...node.data,
+          outPorts: [
+            ...(node.data.outPorts || []),
+            ...payload.nodesToAdd.map((item) => item.id),
+          ],
+          connected: payload.nodesToAdd.length > 0,
+        },
+      }));
+
       setNodes((currentNodes) => [...currentNodes, ...payload.nodesToAdd]);
       setEdges((currentEdges) => [...currentEdges, ...payload.edgesToAdd]);
-      setNodeDataMap((prev) => ({ ...prev, ...payload.dataPatch }));
-      setSelectedNodeId(payload.selectedNodeId);
-
+      setSelectedNode(
+        payload.nodesToAdd.find((item) => item.id === payload.selectedNodeId),
+      );
       setMenuState(null);
     },
-    [menuState, nodes, setNodeDataMap, setNodes, setEdges, getNextNodeId],
+    [menuState, nodes, setNodes, setEdges, getNextNodeId],
   );
 
   const handleAddCarouselCard = useCallback(() => {
-    if (!selectedNodeId) return;
-    const carouselNodeData = nodeDataMap[selectedNodeId];
-    if (!carouselNodeData || carouselNodeData.type !== "carousel") return;
+    if (!selectedNode) return;
+    const carouselNodeData = selectedNode;
+    console.log(carouselNodeData, "CarouselNodeData");
 
-    const carouselNode = nodes.find((node) => node.id === selectedNodeId);
+    if (!carouselNodeData || carouselNodeData.data.type !== "carousel") return;
+    console.log(selectedNode, "Selected Node2111");
+
+    const carouselNode = selectedNode;
     if (!carouselNode) return;
 
     const payload = buildAddCarouselCardPayload({
-      selectedNodeId,
+      selectedNodeId: selectedNode.id,
       carouselNodeData,
       carouselNode,
       getNextNodeId,
     });
 
-    setNodes((currentNodes) => [...currentNodes, ...payload.nodesToAdd]);
+    function handleEdgeCreate(params) {
+      // 1. edge add
+      setEdges((eds) => addEdge(params, eds));
+
+      console.log(params, "params");
+    }
+    payload.edgesToAdd.forEach((edge) => {
+      handleEdgeCreate(edge);
+    });
+
+    //setNodes((currentNodes) => [...currentNodes, ...payload.nodesToAdd]);
     setEdges((currentEdges) => [...currentEdges, ...payload.edgesToAdd]);
-    setNodeDataMap((prev) => ({
-      ...prev,
-      [selectedNodeId]: {
-        ...prev[selectedNodeId],
-        ...payload.dataPatch[selectedNodeId],
-      },
-      ...Object.fromEntries(
-        Object.entries(payload.dataPatch).filter(
-          ([nodeId]) => nodeId !== selectedNodeId,
-        ),
-      ),
-    }));
-  }, [
-    selectedNodeId,
-    nodeDataMap,
-    nodes,
-    setNodeDataMap,
-    setNodes,
-    setEdges,
-    getNextNodeId,
-  ]);
+  }, [nodes, setNodes, setEdges, getNextNodeId]);
 
   return (
     <div className="canvas-layout">
@@ -129,13 +139,14 @@ export default function CanvasFlow() {
           nodes={nodesWithMappedData}
           edges={edges}
           nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
-          onNodeClick={(_, node) => setSelectedNodeId(node.id)}
+          onNodeClick={(_, node) => setSelectedNode(node)}
           onPaneClick={() => {
             setMenuState(null);
-            setSelectedNodeId(null);
+            setSelectedNode(null);
           }}
           fitView
         >
@@ -152,12 +163,46 @@ export default function CanvasFlow() {
 
         <NodeSidebar
           selectedNodeData={selectedNodeData}
-          onChangeTitle={(title) => updateNodeData(selectedNodeId, { title })}
-          onChangeDescription={(description) =>
-            updateNodeData(selectedNodeId, { description })
-          }
+          onChangeTitle={(title) => {
+            const updater = (node) => {
+              return {
+                ...node,
+                data: {
+                  ...node.data,
+                  title: title,
+                },
+              };
+            };
+            updateSingleNode(selectedNode.id, updater);
+            setSelectedNode((prev) => ({
+              ...prev,
+              data: {
+                ...prev.data,
+                title: title,
+              },
+            }));
+          }}
+          onChangeDescription={(description) => {
+            const updater = (node) => {
+              return {
+                ...node,
+                data: {
+                  ...node.data,
+                  description: description,
+                },
+              };
+            };
+            updateSingleNode(selectedNode.id, updater);
+            setSelectedNode((prev) => ({
+              ...prev,
+              data: {
+                ...prev.data,
+                description: description,
+              },
+            }));
+          }}
           onAddCarouselCard={handleAddCarouselCard}
-          onClose={() => setSelectedNodeId(null)}
+          onClose={() => setSelectedNode(null)}
         />
       </div>
     </div>

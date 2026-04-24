@@ -1,5 +1,5 @@
 import React from "react";
-import PropTypes from "prop-types";
+import PropTypes, { object } from "prop-types";
 import "./NodeSidebar.css";
 
 export default function NodeSidebar({
@@ -9,6 +9,8 @@ export default function NodeSidebar({
   onAddCarouselCard,
   onClose,
 }) {
+  console.log(selectedNodeData, "Selected Node Dataww");
+
   if (!selectedNodeData) return null;
 
   return (
@@ -29,7 +31,7 @@ export default function NodeSidebar({
         Title
         <input
           className="node-sidebar__input"
-          value={selectedNodeData.title ?? ""}
+          value={selectedNodeData.data.title ?? ""}
           onChange={(event) => onChangeTitle(event.target.value)}
         />
       </label>
@@ -38,12 +40,12 @@ export default function NodeSidebar({
         Description
         <textarea
           className="node-sidebar__textarea"
-          value={selectedNodeData.description ?? ""}
+          value={selectedNodeData.data.description ?? ""}
           onChange={(event) => onChangeDescription(event.target.value)}
         />
       </label>
 
-      {selectedNodeData.type === "carousel" ? (
+      {selectedNodeData?.data.type === "carousel" ? (
         <button
           type="button"
           className="node-sidebar__add-card-button"
@@ -57,11 +59,7 @@ export default function NodeSidebar({
 }
 
 NodeSidebar.propTypes = {
-  selectedNodeData: PropTypes.shape({
-    type: PropTypes.string,
-    title: PropTypes.string,
-    description: PropTypes.string,
-  }),
+  selectedNodeData: object,
   onChangeTitle: PropTypes.func.isRequired,
   onChangeDescription: PropTypes.func.isRequired,
   onAddCarouselCard: PropTypes.func.isRequired,

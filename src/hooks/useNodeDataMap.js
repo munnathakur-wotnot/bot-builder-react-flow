@@ -5,6 +5,9 @@ const initialNodeDataMap = {
     title: "Bot starts",
     description: "",
     type: "start",
+    inPorts: [],
+    outPorts: [],
+    connected: false,
   },
 };
 

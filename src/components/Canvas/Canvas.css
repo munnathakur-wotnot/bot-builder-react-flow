@@ -9,3 +9,7 @@
   height: 100%;
   background: #f8fafc;
 }
+.react-flow__edge-path {
+  stroke: red;
+  stroke-width: 2;
+}
