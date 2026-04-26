@@ -14,9 +14,7 @@ import "./Canvas.css";
 import CustomNode from "../Nodes/CustomNode";
 import ContextMenu from "../Menu/ContextMenu";
 import NodeSidebar from "../Sidebar/NodeSidebar";
-import { INITIAL_EDGES, INITIAL_NODES, MENU_NODE_TEMPLATES } from "./constants";
-import { buildMenuActionMap } from "./utils";
-import useUpdateNode from "../../hooks/useUpdateNode";
+import { INITIAL_EDGES, INITIAL_NODES } from "./constants";
 import CustomEdge from "../Edges/CustumEdges";
 
 const nodeTypes = { custom: CustomNode };
@@ -29,7 +27,6 @@ export default function CanvasFlow() {
   const [edges, setEdges, onEdgesChange] = useEdgesState(INITIAL_EDGES);
   const [selectedNode, setSelectedNode] = useState(null);
   const [menuState, setMenuState] = useState(null);
-  const { updateSingleNode } = useUpdateNode(setNodes);
   const nextIdRef = useRef(2);
 
   const nodesWithMappedData = useMemo(
@@ -142,54 +139,6 @@ export default function CanvasFlow() {
 
   const selectedNodeData = selectedNode ?? null;
 
-  const handleMenuSelect = useCallback(
-    (optionId) => {
-      if (!menuState?.nodeId) return;
-      console.log("HandleManusElected", menuState);
-
-      const sourceNode = nodes.find((node) => node.id === menuState.nodeId);
-      if (!sourceNode) return;
-
-      const context = {
-        sourceNode,
-        sourceNodeId: menuState.nodeId,
-      };
-      const actionByOption = buildMenuActionMap({
-        context,
-        templates: MENU_NODE_TEMPLATES,
-        getNextNodeId,
-      });
-      const buildPayload = actionByOption[optionId];
-      if (!buildPayload) {
-        setMenuState(null);
-        return;
-      }
-
-      const payload = buildPayload();
-      console.log(payload, "Payload", sourceNode);
-
-      updateSingleNode(sourceNode.id, (node) => ({
-        ...node,
-        data: {
-          ...node.data,
-          outPorts: [
-            ...(node.data.outPorts || []),
-            ...payload.nodesToAdd.map((item) => item.id),
-          ],
-          connected: payload.nodesToAdd.length > 0,
-        },
-      }));
-
-      setNodes((currentNodes) => [...currentNodes, ...payload.nodesToAdd]);
-      setEdges((currentEdges) => [...currentEdges, ...payload.edgesToAdd]);
-      setSelectedNode(
-        payload.nodesToAdd.find((item) => item.id === payload.selectedNodeId),
-      );
-      setMenuState(null);
-    },
-    [menuState, nodes, setNodes, setEdges, getNextNodeId],
-  );
-
   return (
     <div className="canvas-layout">
       <div className="flow-canvas">
@@ -214,9 +163,13 @@ export default function CanvasFlow() {
         </ReactFlow>
 
         <ContextMenu
-          position={menuState ? { x: menuState.x, y: menuState.y } : null}
-          onSelect={handleMenuSelect}
-          onClose={() => setMenuState(null)}
+          menuState={menuState}
+          setMenuState={setMenuState}
+          nodes={nodes}
+          setNodes={setNodes}
+          setEdges={setEdges}
+          setSelectedNode={setSelectedNode}
+          getNextNodeId={getNextNodeId}
         />
 
         <NodeSidebar

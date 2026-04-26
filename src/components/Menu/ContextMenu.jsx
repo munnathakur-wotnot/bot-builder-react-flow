@@ -1,6 +1,9 @@
-import React from "react";
+import React, { useCallback } from "react";
 import PropTypes from "prop-types";
 import "./ContextMenu.css";
+import useUpdateNode from "../../hooks/useUpdateNode";
+import { buildMenuActionMap } from "../Canvas/utils";
+import { MENU_NODE_TEMPLATES } from "../Canvas/constants";
 
 const MENU_OPTIONS = [
   { id: "collectInput", label: "Collect Input" },
@@ -8,19 +11,66 @@ const MENU_OPTIONS = [
   { id: "form", label: "Form" },
 ];
 
-export default function ContextMenu({ position, onSelect, onClose }) {
-  if (!position) return null;
+export default function ContextMenu({
+  menuState,
+  setMenuState,
+  nodes,
+  setNodes,
+  setEdges,
+  setSelectedNode,
+  getNextNodeId,
+}) {
+  const { updateSingleNode } = useUpdateNode(setNodes);
 
-  // function onSelectManyTime(id) {
-  //   for (let i = 0; i < 50; i++) {
-  //     onSelect(id);
-  //   }
-  // }
+  const handleSelect = useCallback(
+    (optionId) => {
+      if (!menuState?.nodeId) return;
+
+      const sourceNode = nodes.find((n) => n.id === menuState.nodeId);
+      if (!sourceNode) return;
+
+      const actionByOption = buildMenuActionMap({
+        context: { sourceNode, sourceNodeId: menuState.nodeId },
+        templates: MENU_NODE_TEMPLATES,
+        getNextNodeId,
+      });
+
+      const buildPayload = actionByOption[optionId];
+      if (!buildPayload) {
+        setMenuState(null);
+        return;
+      }
+
+      const payload = buildPayload();
+
+      updateSingleNode(sourceNode.id, (node) => ({
+        ...node,
+        data: {
+          ...node.data,
+          outPorts: [
+            ...(node.data.outPorts || []),
+            ...payload.nodesToAdd.map((item) => item.id),
+          ],
+          connected: payload.nodesToAdd.length > 0,
+        },
+      }));
+
+      setNodes((curr) => [...curr, ...payload.nodesToAdd]);
+      setEdges((curr) => [...curr, ...payload.edgesToAdd]);
+      setSelectedNode(
+        payload.nodesToAdd.find((item) => item.id === payload.selectedNodeId),
+      );
+      setMenuState(null);
+    },
+    [menuState, nodes, setNodes, setEdges, setSelectedNode, getNextNodeId, updateSingleNode, setMenuState],
+  );
+
+  if (!menuState) return null;
 
   return (
     <div
       className="context-menu"
-      style={{ top: position.y, left: position.x }}
+      style={{ top: menuState.y, left: menuState.x }}
       role="menu"
     >
       <div className="context-menu__header">
@@ -33,14 +83,14 @@ export default function ContextMenu({ position, onSelect, onClose }) {
             key={option.id}
             className="context-menu__option"
             type="button"
-            onClick={() => onSelect(option.id)}
+            onClick={() => handleSelect(option.id)}
           >
             {option.label}
           </button>
         ))}
       </div>
 
-      <button className="context-menu__close" type="button" onClick={onClose}>
+      <button className="context-menu__close" type="button" onClick={() => setMenuState(null)}>
         Close
       </button>
     </div>
@@ -48,14 +98,19 @@ export default function ContextMenu({ position, onSelect, onClose }) {
 }
 
 ContextMenu.propTypes = {
-  position: PropTypes.shape({
+  menuState: PropTypes.shape({
+    nodeId: PropTypes.string,
     x: PropTypes.number,
     y: PropTypes.number,
   }),
-  onSelect: PropTypes.func.isRequired,
-  onClose: PropTypes.func.isRequired,
+  setMenuState: PropTypes.func.isRequired,
+  nodes: PropTypes.array.isRequired,
+  setNodes: PropTypes.func.isRequired,
+  setEdges: PropTypes.func.isRequired,
+  setSelectedNode: PropTypes.func.isRequired,
+  getNextNodeId: PropTypes.func.isRequired,
 };
 
 ContextMenu.defaultProps = {
-  position: null,
+  menuState: null,
 };
