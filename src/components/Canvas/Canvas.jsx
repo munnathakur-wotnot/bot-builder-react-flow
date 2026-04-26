@@ -292,6 +292,16 @@ export default function CanvasFlow() {
             }));
           }}
           onAddCarouselCard={handleAddCarouselCard}
+          onUpdateFormFields={(fields) => {
+            updateSingleNode(selectedNode.id, (node) => ({
+              ...node,
+              data: { ...node.data, fields },
+            }));
+            setSelectedNode((prev) => ({
+              ...prev,
+              data: { ...prev.data, fields },
+            }));
+          }}
           onClose={() => setSelectedNode(null)}
         />
       </div>

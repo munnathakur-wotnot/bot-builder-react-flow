@@ -170,6 +170,29 @@ export function buildCarouselPayload({
   };
 }
 
+export function buildFormPayload({ sourceNode, sourceNodeId, nodeData, getNextNodeId }) {
+  const newNodeId = getNextNodeId();
+
+  const newNode = createFlowNode({
+    id: newNodeId,
+    x: sourceNode.position.x,
+    y: sourceNode.position.y + 220,
+    inPorts: [sourceNodeId],
+    title: nodeData.title ?? "Form",
+    description: nodeData.description ?? "",
+    metaType: "form",
+  });
+
+  // Embed fields directly into the node's data
+  newNode.data.fields = nodeData.fields ?? [];
+
+  return {
+    nodesToAdd: [newNode],
+    edgesToAdd: [createEdge(sourceNodeId, newNodeId)],
+    selectedNodeId: newNodeId,
+  };
+}
+
 export function buildMenuActionMap({ context, templates, getNextNodeId }) {
   return {
     carousel: () => buildCarouselPayload({ ...context, getNextNodeId }),
@@ -177,6 +200,12 @@ export function buildMenuActionMap({ context, templates, getNextNodeId }) {
       buildSingleNodePayload({
         ...context,
         nodeData: templates.collectInput,
+        getNextNodeId,
+      }),
+    form: () =>
+      buildFormPayload({
+        ...context,
+        nodeData: templates.form,
         getNextNodeId,
       }),
   };

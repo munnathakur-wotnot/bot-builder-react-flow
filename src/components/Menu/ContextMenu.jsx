@@ -5,6 +5,7 @@ import "./ContextMenu.css";
 const MENU_OPTIONS = [
   { id: "collectInput", label: "Collect Input" },
   { id: "carousel", label: "Carousel" },
+  { id: "form", label: "Form" },
 ];
 
 export default function ContextMenu({ position, onSelect, onClose }) {
