@@ -1,20 +1,34 @@
 .edge-icon-wrapper {
-    position: absolute;
-    z-index: 10;
-  }
-  
-  .edge-icon-btn {
-    opacity: 0;
-    width: 28px;
-    height: 28px;
-    background: white;
-    border-radius: 50%;
-    border: 1px solid #ccc;
-    cursor: pointer;
-    transition: opacity 0.2s ease;
-  }
-  
-  /* Show on hover of wrapper (reliable) */
-  .edge-icon-wrapper:hover .edge-icon-btn {
-    opacity: 1;
-  }
+  position: absolute;
+  z-index: 10;
+  pointer-events: all;
+}
+
+.edge-icon-btn {
+  opacity: 0;
+  width: 24px;
+  height: 24px;
+  background: white;
+  border-radius: 50%;
+  border: 1.5px solid #f44336;
+  cursor: pointer;
+  transition: opacity 0.15s ease, background 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f44336;
+  font-size: 13px;
+  font-weight: bold;
+  line-height: 1;
+  padding: 0;
+}
+
+.edge-icon-btn:hover {
+  background: #f44336;
+  color: white;
+}
+
+/* Show when edge is selected */
+.edge-icon-wrapper.selected .edge-icon-btn {
+  opacity: 1;
+}

@@ -5,12 +5,16 @@ import "./CustonEdge.css";
 export default function CustomEdge(props) {
     const {
         id,
+        source,
+        target,
         sourceX,
         sourceY,
         targetX,
         targetY,
         sourcePosition,
         targetPosition,
+        selected,
+        data,
     } = props;
 
     const [edgePath, labelX, labelY] = getBezierPath({
@@ -21,21 +25,28 @@ export default function CustomEdge(props) {
         sourcePosition,
         targetPosition,
     });
+
+    const handleDelete = (e) => {
+        e.stopPropagation();
+        data?.onDeleteEdge?.(id, source, target);
+    };
+
     return (
         <>
             {/* Edge Line */}
             <BaseEdge path={edgePath} />
 
-            {/* Hover Icon */}
+            {/* Delete Icon — visible when edge is selected */}
             <EdgeLabelRenderer>
                 <div
-                    onClick={() => console.log("Edge clicked: hello", id)}
-                    className="edge-icon-wrapper"
+                    className={`edge-icon-wrapper${selected ? " selected" : ""}`}
                     style={{
                         transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
                     }}
                 >
-                    <button className="edge-icon-btn">⚙️ Hello bhai</button>
+                    <button className="edge-icon-btn" onClick={handleDelete}>
+                        ✕
+                    </button>
                 </div>
             </EdgeLabelRenderer>
         </>
