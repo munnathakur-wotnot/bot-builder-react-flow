@@ -15,7 +15,7 @@ import CustomNode from "../Nodes/CustomNode";
 import ContextMenu from "../Menu/ContextMenu";
 import NodeSidebar from "../Sidebar/NodeSidebar";
 import { INITIAL_EDGES, INITIAL_NODES, MENU_NODE_TEMPLATES } from "./constants";
-import { buildAddCarouselCardPayload, buildMenuActionMap } from "./utils";
+import { buildMenuActionMap } from "./utils";
 import useUpdateNode from "../../hooks/useUpdateNode";
 import CustomEdge from "../Edges/CustumEdges";
 
@@ -190,38 +190,6 @@ export default function CanvasFlow() {
     [menuState, nodes, setNodes, setEdges, getNextNodeId],
   );
 
-  const handleAddCarouselCard = useCallback(() => {
-    if (!selectedNode) return;
-    const carouselNodeData = selectedNode;
-    console.log(carouselNodeData, "CarouselNodeData");
-
-    if (!carouselNodeData || carouselNodeData.data.type !== "carousel") return;
-    console.log(selectedNode, "Selected Node2111");
-
-    const carouselNode = selectedNode;
-    if (!carouselNode) return;
-
-    const payload = buildAddCarouselCardPayload({
-      selectedNodeId: selectedNode.id,
-      carouselNodeData,
-      carouselNode,
-      getNextNodeId,
-    });
-
-    function handleEdgeCreate(params) {
-      // 1. edge add
-      setEdges((eds) => addEdge(params, eds));
-
-      console.log(params, "params");
-    }
-    payload.edgesToAdd.forEach((edge) => {
-      handleEdgeCreate(edge);
-    });
-
-    //setNodes((currentNodes) => [...currentNodes, ...payload.nodesToAdd]);
-    setEdges((currentEdges) => [...currentEdges, ...payload.edgesToAdd]);
-  }, [nodes, setNodes, setEdges, getNextNodeId]);
-
   return (
     <div className="canvas-layout">
       <div className="flow-canvas">
@@ -252,56 +220,11 @@ export default function CanvasFlow() {
         />
 
         <NodeSidebar
-          selectedNodeData={selectedNodeData}
-          onChangeTitle={(title) => {
-            const updater = (node) => {
-              return {
-                ...node,
-                data: {
-                  ...node.data,
-                  title: title,
-                },
-              };
-            };
-            updateSingleNode(selectedNode.id, updater);
-            setSelectedNode((prev) => ({
-              ...prev,
-              data: {
-                ...prev.data,
-                title: title,
-              },
-            }));
-          }}
-          onChangeDescription={(description) => {
-            const updater = (node) => {
-              return {
-                ...node,
-                data: {
-                  ...node.data,
-                  description: description,
-                },
-              };
-            };
-            updateSingleNode(selectedNode.id, updater);
-            setSelectedNode((prev) => ({
-              ...prev,
-              data: {
-                ...prev.data,
-                description: description,
-              },
-            }));
-          }}
-          onAddCarouselCard={handleAddCarouselCard}
-          onUpdateFormFields={(fields) => {
-            updateSingleNode(selectedNode.id, (node) => ({
-              ...node,
-              data: { ...node.data, fields },
-            }));
-            setSelectedNode((prev) => ({
-              ...prev,
-              data: { ...prev.data, fields },
-            }));
-          }}
+          selectedNode={selectedNodeData}
+          setSelectedNode={setSelectedNode}
+          setNodes={setNodes}
+          setEdges={setEdges}
+          getNextNodeId={getNextNodeId}
           onClose={() => setSelectedNode(null)}
         />
       </div>

@@ -1,46 +1,35 @@
 import React from "react";
-import PropTypes, { object } from "prop-types";
+import PropTypes from "prop-types";
 import "./NodeSidebar.css";
+import useNodeUpdater from "../../hooks/useNodeUpdater";
+import TitleDescriptionFields from "./TitleDescriptionFields";
+import CarouselConfig from "./CarouselConfig";
+import FormConfig from "./FormConfig";
+
+// To add a new node type: create a new XxxConfig component and add it here.
+const NODE_CONFIG_MAP = {
+  carousel: CarouselConfig,
+  form: FormConfig,
+};
 
 export default function NodeSidebar({
-  selectedNodeData,
-  onChangeTitle,
-  onChangeDescription,
-  onAddCarouselCard,
-  onUpdateFormFields,
+  selectedNode,
+  setSelectedNode,
+  setNodes,
+  setEdges,
+  getNextNodeId,
   onClose,
 }) {
-  if (!selectedNodeData) return null;
+  const { updateNode } = useNodeUpdater({
+    nodeId: selectedNode?.id,
+    setNodes,
+    setSelectedNode,
+  });
 
-  const nodeType = selectedNodeData.data.type;
-  const fields = selectedNodeData.data.fields ?? [];
+  if (!selectedNode) return null;
 
-  const handleFieldLabelChange = (fieldId, newLabel) => {
-    const updated = fields.map((f) =>
-      f.id === fieldId ? { ...f, label: newLabel } : f
-    );
-    onUpdateFormFields(updated);
-  };
-
-  const handleFieldTypeChange = (fieldId, newType) => {
-    const updated = fields.map((f) =>
-      f.id === fieldId ? { ...f, type: newType } : f
-    );
-    onUpdateFormFields(updated);
-  };
-
-  const handleAddField = () => {
-    const newField = {
-      id: `field_${Date.now()}`,
-      label: "New Field",
-      type: "text",
-    };
-    onUpdateFormFields([...fields, newField]);
-  };
-
-  const handleRemoveField = (fieldId) => {
-    onUpdateFormFields(fields.filter((f) => f.id !== fieldId));
-  };
+  const nodeData = selectedNode.data;
+  const ExtraConfig = NODE_CONFIG_MAP[nodeData.type] ?? null;
 
   return (
     <aside className="node-sidebar">
@@ -56,90 +45,30 @@ export default function NodeSidebar({
         </button>
       </div>
 
-      <label className="node-sidebar__label">
-        Title
-        <input
-          className="node-sidebar__input"
-          value={selectedNodeData.data.title ?? ""}
-          onChange={(event) => onChangeTitle(event.target.value)}
+      <TitleDescriptionFields nodeData={nodeData} updateNode={updateNode} />
+
+      {ExtraConfig && (
+        <ExtraConfig
+          nodeData={nodeData}
+          updateNode={updateNode}
+          selectedNode={selectedNode}
+          setEdges={setEdges}
+          getNextNodeId={getNextNodeId}
         />
-      </label>
-
-      <label className="node-sidebar__label">
-        Description
-        <textarea
-          className="node-sidebar__textarea"
-          value={selectedNodeData.data.description ?? ""}
-          onChange={(event) => onChangeDescription(event.target.value)}
-        />
-      </label>
-
-      {nodeType === "carousel" && (
-        <button
-          type="button"
-          className="node-sidebar__add-card-button"
-          onClick={onAddCarouselCard}
-        >
-          + Add Card
-        </button>
-      )}
-
-      {nodeType === "form" && (
-        <div className="node-sidebar__form-fields">
-          <p className="node-sidebar__section-title">Form Fields</p>
-
-          {fields.map((field) => (
-            <div key={field.id} className="node-sidebar__field-row">
-              <input
-                className="node-sidebar__input node-sidebar__field-label"
-                value={field.label}
-                onChange={(e) => handleFieldLabelChange(field.id, e.target.value)}
-                placeholder="Field label"
-              />
-              <select
-                className="node-sidebar__field-type"
-                value={field.type}
-                onChange={(e) => handleFieldTypeChange(field.id, e.target.value)}
-              >
-                <option value="text">Text</option>
-                <option value="email">Email</option>
-                <option value="tel">Phone</option>
-                <option value="number">Number</option>
-                <option value="date">Date</option>
-              </select>
-              <button
-                type="button"
-                className="node-sidebar__field-remove"
-                onClick={() => handleRemoveField(field.id)}
-                aria-label="Remove field"
-              >
-                ×
-              </button>
-            </div>
-          ))}
-
-          <button
-            type="button"
-            className="node-sidebar__add-field-button"
-            onClick={handleAddField}
-          >
-            + Add Field
-          </button>
-        </div>
       )}
     </aside>
   );
 }
 
 NodeSidebar.propTypes = {
-  selectedNodeData: object,
-  onChangeTitle: PropTypes.func.isRequired,
-  onChangeDescription: PropTypes.func.isRequired,
-  onAddCarouselCard: PropTypes.func.isRequired,
-  onUpdateFormFields: PropTypes.func.isRequired,
+  selectedNode: PropTypes.object,
+  setSelectedNode: PropTypes.func.isRequired,
+  setNodes: PropTypes.func.isRequired,
+  setEdges: PropTypes.func.isRequired,
+  getNextNodeId: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
 };
 
 NodeSidebar.defaultProps = {
-  selectedNodeData: null,
+  selectedNode: null,
 };
