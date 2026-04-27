@@ -52,7 +52,7 @@
 }
 
 .custom-node--start .custom-node__handle--source {
-  bottom: -8px;
+  bottom: 0;
 }
 
 .custom-node--carouselCard .custom-node__header,
@@ -106,6 +106,11 @@
   font-size: 31px;
   font-weight: 500;
   line-height: 1.2;
+  word-break: break-all;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .custom-node__description {
@@ -114,41 +119,67 @@
   color: #667085;
   font-size: 14px;
   border-top: 1px solid #d8dde2;
+  word-break: break-all;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .custom-node__handle {
   width: 12px;
   height: 12px;
-  border: 1px solid #b8bfc5;
-  background: #eef0f2;
+  border: 2px solid #1fb26a;
+  background: #fff;
 }
 
 .custom-node__handle--target {
-  top: -7px;
+  top: -6px;
 }
 
 .custom-node__handle--source {
-  bottom: -7px;
-}
-
-.custom-node__add-button {
-  position: absolute;
-  left: 50%;
-  bottom: -18px;
-  transform: translateX(-50%);
+  bottom: 0;
   width: 28px;
   height: 28px;
-  border: 1px solid #d0d5dd;
   border-radius: 50%;
+  border: 1.5px solid #d0d5dd;
   background: #fff;
-  color: #667085;
-  font-size: 20px;
-  line-height: 1;
-  cursor: pointer;
   box-shadow: 0 3px 8px rgba(15, 23, 42, 0.12);
+  cursor: crosshair;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.custom-node__add-button:hover {
-  color: #344054;
-  border-color: #98a2b3;
+.custom-node__handle--source::after {
+  content: "+";
+  font-size: 20px;
+  line-height: 1;
+  color: #667085;
+  pointer-events: none;
+}
+
+.custom-node__handle--source:hover {
+  border-color: #1fb26a;
+  background: #f0fdf7;
+}
+
+.custom-node__handle--source:hover::after {
+  color: #1fb26a;
+}
+
+/* Hide + visuals when connected but keep in DOM for edge positioning */
+.custom-node__handle--source-hidden {
+  width: 8px !important;
+  height: 8px !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  bottom: 0 !important;
+  cursor: default !important;
+  pointer-events: none;
+}
+
+.custom-node__handle--source-hidden::after {
+  display: none !important;
 }

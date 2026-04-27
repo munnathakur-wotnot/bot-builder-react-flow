@@ -1,102 +1,93 @@
-import React from "react";
+import React, { memo, useCallback } from "react";
 import PropTypes from "prop-types";
 import { Handle, Position } from "@xyflow/react";
 import "./CustomNode.css";
+import { useFlowCallbacks } from "../Canvas/FlowCallbacksContext.jsx";
 
-export default function CustomNode({ id, data }) {
-  const nodeData = data.nodeDataMap[id];
-
-  if (!nodeData) return null;
+function CustomNode({ id, data }) {
+  const nodeData = data;
+  const { openMenu } = useFlowCallbacks();
 
   const isStartNode = nodeData.type === "start";
   const typeClassName = `custom-node--${nodeData.type ?? "default"}`;
   const showDescription = Boolean(nodeData.description);
 
+  const onOpenMenu = useCallback(
+    (event) => {
+      event.stopPropagation();
+      openMenu({
+        nodeId: id,
+        x: event.clientX,
+        y: event.clientY + 10,
+      });
+    },
+    [id, openMenu],
+  );
+  if (!nodeData) return null;
+
   return (
     <div
       className={`custom-node ${typeClassName}`}
-      onClick={
-        isStartNode
-          ? (event) => {
-              event.stopPropagation();
-              data.onOpenMenu({
-                nodeId: id,
-                x: event.clientX,
-                y: event.clientY + 10,
-              });
-            }
-          : undefined
-      }
+      onClick={isStartNode ? onOpenMenu : undefined}
       role={isStartNode ? "button" : undefined}
       tabIndex={isStartNode ? 0 : undefined}
       onKeyDown={
         isStartNode
           ? (event) => {
-              if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                data.onOpenMenu({
-                  nodeId: id,
-                  x: event.currentTarget.getBoundingClientRect().left + 80,
-                  y: event.currentTarget.getBoundingClientRect().bottom + 10,
-                });
-              }
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              openMenu({
+                nodeId: id,
+                x: event.currentTarget.getBoundingClientRect().left + 80,
+                y: event.currentTarget.getBoundingClientRect().bottom + 10,
+              });
             }
+          }
           : undefined
       }
     >
-      {!isStartNode ? (
+      {/* Target handle — always visible on non-start nodes */}
+      {!isStartNode && (
         <Handle
           type="target"
           position={Position.Top}
           className="custom-node__handle custom-node__handle--target"
         />
-      ) : null}
+      )}
 
       <div className="custom-node__header">
         <div className="custom-node__icon" />
         <p className="custom-node__title">{nodeData.title}</p>
       </div>
 
-      {showDescription ? (
+      {showDescription && (
         <p className="custom-node__description">{nodeData.description}</p>
-      ) : null}
+      )}
 
+      {/* Source handle — always in DOM so React Flow positions edges correctly.
+          Visually shown as + only when not yet connected. */}
       <Handle
         type="source"
         position={Position.Bottom}
-        className="custom-node__handle custom-node__handle--source"
+        className={`custom-node__handle custom-node__handle--source${nodeData.outPorts?.length > 0
+            ? " custom-node__handle--source-hidden"
+            : ""
+          }`}
+        isConnectable={!(nodeData.outPorts?.length > 0)}
+        onClick={
+          !isStartNode && !(nodeData.outPorts?.length > 0)
+            ? onOpenMenu
+            : undefined
+        }
       />
-
-      {!isStartNode ? (
-        <button
-          type="button"
-          className="custom-node__add-button"
-          onClick={(event) => {
-            event.stopPropagation();
-            data.onOpenMenu({
-              nodeId: id,
-              x: event.clientX,
-              y: event.clientY + 10,
-            });
-          }}
-        >
-          +
-        </button>
-      ) : null}
     </div>
   );
 }
 
+const MemoCustomNode = memo(CustomNode);
 CustomNode.propTypes = {
-  id: PropTypes.string.isRequired,
-  data: PropTypes.shape({
-    nodeDataMap: PropTypes.objectOf(
-      PropTypes.shape({
-        type: PropTypes.string,
-        title: PropTypes.string,
-        description: PropTypes.string,
-      }),
-    ).isRequired,
-    onOpenMenu: PropTypes.func.isRequired,
-  }).isRequired,
+  id: PropTypes.string,
+  data: PropTypes.object,
 };
+
+export default MemoCustomNode;

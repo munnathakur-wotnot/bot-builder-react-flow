@@ -1,15 +1,35 @@
 import React from "react";
 import PropTypes from "prop-types";
 import "./NodeSidebar.css";
+import useNodeUpdater from "../../hooks/useNodeUpdater";
+import TitleDescriptionFields from "./TitleDescriptionFields";
+import CarouselConfig from "./CarouselConfig";
+import FormConfig from "./FormConfig";
+
+// To add a new node type: create a new XxxConfig component and add it here.
+const NODE_CONFIG_MAP = {
+  carousel: CarouselConfig,
+  form: FormConfig,
+};
 
 export default function NodeSidebar({
-  selectedNodeData,
-  onChangeTitle,
-  onChangeDescription,
-  onAddCarouselCard,
+  selectedNodeId,
+  nodes,
+  setNodes,
+  setEdges,
+  getNextNodeId,
   onClose,
 }) {
-  if (!selectedNodeData) return null;
+  const selectedNode = nodes.find((n) => n.id === selectedNodeId) ?? null;
+  const { updateNode } = useNodeUpdater({
+    nodeId: selectedNode?.id,
+    setNodes,
+  });
+
+  if (!selectedNode) return null;
+
+  const nodeData = selectedNode.data;
+  const ExtraConfig = NODE_CONFIG_MAP[nodeData.type] ?? null;
 
   return (
     <aside className="node-sidebar">
@@ -25,49 +45,31 @@ export default function NodeSidebar({
         </button>
       </div>
 
-      <label className="node-sidebar__label">
-        Title
-        <input
-          className="node-sidebar__input"
-          value={selectedNodeData.title ?? ""}
-          onChange={(event) => onChangeTitle(event.target.value)}
-        />
-      </label>
+      <TitleDescriptionFields nodeData={nodeData} updateNode={updateNode} />
 
-      <label className="node-sidebar__label">
-        Description
-        <textarea
-          className="node-sidebar__textarea"
-          value={selectedNodeData.description ?? ""}
-          onChange={(event) => onChangeDescription(event.target.value)}
+      {ExtraConfig && (
+        <ExtraConfig
+          nodeData={nodeData}
+          updateNode={updateNode}
+          selectedNode={selectedNode}
+          setNodes={setNodes}
+          setEdges={setEdges}
+          getNextNodeId={getNextNodeId}
         />
-      </label>
-
-      {selectedNodeData.type === "carousel" ? (
-        <button
-          type="button"
-          className="node-sidebar__add-card-button"
-          onClick={onAddCarouselCard}
-        >
-          + Add Card
-        </button>
-      ) : null}
+      )}
     </aside>
   );
 }
 
 NodeSidebar.propTypes = {
-  selectedNodeData: PropTypes.shape({
-    type: PropTypes.string,
-    title: PropTypes.string,
-    description: PropTypes.string,
-  }),
-  onChangeTitle: PropTypes.func.isRequired,
-  onChangeDescription: PropTypes.func.isRequired,
-  onAddCarouselCard: PropTypes.func.isRequired,
+  selectedNodeId: PropTypes.string,
+  nodes: PropTypes.array.isRequired,
+  setNodes: PropTypes.func.isRequired,
+  setEdges: PropTypes.func.isRequired,
+  getNextNodeId: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
 };
 
 NodeSidebar.defaultProps = {
-  selectedNodeData: null,
+  selectedNodeId: null,
 };
