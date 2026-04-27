@@ -5,14 +5,13 @@ import "./CustomNode.css";
 import { useFlowCallbacks } from "../Canvas/FlowCallbacksContext.jsx";
 
 function CustomNode({ id, data }) {
-  const nodeData = data;
   const { openMenu } = useFlowCallbacks();
+  const isStartNode = data.type === "start";
+  const hasOutgoing = data.outPorts?.length > 0;
+  const showDescription = Boolean(data.description);
 
-  const isStartNode = nodeData.type === "start";
-  const typeClassName = `custom-node--${nodeData.type ?? "default"}`;
-  const showDescription = Boolean(nodeData.description);
-
-  const onOpenMenu = useCallback(
+  //  Stable click handler
+  const handleOpenMenu = useCallback(
     (event) => {
       event.stopPropagation();
       openMenu({
@@ -23,30 +22,36 @@ function CustomNode({ id, data }) {
     },
     [id, openMenu],
   );
-  if (!nodeData) return null;
+
+  // Stable keyboard handler (no inline function)
+  const handleKeyDown = useCallback(
+    (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        const rect = event.currentTarget.getBoundingClientRect();
+
+        openMenu({
+          nodeId: id,
+          x: rect.left + 80,
+          y: rect.bottom + 10,
+        });
+      }
+    },
+    [id, openMenu],
+  );
+  if (!data) return null;
+
+  const typeClassName = `custom-node custom-node--${data.type ?? "default"}`;
 
   return (
     <div
-      className={`custom-node ${typeClassName}`}
-      onClick={isStartNode ? onOpenMenu : undefined}
+      className={typeClassName}
+      onClick={isStartNode ? handleOpenMenu : undefined}
+      onKeyDown={isStartNode ? handleKeyDown : undefined}
       role={isStartNode ? "button" : undefined}
       tabIndex={isStartNode ? 0 : undefined}
-      onKeyDown={
-        isStartNode
-          ? (event) => {
-            if (event.key === "Enter" || event.key === " ") {
-              event.preventDefault();
-              openMenu({
-                nodeId: id,
-                x: event.currentTarget.getBoundingClientRect().left + 80,
-                y: event.currentTarget.getBoundingClientRect().bottom + 10,
-              });
-            }
-          }
-          : undefined
-      }
     >
-      {/* Target handle — always visible on non-start nodes */}
+      {/* Target Handle */}
       {!isStartNode && (
         <Handle
           type="target"
@@ -55,39 +60,50 @@ function CustomNode({ id, data }) {
         />
       )}
 
+      {/* Header */}
       <div className="custom-node__header">
         <div className="custom-node__icon" />
-        <p className="custom-node__title">{nodeData.title}</p>
+        <p className="custom-node__title">{data.title}</p>
       </div>
 
+      {/* Description */}
       {showDescription && (
-        <p className="custom-node__description">{nodeData.description}</p>
+        <p className="custom-node__description">{data.description}</p>
       )}
 
-      {/* Source handle — always in DOM so React Flow positions edges correctly.
-          Visually shown as + only when not yet connected. */}
+      {/* Source Handle */}
       <Handle
         type="source"
         position={Position.Bottom}
-        className={`custom-node__handle custom-node__handle--source${nodeData.outPorts?.length > 0
-            ? " custom-node__handle--source-hidden"
-            : ""
+        className={`custom-node__handle custom-node__handle--source ${hasOutgoing ? "custom-node__handle--source-hidden" : ""
           }`}
-        isConnectable={!(nodeData.outPorts?.length > 0)}
-        onClick={
-          !isStartNode && !(nodeData.outPorts?.length > 0)
-            ? onOpenMenu
-            : undefined
-        }
+        isConnectable={!hasOutgoing}
+        onClick={!isStartNode && !hasOutgoing ? handleOpenMenu : undefined}
       />
     </div>
   );
 }
 
-const MemoCustomNode = memo(CustomNode);
 CustomNode.propTypes = {
-  id: PropTypes.string,
-  data: PropTypes.object,
+  id: PropTypes.string.isRequired,
+  data: PropTypes.object.isRequired,
 };
 
-export default MemoCustomNode;
+export default memo(CustomNode, (prev, next) => {
+  //  Custom comparison (VERY IMPORTANT)
+
+  // same id
+  if (prev.id !== next.id) return false;
+
+  // shallow compare important fields only
+  const prevData = prev.data;
+  const nextData = next.data;
+
+  return (
+    prevData.title === nextData.title &&
+    prevData.description === nextData.description &&
+    prevData.type === nextData.type &&
+    prevData.outPorts === nextData.outPorts && // reference check (fast)
+    prevData.inPorts === nextData.inPorts
+  );
+});

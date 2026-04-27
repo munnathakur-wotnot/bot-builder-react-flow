@@ -96,10 +96,7 @@ export default function CanvasFlow() {
       setNodes((nds) =>
         nds.map((node) => {
           if (node.id === params.source) {
-            const newOutPorts = [
-              ...(node.data.outPorts || []),
-              params.target,
-            ];
+            const newOutPorts = [...(node.data.outPorts || []), params.target];
             return {
               ...node,
               data: {
@@ -110,10 +107,7 @@ export default function CanvasFlow() {
             };
           }
           if (node.id === params.target) {
-            const newInPorts = [
-              ...(node.data.inPorts || []),
-              params.source,
-            ];
+            const newInPorts = [...(node.data.inPorts || []), params.source];
             return {
               ...node,
               data: {
@@ -138,6 +132,15 @@ export default function CanvasFlow() {
     requestAnimationFrame(() => fitView({ padding: 0.2, duration: 300 }));
   }, [edges, fitView, setNodes]);
 
+  const handleNodeClick = useCallback((_, node) => {
+    setSelectedNodeId(node.id);
+  }, []);
+
+  const handlePaneClick = useCallback(() => {
+    setMenuState(null);
+    setSelectedNodeId(null);
+  }, []);
+
   return (
     <div className="canvas-layout">
       <div className="flow-canvas">
@@ -159,12 +162,10 @@ export default function CanvasFlow() {
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
-            onNodeClick={(_, node) => setSelectedNodeId(node.id)}
-            onPaneClick={() => {
-              setMenuState(null);
-              setSelectedNodeId(null);
-            }}
+            onNodeClick={handleNodeClick}
+            onPaneClick={handlePaneClick}
             fitView
+            minZoom={0.1}
           >
             <Background gap={20} size={1} />
             <MiniMap />
