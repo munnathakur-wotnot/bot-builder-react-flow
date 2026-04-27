@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React from "react";
 
-export default function FormConfig({ nodeData, updateNode }) {
+export default function FormFields({ nodeData, updateNode }) {
   const fields = nodeData.fields ?? [];
   const updateFields = (updated) => updateNode({ fields: updated });
 
@@ -52,24 +52,11 @@ export default function FormConfig({ nodeData, updateNode }) {
           </button>
         </div>
       ))}
-
-      <button
-        type="button"
-        className="node-sidebar__add-field-button"
-        onClick={() =>
-          updateFields([
-            ...fields,
-            { id: `field_${Date.now()}`, label: "New Field", type: "text" },
-          ])
-        }
-      >
-        + Add Field
-      </button>
     </div>
   );
 }
 
-FormConfig.propTypes = {
+FormFields.propTypes = {
   nodeData: PropTypes.object,
   updateNode: PropTypes.func,
 };

@@ -90,7 +90,7 @@ CustomNode.propTypes = {
 };
 
 export default memo(CustomNode, (prev, next) => {
-  //  Custom comparison (VERY IMPORTANT)
+  //  Custom comparison
 
   // same id
   if (prev.id !== next.id) return false;
@@ -107,3 +107,4 @@ export default memo(CustomNode, (prev, next) => {
     prevData.inPorts === nextData.inPorts
   );
 });
+CustomNode.displayName = "CustomNode";
