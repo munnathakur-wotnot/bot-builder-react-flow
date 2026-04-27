@@ -5,6 +5,7 @@ import {
   MiniMap,
   ReactFlow,
   addEdge,
+  useReactFlow,
   useEdgesState,
   useNodesState,
 } from "@xyflow/react";
@@ -16,6 +17,8 @@ import ContextMenu from "../Menu/ContextMenu";
 import NodeSidebar from "../Sidebar/NodeSidebar";
 import { INITIAL_EDGES, INITIAL_NODES } from "./constants";
 import CustomEdge from "../Edges/CustumEdges";
+import { FlowCallbacksProvider } from "./FlowCallbacksContext.jsx";
+import { layoutNodesDagre } from "./layout";
 
 const nodeTypes = { custom: CustomNode };
 const edgeTypes = {
@@ -25,20 +28,16 @@ const edgeTypes = {
 export default function CanvasFlow() {
   const [nodes, setNodes, onNodesChange] = useNodesState(INITIAL_NODES);
   const [edges, setEdges, onEdgesChange] = useEdgesState(INITIAL_EDGES);
-  const [selectedNode, setSelectedNode] = useState(null);
+  const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [menuState, setMenuState] = useState(null);
   const nextIdRef = useRef(2);
+  const { fitView } = useReactFlow();
 
-  const nodesWithMappedData = useMemo(
-    () =>
-      nodes.map((node) => ({
-        ...node,
-        data: {
-          ...node.data,
-          onOpenMenu: setMenuState,
-        },
-      })),
-    [nodes],
+  const openMenu = useCallback(
+    ({ nodeId, x, y }) => {
+      setMenuState({ nodeId, x, y });
+    },
+    [setMenuState],
   );
 
   const handleDeleteEdge = useCallback(
@@ -79,16 +78,12 @@ export default function CanvasFlow() {
     [setEdges, setNodes],
   );
 
-  const edgesWithMappedData = useMemo(
-    () =>
-      edges.map((edge) => ({
-        ...edge,
-        data: {
-          ...edge.data,
-          onDeleteEdge: handleDeleteEdge,
-        },
-      })),
-    [edges, handleDeleteEdge],
+  const flowCallbacks = useMemo(
+    () => ({
+      openMenu,
+      deleteEdge: handleDeleteEdge,
+    }),
+    [openMenu, handleDeleteEdge],
   );
 
   const onConnect = useCallback(
@@ -137,30 +132,45 @@ export default function CanvasFlow() {
 
   const getNextNodeId = useCallback(() => `node_${nextIdRef.current++}`, []);
 
-  const selectedNodeData = selectedNode ?? null;
+  const onAutoLayout = useCallback(() => {
+    setNodes((currNodes) => layoutNodesDagre(currNodes, edges));
+    // Let React apply positions first, then fit.
+    requestAnimationFrame(() => fitView({ padding: 0.2, duration: 300 }));
+  }, [edges, fitView, setNodes]);
 
   return (
     <div className="canvas-layout">
       <div className="flow-canvas">
-        <ReactFlow
-          nodes={nodesWithMappedData}
-          edges={edgesWithMappedData}
-          nodeTypes={nodeTypes}
-          edgeTypes={edgeTypes}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          onNodeClick={(_, node) => setSelectedNode(node)}
-          onPaneClick={() => {
-            setMenuState(null);
-            setSelectedNode(null);
-          }}
-          fitView
-        >
-          <Background gap={20} size={1} />
-          <MiniMap />
-          <Controls />
-        </ReactFlow>
+        <div className="layout-toolbar">
+          <button
+            type="button"
+            className="layout-toolbar__btn"
+            onClick={onAutoLayout}
+          >
+            Auto layout
+          </button>
+        </div>
+        <FlowCallbacksProvider value={flowCallbacks}>
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            onNodeClick={(_, node) => setSelectedNodeId(node.id)}
+            onPaneClick={() => {
+              setMenuState(null);
+              setSelectedNodeId(null);
+            }}
+            fitView
+          >
+            <Background gap={20} size={1} />
+            <MiniMap />
+            <Controls />
+          </ReactFlow>
+        </FlowCallbacksProvider>
 
         <ContextMenu
           menuState={menuState}
@@ -168,17 +178,17 @@ export default function CanvasFlow() {
           nodes={nodes}
           setNodes={setNodes}
           setEdges={setEdges}
-          setSelectedNode={setSelectedNode}
+          setSelectedNodeId={setSelectedNodeId}
           getNextNodeId={getNextNodeId}
         />
 
         <NodeSidebar
-          selectedNode={selectedNodeData}
-          setSelectedNode={setSelectedNode}
+          selectedNodeId={selectedNodeId}
+          nodes={nodes}
           setNodes={setNodes}
           setEdges={setEdges}
           getNextNodeId={getNextNodeId}
-          onClose={() => setSelectedNode(null)}
+          onClose={() => setSelectedNodeId(null)}
         />
       </div>
     </div>

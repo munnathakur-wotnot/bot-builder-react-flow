@@ -17,7 +17,7 @@ export default function ContextMenu({
   nodes,
   setNodes,
   setEdges,
-  setSelectedNode,
+  setSelectedNodeId,
   getNextNodeId,
 }) {
   const { updateSingleNode } = useUpdateNode(setNodes);
@@ -57,12 +57,19 @@ export default function ContextMenu({
 
       setNodes((curr) => [...curr, ...payload.nodesToAdd]);
       setEdges((curr) => [...curr, ...payload.edgesToAdd]);
-      setSelectedNode(
-        payload.nodesToAdd.find((item) => item.id === payload.selectedNodeId),
-      );
+      setSelectedNodeId(payload.selectedNodeId);
       setMenuState(null);
     },
-    [menuState, nodes, setNodes, setEdges, setSelectedNode, getNextNodeId, updateSingleNode, setMenuState],
+    [
+      menuState,
+      nodes,
+      setNodes,
+      setEdges,
+      setSelectedNodeId,
+      getNextNodeId,
+      updateSingleNode,
+      setMenuState,
+    ],
   );
 
   if (!menuState) return null;
@@ -90,7 +97,11 @@ export default function ContextMenu({
         ))}
       </div>
 
-      <button className="context-menu__close" type="button" onClick={() => setMenuState(null)}>
+      <button
+        className="context-menu__close"
+        type="button"
+        onClick={() => setMenuState(null)}
+      >
         Close
       </button>
     </div>
@@ -107,7 +118,7 @@ ContextMenu.propTypes = {
   nodes: PropTypes.array.isRequired,
   setNodes: PropTypes.func.isRequired,
   setEdges: PropTypes.func.isRequired,
-  setSelectedNode: PropTypes.func.isRequired,
+  setSelectedNodeId: PropTypes.func.isRequired,
   getNextNodeId: PropTypes.func.isRequired,
 };
 

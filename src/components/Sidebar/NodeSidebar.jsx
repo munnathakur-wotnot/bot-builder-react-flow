@@ -13,17 +13,17 @@ const NODE_CONFIG_MAP = {
 };
 
 export default function NodeSidebar({
-  selectedNode,
-  setSelectedNode,
+  selectedNodeId,
+  nodes,
   setNodes,
   setEdges,
   getNextNodeId,
   onClose,
 }) {
+  const selectedNode = nodes.find((n) => n.id === selectedNodeId) ?? null;
   const { updateNode } = useNodeUpdater({
     nodeId: selectedNode?.id,
     setNodes,
-    setSelectedNode,
   });
 
   if (!selectedNode) return null;
@@ -52,6 +52,7 @@ export default function NodeSidebar({
           nodeData={nodeData}
           updateNode={updateNode}
           selectedNode={selectedNode}
+          setNodes={setNodes}
           setEdges={setEdges}
           getNextNodeId={getNextNodeId}
         />
@@ -61,8 +62,8 @@ export default function NodeSidebar({
 }
 
 NodeSidebar.propTypes = {
-  selectedNode: PropTypes.object,
-  setSelectedNode: PropTypes.func.isRequired,
+  selectedNodeId: PropTypes.string,
+  nodes: PropTypes.array.isRequired,
   setNodes: PropTypes.func.isRequired,
   setEdges: PropTypes.func.isRequired,
   getNextNodeId: PropTypes.func.isRequired,
@@ -70,5 +71,5 @@ NodeSidebar.propTypes = {
 };
 
 NodeSidebar.defaultProps = {
-  selectedNode: null,
+  selectedNodeId: null,
 };

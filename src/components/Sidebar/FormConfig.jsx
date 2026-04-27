@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react";
 
 export default function FormConfig({ nodeData, updateNode }) {
@@ -42,7 +43,9 @@ export default function FormConfig({ nodeData, updateNode }) {
           <button
             type="button"
             className="node-sidebar__field-remove"
-            onClick={() => updateFields(fields.filter((f) => f.id !== field.id))}
+            onClick={() =>
+              updateFields(fields.filter((f) => f.id !== field.id))
+            }
             aria-label="Remove field"
           >
             ×
@@ -65,3 +68,8 @@ export default function FormConfig({ nodeData, updateNode }) {
     </div>
   );
 }
+
+FormConfig.propTypes = {
+  nodeData: PropTypes.object,
+  updateNode: PropTypes.func,
+};

@@ -80,17 +80,21 @@ export function buildCarouselPayload({
   const cardY = carouselY + 120;
   const buttonY = cardY + 100;
 
+  const carouselNode = createFlowNode({
+    id: carouselId,
+    x: carouselX,
+    y: carouselY,
+    inPorts: [sourceNodeId],
+    title: "Carousel",
+    description: "Carousel Node",
+    metaType: "carousel",
+  });
+  // Keep track of cards on the carousel so "Add Card" can position new cards correctly.
+  carouselNode.data.cards = [cardOneId, cardTwoId];
+
   return {
     nodesToAdd: [
-      createFlowNode({
-        id: carouselId,
-        x: carouselX,
-        y: carouselY,
-        inPorts: [sourceNodeId],
-        title: "Carousel",
-        description: "Carousel Node",
-        metaType: "carousel",
-      }),
+      carouselNode,
       createFlowNode({
         id: cardOneId,
         x: carouselX - 120,
@@ -213,23 +217,42 @@ export function buildMenuActionMap({ context, templates, getNextNodeId }) {
 
 export function buildAddCarouselCardPayload({
   selectedNodeId,
-  carouselNodeData,
   carouselNode,
   getNextNodeId,
 }) {
-  console.log(carouselNodeData, "SSSS");
-
-  const nextCardIndex = (carouselNodeData.cards?.length ?? 0) + 1;
+  const existingCards = carouselNode?.data?.cards ?? [];
+  const nextCardIndex = existingCards.length + 1;
   const cardId = getNextNodeId();
   const buttonId = getNextNodeId();
-  const cardX = carouselNode.position.x + (nextCardIndex - 2) * 170;
+
+  // Layout: keep cards spread horizontally under the carousel.
+  // Initial template uses -120 / +120 around carouselX; for additional cards,
+  // extend to the right using a wider spacing so cards never overlap.
+  const spacingX = 240;
+  const cardX =
+    carouselNode.position.x + (existingCards.length - 0.5) * spacingX;
   const cardY = carouselNode.position.y + 120;
   const buttonY = cardY + 100;
 
   return {
     nodesToAdd: [
-      createFlowNode(cardId, cardX, cardY),
-      createFlowNode(buttonId, cardX, buttonY),
+      createFlowNode({
+        id: cardId,
+        x: cardX,
+        y: cardY,
+        inPorts: [selectedNodeId],
+        metaType: "carouselCard",
+        title: `Card ${nextCardIndex}`,
+        description: "Carousel Node",
+      }),
+      createFlowNode({
+        id: buttonId,
+        x: cardX,
+        y: buttonY,
+        inPorts: [cardId],
+        metaType: "carouselButton",
+        title: "Button",
+      }),
     ],
     edgesToAdd: [
       createEdge(selectedNodeId, cardId),
@@ -237,18 +260,10 @@ export function buildAddCarouselCardPayload({
     ],
     dataPatch: {
       [selectedNodeId]: {
-        cards: [...(carouselNodeData.cards ?? []), cardId],
+        cards: [...existingCards, cardId],
       },
-      [cardId]: {
-        type: "carouselCard",
-        title: `Card ${nextCardIndex}`,
-        description: "",
-      },
-      [buttonId]: {
-        type: "carouselButton",
-        title: "Button 1",
-        description: "",
-      },
+      [cardId]: {},
+      [buttonId]: {},
     },
   };
 }
