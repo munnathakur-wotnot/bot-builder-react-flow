@@ -9,7 +9,6 @@ function CustomNode({ id, data }) {
   const isStartNode = data.type === "start";
   const hasOutgoing = data.outPorts?.length > 0;
   const showDescription = Boolean(data.description);
-  console.log(data, "data-current");
 
   //  Stable click handler
   const handleOpenMenu = useCallback(

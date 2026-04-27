@@ -34,12 +34,6 @@ export function layoutNodesDagre(nodes, edges, options = {}) {
     if (!e?.source || !e?.target) continue;
     g.setEdge(e.source, e.target);
   }
-  console.log(
-    g.nodes().map((id) => ({
-      id,
-      ...g.node(id),
-    })),
-  );
 
   dagre.layout(g);
 
