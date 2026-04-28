@@ -32,11 +32,14 @@ export function createFlowNode({
   };
 }
 
-export function createEdge(source, target) {
+export function createEdge(source, target, isNotDeletable = false) {
   return {
     id: `edge_${source}_${target}`,
     source,
     target,
+    data: {
+      isNotDeletable,
+    },
     type: "custom",
   };
 }
@@ -103,9 +106,11 @@ export function buildCarouselPayload({
   });
 
   carouselNode.data.cards = cardIds;
+  carouselNode.data.outPorts = cardIds;
+  carouselNode.data.connected = cardIds.length > 0;
 
   const nodes = [carouselNode];
-  const edges = [createEdge(sourceNodeId, carouselId)];
+  const edges = [createEdge(sourceNodeId, carouselId, true)];
 
   cardIds.forEach((cardId, index) => {
     const x = startX + index * (NODE_WIDTH + HORIZONTAL_GAP);
@@ -120,6 +125,8 @@ export function buildCarouselPayload({
         y: cardY,
         inPorts: [carouselId],
         metaType: "carouselCard",
+        connected: true,
+        outPorts: [buttonId],
         title: `Card ${index + 1}`,
       }),
     );
@@ -136,8 +143,8 @@ export function buildCarouselPayload({
       }),
     );
 
-    edges.push(createEdge(carouselId, cardId));
-    edges.push(createEdge(cardId, buttonId));
+    edges.push(createEdge(carouselId, cardId, true));
+    edges.push(createEdge(cardId, buttonId, true));
   });
 
   return {
@@ -244,6 +251,8 @@ export function buildAddCarouselCardPayload({
           x,
           y: cardY,
           inPorts: [selectedNodeId],
+          connected: true,
+          outPorts: [newButtonId],
           metaType: "carouselCard",
           title: `Card ${allCards.length}`,
         }),
@@ -261,8 +270,8 @@ export function buildAddCarouselCardPayload({
         }),
       );
 
-      edgesToAdd.push(createEdge(selectedNodeId, newCardId));
-      edgesToAdd.push(createEdge(newCardId, newButtonId));
+      edgesToAdd.push(createEdge(selectedNodeId, newCardId, true));
+      edgesToAdd.push(createEdge(newCardId, newButtonId, true));
     }
   });
 

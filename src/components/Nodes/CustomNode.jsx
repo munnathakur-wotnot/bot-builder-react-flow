@@ -11,7 +11,6 @@ function CustomNode({ id, data }) {
   const hasOutgoing = data.outPorts?.length > 0;
   const showDescription = Boolean(data.description);
 
-  //  Stable click handler
   const handleOpenMenu = useCallback(
     (event) => {
       event.stopPropagation();
@@ -24,7 +23,6 @@ function CustomNode({ id, data }) {
     [id, openMenu],
   );
 
-  // Stable keyboard handler (no inline function)
   const handleKeyDown = useCallback(
     (event) => {
       if (event.key === "Enter" || event.key === " ") {
