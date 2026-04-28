@@ -27,6 +27,7 @@ export default function CanvasFlow() {
   const [nodes, setNodes, onNodesChange] = useNodesState(INITIAL_NODES);
   const [edges, setEdges, onEdgesChange] = useEdgesState(INITIAL_EDGES);
   const [selectedNodeId, setSelectedNodeId] = useState(null);
+  const [nuberOfNodes, setNumberOfNodes] = useState(0);
   const [menuState, setMenuState] = useState(null);
   const nextIdRef = useRef(2);
 
@@ -140,7 +141,12 @@ export default function CanvasFlow() {
   return (
     <div className="canvas-layout">
       <div className="flow-canvas">
-        <HeaderTooltip setNodes={setNodes} edges={edges} />
+        <HeaderTooltip
+          setNodes={setNodes}
+          edges={edges}
+          nuberOfNodes={nuberOfNodes}
+          setNumberOfNodes={setNumberOfNodes}
+        />
         <FlowCallbacksProvider value={flowCallbacks}>
           <ReactFlow
             nodes={nodes}
@@ -167,6 +173,7 @@ export default function CanvasFlow() {
             menuState={menuState}
             setMenuState={setMenuState}
             nodes={nodes}
+            nuberOfNodes={nuberOfNodes}
             setNodes={setNodes}
             setEdges={setEdges}
             setSelectedNodeId={setSelectedNodeId}

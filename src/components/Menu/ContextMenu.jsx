@@ -19,6 +19,7 @@ export default function ContextMenu({
   setEdges,
   setSelectedNodeId,
   getNextNodeId,
+  nuberOfNodes,
 }) {
   const { updateSingleNode } = useUpdateNode(setNodes);
 
@@ -71,7 +72,23 @@ export default function ContextMenu({
       setMenuState,
     ],
   );
+  const performanceChecker = (id) => {
+    const batchSize = 100;
+    let count = 0;
 
+    const runBatch = () => {
+      for (let i = 0; i < batchSize && count < nuberOfNodes; i++) {
+        handleSelect(id);
+        count++;
+      }
+
+      if (count < nuberOfNodes) {
+        requestAnimationFrame(runBatch);
+      }
+    };
+
+    runBatch();
+  };
   if (!menuState) return null;
 
   return (
@@ -90,7 +107,7 @@ export default function ContextMenu({
             key={option.id}
             className="context-menu__option"
             type="button"
-            onClick={() => handleSelect(option.id)}
+            onClick={() => performanceChecker(option.id)}
           >
             {option.label}
           </button>
@@ -120,6 +137,8 @@ ContextMenu.propTypes = {
   setEdges: PropTypes.func.isRequired,
   setSelectedNodeId: PropTypes.func.isRequired,
   getNextNodeId: PropTypes.func.isRequired,
+  nuberOfNodes: PropTypes.number,
+  setIsProcessing: PropTypes.func,
 };
 
 ContextMenu.defaultProps = {

@@ -1,9 +1,11 @@
 import React, { useCallback } from "react";
 import { layoutNodesDagre } from "../Canvas/layout";
-import { useReactFlow } from "@xyflow/react";
+import { useNodes, useReactFlow } from "@xyflow/react";
 import PropTypes from "prop-types";
 export default function HeaderTooltip(props) {
-    const { edges, setNodes } = props;
+    const { edges, setNodes, nuberOfNodes, setNumberOfNodes } = props;
+    const nodes = useNodes();
+    const totalNodes = nodes.length;
 
     const { fitView } = useReactFlow();
     const onAutoLayout = useCallback(() => {
@@ -21,6 +23,18 @@ export default function HeaderTooltip(props) {
             >
                 Auto layout
             </button>
+            <div className="layout-toolbar__btn">
+                <label htmlFor="">Enter Number Of Nodes : </label>
+                <input
+                    className="layout-toolbar__btn"
+                    type="number"
+                    onChange={(e) => setNumberOfNodes(e.target.value)}
+                    value={nuberOfNodes}
+                />
+            </div>
+            <div className="layout-toolbar__btn">
+                <label htmlFor="">Number Of Nodes : {totalNodes}</label>
+            </div>
         </div>
     );
 }
@@ -28,4 +42,7 @@ export default function HeaderTooltip(props) {
 HeaderTooltip.propTypes = {
     edges: PropTypes.object,
     setNodes: PropTypes.func,
+    nuberOfNodes: PropTypes.number,
+    setNumberOfNodes: PropTypes.func,
+    isProcessing: PropTypes.bool,
 };
