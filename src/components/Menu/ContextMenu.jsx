@@ -1,9 +1,10 @@
 import React, { useCallback } from "react";
 import PropTypes from "prop-types";
 import "./ContextMenu.css";
-import useUpdateNode from "../../hooks/useUpdateNode";
 import { buildMenuActionMap } from "../Canvas/utils";
 import { MENU_NODE_TEMPLATES } from "../Canvas/constants";
+import { buildLaidOutGraph } from "../Canvas/layout";
+import AppInput from "../Common/AppInput";
 
 const MENU_OPTIONS = [
   { id: "collectInput", label: "Collect Input" },
@@ -15,14 +16,13 @@ export default function ContextMenu({
   menuState,
   setMenuState,
   nodes,
+  edges,
   setNodes,
   setEdges,
   setSelectedNodeId,
   getNextNodeId,
   nuberOfNodes,
 }) {
-  const { updateSingleNode } = useUpdateNode(setNodes);
-
   const handleSelect = useCallback(
     (optionId) => {
       if (!menuState?.nodeId) return;
@@ -43,52 +43,149 @@ export default function ContextMenu({
       }
 
       const payload = buildPayload();
+      const directTargets = payload.edgesToAdd
+        .filter((edge) => edge.source === sourceNode.id)
+        .map((edge) => edge.target);
+      const nextNodes = nodes.map((node) => {
+        if (node.id !== sourceNode.id) return node;
 
-      updateSingleNode(sourceNode.id, (node) => ({
-        ...node,
-        data: {
-          ...node.data,
-          outPorts: [
-            ...(node.data.outPorts || []),
-            ...payload.nodesToAdd.map((item) => item.id),
-          ],
-          connected: payload.nodesToAdd.length > 0,
-        },
-      }));
-
-      setNodes((curr) => [...curr, ...payload.nodesToAdd]);
-      setEdges((curr) => [...curr, ...payload.edgesToAdd]);
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            outPorts: [...(node.data.outPorts || []), ...directTargets],
+            connected: directTargets.length > 0,
+          },
+        };
+      });
+      const mergedNodes = [...nextNodes, ...payload.nodesToAdd];
+      const mergedEdges = [...edges, ...payload.edgesToAdd];
+      const { nodes: laidOutNodes } = buildLaidOutGraph(
+        mergedNodes,
+        mergedEdges,
+      );
+      setNodes(laidOutNodes);
+      setEdges(mergedEdges);
       setSelectedNodeId(payload.selectedNodeId);
       setMenuState(null);
     },
     [
       menuState,
       nodes,
+      edges,
       setNodes,
       setEdges,
       setSelectedNodeId,
       getNextNodeId,
-      updateSingleNode,
       setMenuState,
     ],
   );
-  const performanceChecker = (id) => {
-    const batchSize = 100;
-    let count = 0;
 
-    const runBatch = () => {
-      for (let i = 0; i < batchSize && count < nuberOfNodes; i++) {
-        handleSelect(id);
-        count++;
+  const bulkAddFromSource = useCallback(
+    (optionId) => {
+      const sourceNodeId = menuState?.nodeId;
+      if (!sourceNodeId) return;
+
+      const totalToAdd = Math.max(0, Number(nuberOfNodes || 0));
+      if (totalToAdd <= 1) {
+        handleSelect(optionId);
+        return;
       }
 
-      if (count < nuberOfNodes) {
-        requestAnimationFrame(runBatch);
-      }
-    };
+      let workingNodes = nodes;
+      let workingEdges = edges;
+      let created = 0;
+      let finalSelectedNodeId = null;
+      const batchSize = 25;
+      let aborted = false;
 
-    runBatch();
-  };
+      const runBatch = () => {
+        const batchLimit = Math.min(batchSize, totalToAdd - created);
+
+        for (let i = 0; i < batchLimit; i++) {
+          const sourceNode = workingNodes.find((n) => n.id === sourceNodeId);
+          if (!sourceNode) {
+            aborted = true;
+            break;
+          }
+
+          const actionByOption = buildMenuActionMap({
+            context: { sourceNode, sourceNodeId },
+            templates: MENU_NODE_TEMPLATES,
+            getNextNodeId,
+          });
+
+          const buildPayload = actionByOption[optionId];
+          if (!buildPayload) {
+            aborted = true;
+            break;
+          }
+
+          const payload = buildPayload();
+          if (!payload) {
+            aborted = true;
+            break;
+          }
+
+          const directTargets = (payload.edgesToAdd || [])
+            .filter((edge) => edge.source === sourceNodeId)
+            .map((edge) => edge.target);
+
+          const nextNodes = workingNodes.map((node) => {
+            if (node.id !== sourceNodeId) return node;
+
+            const existingOutPorts = node.data?.outPorts || [];
+            const mergedOutPorts = Array.from(
+              new Set([...existingOutPorts, ...directTargets]),
+            );
+
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                outPorts: mergedOutPorts,
+                connected: mergedOutPorts.length > 0,
+              },
+            };
+          });
+
+          workingNodes = [...nextNodes, ...(payload.nodesToAdd || [])];
+          workingEdges = [...workingEdges, ...(payload.edgesToAdd || [])];
+          finalSelectedNodeId = payload.selectedNodeId || finalSelectedNodeId;
+          created++;
+        }
+
+        if (!aborted && created < totalToAdd) {
+          requestAnimationFrame(runBatch);
+          return;
+        }
+
+        const { nodes: laidOutNodes } = buildLaidOutGraph(
+          workingNodes,
+          workingEdges,
+        );
+        setNodes(laidOutNodes);
+        setEdges(workingEdges);
+        if (finalSelectedNodeId) setSelectedNodeId(finalSelectedNodeId);
+        setMenuState(null);
+      };
+
+      runBatch();
+    },
+    [
+      menuState,
+      nuberOfNodes,
+      nodes,
+      edges,
+      getNextNodeId,
+      handleSelect,
+      setNodes,
+      setEdges,
+      setSelectedNodeId,
+      setMenuState,
+    ],
+  );
+
   if (!menuState) return null;
 
   return (
@@ -98,7 +195,7 @@ export default function ContextMenu({
       role="menu"
     >
       <div className="context-menu__header">
-        <input className="context-menu__search" placeholder="Search..." />
+        <AppInput className="context-menu__search" placeholder="Search..." />
       </div>
 
       <div className="context-menu__options">
@@ -109,7 +206,7 @@ export default function ContextMenu({
             type="button"
             onClick={() =>
               nuberOfNodes > 1
-                ? performanceChecker(option.id)
+                ? bulkAddFromSource(option.id)
                 : handleSelect(option.id)
             }
           >
@@ -137,12 +234,12 @@ ContextMenu.propTypes = {
   }),
   setMenuState: PropTypes.func.isRequired,
   nodes: PropTypes.array.isRequired,
+  edges: PropTypes.array.isRequired,
   setNodes: PropTypes.func.isRequired,
   setEdges: PropTypes.func.isRequired,
   setSelectedNodeId: PropTypes.func.isRequired,
   getNextNodeId: PropTypes.func.isRequired,
   nuberOfNodes: PropTypes.number,
-  setIsProcessing: PropTypes.func,
 };
 
 ContextMenu.defaultProps = {

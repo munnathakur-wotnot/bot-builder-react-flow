@@ -2,15 +2,19 @@ import dagre from "@dagrejs/dagre";
 
 const DEFAULT_NODE_WIDTH = 240;
 const DEFAULT_NODE_HEIGHT = 120;
+const DEFAULT_LAYOUT_OPTIONS = {
+  direction: "TB",
+  nodeSep: 170,
+  rankSep: 180,
+  marginX: 80,
+  marginY: 80,
+};
 
 export function layoutNodesDagre(nodes, edges, options = {}) {
-  const {
-    direction = "TB", // TB (top-bottom) | LR (left-right)
-    nodeSep = 100,
-    rankSep = 180,
-    marginX = 60,
-    marginY = 60,
-  } = options;
+  const { direction, nodeSep, rankSep, marginX, marginY } = {
+    ...DEFAULT_LAYOUT_OPTIONS,
+    ...options,
+  };
 
   const g = new dagre.graphlib.Graph();
   g.setDefaultEdgeLabel(() => ({}));
@@ -20,7 +24,7 @@ export function layoutNodesDagre(nodes, edges, options = {}) {
     ranksep: rankSep,
     marginx: marginX,
     marginy: marginY,
-    align: "UL", // try alignment tweaks
+    ranker: "tight-tree",
   });
 
   for (const n of nodes) {
@@ -50,4 +54,11 @@ export function layoutNodesDagre(nodes, edges, options = {}) {
       position: { x: x - w / 2, y: y - h / 2 },
     };
   });
+}
+
+export function buildLaidOutGraph(nodes, edges, options = {}) {
+  return {
+    nodes: layoutNodesDagre(nodes, edges, options),
+    edges,
+  };
 }

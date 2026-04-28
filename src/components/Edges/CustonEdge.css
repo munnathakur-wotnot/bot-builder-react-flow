@@ -1,34 +1,49 @@
 .edge-icon-wrapper {
   position: absolute;
-  z-index: 10;
+  z-index: 20;
   pointer-events: all;
+  transform: translate(-50%, -50%);
 }
 
 .edge-icon-btn {
-  opacity: 0;
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   background: white;
-  border-radius: 50%;
-  border: 1.5px solid #f44336;
+  border-radius: 4px;
+  border: 1px solid #d7dce5;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.12);
   cursor: pointer;
-  transition: opacity 0.15s ease, background 0.15s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #f44336;
-  font-size: 13px;
-  font-weight: bold;
-  line-height: 1;
   padding: 0;
 }
 
 .edge-icon-btn:hover {
-  background: #f44336;
-  color: white;
+  background: #fff5f5;
+  border-color: #f87171;
+  box-shadow: 0 4px 12px rgb(248 113 113 / 0.2);
+  transform: translateY(-1px);
 }
 
-/* Show when edge is selected */
-.edge-icon-wrapper.selected .edge-icon-btn {
-  opacity: 1;
+.edge-icon-btn__trash {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #dc2626;
+}
+
+.edge-icon-btn__trash svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.edge-hitbox {
+  cursor: pointer;
 }

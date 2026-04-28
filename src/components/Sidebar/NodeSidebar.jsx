@@ -8,6 +8,7 @@ import SidebarChecker from "./SidebarChecker";
 export default function NodeSidebar({
   selectedNodeId,
   nodes,
+  edges,
   setNodes,
   setEdges,
   getNextNodeId,
@@ -44,6 +45,8 @@ export default function NodeSidebar({
         nodeData={nodeData}
         updateNode={updateNode}
         selectedNode={selectedNode}
+        nodes={nodes}
+        edges={edges}
         setNodes={setNodes}
         setEdges={setEdges}
         getNextNodeId={getNextNodeId}
@@ -55,6 +58,7 @@ export default function NodeSidebar({
 NodeSidebar.propTypes = {
   selectedNodeId: PropTypes.string,
   nodes: PropTypes.array.isRequired,
+  edges: PropTypes.array.isRequired,
   setNodes: PropTypes.func.isRequired,
   setEdges: PropTypes.func.isRequired,
   getNextNodeId: PropTypes.func.isRequired,
