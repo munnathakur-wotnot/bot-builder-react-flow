@@ -5,10 +5,22 @@ import { useFlowCallbacks } from "../Canvas/FlowCallbacksContext.jsx";
 import PropTypes from "prop-types";
 
 export default function CustomEdge(props) {
-  const { id, source, target, sourceX, sourceY, targetX, targetY, selected } =
-    props;
+  const {
+    id,
+    source,
+    target,
+    sourceX,
+    sourceY,
+    targetX,
+    targetY,
+    selected,
+    data,
+  } = props;
 
   const { deleteEdge } = useFlowCallbacks();
+
+  const isDeletableEdges = data.isNotDeletable;
+  console.log(data, "DataIsAvaliable");
 
   // Force all outgoing edges to share a common "trunk" segment from the source,
   // then split horizontally. This matches a clean tree visual.
@@ -30,18 +42,20 @@ export default function CustomEdge(props) {
     <>
       <BaseEdge path={edgePath} />
 
-      <EdgeLabelRenderer>
-        <div
-          className={`edge-icon-wrapper${selected ? " selected" : ""}`}
-          style={{
-            transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
-          }}
-        >
-          <button className="edge-icon-btn" onClick={handleDelete}>
-            ✕
-          </button>
-        </div>
-      </EdgeLabelRenderer>
+      {!isDeletableEdges && (
+        <EdgeLabelRenderer>
+          <div
+            className={`edge-icon-wrapper${selected ? " selected" : ""}`}
+            style={{
+              transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
+            }}
+          >
+            <button className="edge-icon-btn" onClick={handleDelete}>
+              ✕
+            </button>
+          </div>
+        </EdgeLabelRenderer>
+      )}
     </>
   );
 }
@@ -54,4 +68,5 @@ CustomEdge.propTypes = {
   targetX: PropTypes.number,
   targetY: PropTypes.number,
   selected: PropTypes.number,
+  data: PropTypes.object,
 };
