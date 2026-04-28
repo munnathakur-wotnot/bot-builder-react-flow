@@ -1,8 +1,11 @@
 import { addEdge } from "@xyflow/react";
 import { buildAddCarouselCardPayload } from "../Canvas/utils";
+import { buildLaidOutGraph } from "../Canvas/layout";
 
 export function handleAddCarousel({
   selectedNode,
+  nodes,
+  edges,
   getNextNodeId,
   setNodes,
   setEdges,
@@ -16,15 +19,33 @@ export function handleAddCarousel({
     getNextNodeId,
   });
 
-  // Batch-like updates
-  setNodes((curr) => [...curr, ...payload.nodesToAdd]);
-
-  setEdges((eds) =>
-    payload.edgesToAdd.reduce((acc, edge) => addEdge(edge, acc), eds),
-  );
-
-  // Patch carousel data
   const patch = payload.dataPatch?.[selectedNode.id];
+  const nextNodes = nodes.map((node) => {
+    if (node.id !== selectedNode.id) return node;
+
+    return {
+      ...node,
+      position: payload.positionPatch?.[node.id]?.position ?? node.position,
+      data: {
+        ...node.data,
+        ...patch,
+      },
+    };
+  });
+  const mergedNodes = nextNodes.map((node) => ({
+    ...node,
+    position: payload.positionPatch?.[node.id]?.position ?? node.position,
+  }));
+  const graphNodes = [...mergedNodes, ...payload.nodesToAdd];
+  const graphEdges = payload.edgesToAdd.reduce(
+    (acc, edge) => addEdge(edge, acc),
+    edges,
+  );
+  const { nodes: laidOutNodes } = buildLaidOutGraph(graphNodes, graphEdges);
+
+  setNodes(laidOutNodes);
+  setEdges(graphEdges);
+
   if (patch) updateNode(patch);
 }
 

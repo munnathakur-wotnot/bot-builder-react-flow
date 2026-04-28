@@ -23,6 +23,14 @@ const edgeTypes = {
   custom: CustomEdge,
 };
 
+const StaticBackground = React.memo(function StaticBackground() {
+  return <Background gap={20} size={1} />;
+});
+
+const StaticControls = React.memo(function StaticControls() {
+  return <Controls />;
+});
+
 export default function CanvasFlow() {
   const [nodes, setNodes, onNodesChange] = useNodesState(INITIAL_NODES);
   const [edges, setEdges, onEdgesChange] = useEdgesState(INITIAL_EDGES);
@@ -162,9 +170,9 @@ export default function CanvasFlow() {
             fitView
             minZoom={0.1}
           >
-            <Background gap={20} size={1} />
+            <StaticBackground />
             <MiniMap />
-            <Controls />
+            <StaticControls />
           </ReactFlow>
         </FlowCallbacksProvider>
 
@@ -173,6 +181,7 @@ export default function CanvasFlow() {
             menuState={menuState}
             setMenuState={setMenuState}
             nodes={nodes}
+            edges={edges}
             nuberOfNodes={nuberOfNodes}
             setNodes={setNodes}
             setEdges={setEdges}
@@ -184,6 +193,7 @@ export default function CanvasFlow() {
         <NodeSidebar
           selectedNodeId={selectedNodeId}
           nodes={nodes}
+          edges={edges}
           setNodes={setNodes}
           setEdges={setEdges}
           getNextNodeId={getNextNodeId}

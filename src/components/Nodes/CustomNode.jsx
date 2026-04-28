@@ -89,14 +89,11 @@ CustomNode.propTypes = {
 };
 
 export default memo(CustomNode, (prev, next) => {
-  //  Custom comparison
-
-  // same id
   if (prev.id !== next.id) return false;
 
-  // shallow compare important fields only
   const prevData = prev.data;
   const nextData = next.data;
+  if (!prevData || !nextData) return prevData === nextData;
 
   return (
     prevData.title === nextData.title &&

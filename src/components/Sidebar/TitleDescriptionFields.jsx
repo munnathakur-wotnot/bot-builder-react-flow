@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useRef, useState } from "react";
 import useDebouncedCallback from "../../hooks/useDebouncedCallback";
+import AppInput from "../Common/AppInput";
 
 export default function TitleDescriptionFields({ nodeData, updateNode }) {
   const [title, setTitle] = useState(nodeData.title ?? "");
@@ -43,7 +44,7 @@ export default function TitleDescriptionFields({ nodeData, updateNode }) {
     <>
       <label className="node-sidebar__label">
         Title
-        <input
+        <AppInput
           className="node-sidebar__input"
           value={title}
           onChange={(e) => setTitle(e.target.value)}

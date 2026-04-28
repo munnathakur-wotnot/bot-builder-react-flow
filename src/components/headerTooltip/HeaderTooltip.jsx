@@ -1,8 +1,9 @@
-import React, { useCallback } from "react";
+import React, { memo, useCallback } from "react";
 import { layoutNodesDagre } from "../Canvas/layout";
 import { useNodes, useReactFlow } from "@xyflow/react";
 import PropTypes from "prop-types";
-export default function HeaderTooltip(props) {
+import AppInput from "../Common/AppInput";
+function HeaderTooltip(props) {
     const { edges, setNodes, nuberOfNodes, setNumberOfNodes } = props;
     const nodes = useNodes();
     const totalNodes = nodes.length;
@@ -25,7 +26,7 @@ export default function HeaderTooltip(props) {
             </button>
             <div className="layout-toolbar__btn">
                 <label htmlFor="">Enter Number Of Nodes : </label>
-                <input
+                <AppInput
                     className="layout-toolbar__btn"
                     type="number"
                     onChange={(e) => setNumberOfNodes(e.target.value)}
@@ -38,7 +39,8 @@ export default function HeaderTooltip(props) {
         </div>
     );
 }
-
+const HeaderTooltipMemo = memo(HeaderTooltip);
+export default HeaderTooltipMemo;
 HeaderTooltip.propTypes = {
     edges: PropTypes.object,
     setNodes: PropTypes.func,

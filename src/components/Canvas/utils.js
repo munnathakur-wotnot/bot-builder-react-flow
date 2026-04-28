@@ -110,7 +110,7 @@ export function buildCarouselPayload({
   carouselNode.data.connected = cardIds.length > 0;
 
   const nodes = [carouselNode];
-  const edges = [createEdge(sourceNodeId, carouselId, true)];
+  const edges = [createEdge(sourceNodeId, carouselId)];
 
   cardIds.forEach((cardId, index) => {
     const x = startX + index * (NODE_WIDTH + HORIZONTAL_GAP);

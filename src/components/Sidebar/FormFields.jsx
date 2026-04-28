@@ -1,9 +1,9 @@
 import PropTypes from "prop-types";
 import React from "react";
+import AppInput from "../Common/AppInput";
 
-export default function FormFields({ nodeData, updateNode }) {
+export default function FormFields({ nodeData, formHandlers }) {
   const fields = nodeData.fields ?? [];
-  const updateFields = (updated) => updateNode({ fields: updated });
 
   return (
     <div className="node-sidebar__form-fields">
@@ -11,15 +11,11 @@ export default function FormFields({ nodeData, updateNode }) {
 
       {fields.map((field) => (
         <div key={field.id} className="node-sidebar__field-row">
-          <input
+          <AppInput
             className="node-sidebar__input node-sidebar__field-label"
             value={field.label}
             onChange={(e) =>
-              updateFields(
-                fields.map((f) =>
-                  f.id === field.id ? { ...f, label: e.target.value } : f,
-                ),
-              )
+              formHandlers.updateFieldLabel(field.id, e.target.value)
             }
             placeholder="Field label"
           />
@@ -27,11 +23,7 @@ export default function FormFields({ nodeData, updateNode }) {
             className="node-sidebar__field-type"
             value={field.type}
             onChange={(e) =>
-              updateFields(
-                fields.map((f) =>
-                  f.id === field.id ? { ...f, type: e.target.value } : f,
-                ),
-              )
+              formHandlers.updateFieldType(field.id, e.target.value)
             }
           >
             <option value="text">Text</option>
@@ -43,9 +35,7 @@ export default function FormFields({ nodeData, updateNode }) {
           <button
             type="button"
             className="node-sidebar__field-remove"
-            onClick={() =>
-              updateFields(fields.filter((f) => f.id !== field.id))
-            }
+            onClick={() => formHandlers.removeField(field.id)}
             aria-label="Remove field"
           >
             ×
@@ -58,5 +48,9 @@ export default function FormFields({ nodeData, updateNode }) {
 
 FormFields.propTypes = {
   nodeData: PropTypes.object,
-  updateNode: PropTypes.func,
+  formHandlers: PropTypes.shape({
+    updateFieldLabel: PropTypes.func,
+    updateFieldType: PropTypes.func,
+    removeField: PropTypes.func,
+  }).isRequired,
 };
