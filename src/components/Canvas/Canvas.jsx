@@ -5,11 +5,9 @@ import {
   MiniMap,
   ReactFlow,
   addEdge,
-  useReactFlow,
   useEdgesState,
   useNodesState,
 } from "@xyflow/react";
-
 import "@xyflow/react/dist/style.css";
 import "./Canvas.css";
 import CustomNode from "../Nodes/CustomNode";
@@ -18,7 +16,7 @@ import NodeSidebar from "../Sidebar/NodeSidebar";
 import { INITIAL_EDGES, INITIAL_NODES } from "./constants";
 import CustomEdge from "../Edges/CustumEdges";
 import { FlowCallbacksProvider } from "./FlowCallbacksContext.jsx";
-import { layoutNodesDagre } from "./layout";
+import HeaderTooltip from "../headerTooltip/HeaderTooltip.jsx";
 
 const nodeTypes = { custom: CustomNode };
 const edgeTypes = {
@@ -31,7 +29,6 @@ export default function CanvasFlow() {
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [menuState, setMenuState] = useState(null);
   const nextIdRef = useRef(2);
-  const { fitView } = useReactFlow();
 
   const openMenu = useCallback(
     ({ nodeId, x, y }) => {
@@ -124,17 +121,11 @@ export default function CanvasFlow() {
     [edges, setNodes, setEdges],
   );
 
-  const getNextNodeId = useCallback(() => `node_${nextIdRef.current++}`, []);
-
-  const onAutoLayout = useCallback(() => {
-    setNodes((currNodes) => layoutNodesDagre(currNodes, edges));
-    // Let React apply positions first, then fit.
-    requestAnimationFrame(() => fitView({ padding: 0.2, duration: 300 }));
-  }, [edges, fitView, setNodes]);
-
   const handleNodeClick = useCallback((_, node) => {
     setSelectedNodeId(node.id);
   }, []);
+
+  const getNextNodeId = useCallback(() => `node_${nextIdRef.current++}`, []);
 
   const handlePaneClick = useCallback(() => {
     setMenuState(null);
@@ -149,15 +140,7 @@ export default function CanvasFlow() {
   return (
     <div className="canvas-layout">
       <div className="flow-canvas">
-        <div className="layout-toolbar">
-          <button
-            type="button"
-            className="layout-toolbar__btn"
-            onClick={onAutoLayout}
-          >
-            Auto layout
-          </button>
-        </div>
+        <HeaderTooltip setNodes={setNodes} edges={edges} />
         <FlowCallbacksProvider value={flowCallbacks}>
           <ReactFlow
             nodes={nodes}

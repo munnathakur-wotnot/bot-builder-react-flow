@@ -103,6 +103,8 @@ export function buildCarouselPayload({
   });
 
   carouselNode.data.cards = cardIds;
+  carouselNode.data.outPorts = cardIds;
+  carouselNode.data.connected = cardIds.length > 0;
 
   const nodes = [carouselNode];
   const edges = [createEdge(sourceNodeId, carouselId)];
@@ -120,6 +122,8 @@ export function buildCarouselPayload({
         y: cardY,
         inPorts: [carouselId],
         metaType: "carouselCard",
+        connected: true,
+        outPorts: [buttonId],
         title: `Card ${index + 1}`,
       }),
     );
@@ -244,6 +248,8 @@ export function buildAddCarouselCardPayload({
           x,
           y: cardY,
           inPorts: [selectedNodeId],
+          connected: true,
+          outPorts: [newButtonId],
           metaType: "carouselCard",
           title: `Card ${allCards.length}`,
         }),
