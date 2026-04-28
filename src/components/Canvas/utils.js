@@ -1,3 +1,9 @@
+const NODE_WIDTH = 240;
+const NODE_HEIGHT = 120;
+
+const HORIZONTAL_GAP = 80;
+const VERTICAL_GAP = 100;
+
 export function createFlowNode({
   id,
   x,
@@ -42,7 +48,6 @@ export function buildSingleNodePayload({
   getNextNodeId,
 }) {
   const newNodeId = getNextNodeId();
-  console.log(sourceNode, "Hello");
 
   const newNode = createFlowNode({
     id: newNodeId,
@@ -70,111 +75,90 @@ export function buildCarouselPayload({
   getNextNodeId,
 }) {
   const carouselId = getNextNodeId();
-  const cardOneId = getNextNodeId();
-  const cardTwoId = getNextNodeId();
-  const buttonOneId = getNextNodeId();
-  const buttonTwoId = getNextNodeId();
 
-  const carouselX = sourceNode.position.x;
-  const carouselY = sourceNode.position.y + 220;
-  const cardY = carouselY + 120;
-  const buttonY = cardY + 100;
+  const cardIds = [getNextNodeId(), getNextNodeId()];
+  const buttonIds = [getNextNodeId(), getNextNodeId()];
 
+  const baseX = sourceNode.position.x;
+  const baseY = sourceNode.position.y;
+
+  const carouselY = baseY + NODE_HEIGHT + VERTICAL_GAP;
+  const cardY = carouselY + NODE_HEIGHT + VERTICAL_GAP;
+  const buttonY = cardY + NODE_HEIGHT + VERTICAL_GAP;
+
+  const totalWidth =
+    cardIds.length * NODE_WIDTH + (cardIds.length - 1) * HORIZONTAL_GAP;
+
+  const startX = baseX - totalWidth / 2 + NODE_WIDTH / 2;
+
+  //  Carousel Node
   const carouselNode = createFlowNode({
     id: carouselId,
-    x: carouselX,
+    x: baseX,
     y: carouselY,
     inPorts: [sourceNodeId],
     title: "Carousel",
     description: "Carousel Node",
     metaType: "carousel",
   });
-  // Keep track of cards on the carousel so "Add Card" can position new cards correctly.
-  carouselNode.data.cards = [cardOneId, cardTwoId];
+
+  carouselNode.data.cards = cardIds;
+
+  const nodes = [carouselNode];
+  const edges = [createEdge(sourceNodeId, carouselId)];
+
+  cardIds.forEach((cardId, index) => {
+    const x = startX + index * (NODE_WIDTH + HORIZONTAL_GAP);
+
+    const buttonId = buttonIds[index];
+
+    // Card
+    nodes.push(
+      createFlowNode({
+        id: cardId,
+        x,
+        y: cardY,
+        inPorts: [carouselId],
+        metaType: "carouselCard",
+        title: `Card ${index + 1}`,
+      }),
+    );
+
+    // Button
+    nodes.push(
+      createFlowNode({
+        id: buttonId,
+        x,
+        y: buttonY,
+        inPorts: [cardId],
+        metaType: "carouselButton",
+        title: `Button ${index + 1}`,
+      }),
+    );
+
+    edges.push(createEdge(carouselId, cardId));
+    edges.push(createEdge(cardId, buttonId));
+  });
 
   return {
-    nodesToAdd: [
-      carouselNode,
-      createFlowNode({
-        id: cardOneId,
-        x: carouselX - 120,
-        y: cardY,
-        title: "Card 1",
-        description: "Carousel Node",
-        inPorts: [carouselId],
-        metaType: "carouselCard",
-      }),
-      createFlowNode({
-        id: cardTwoId,
-        x: carouselX + 120,
-        y: cardY,
-        inPorts: [carouselId],
-        metaType: "carouselCard",
-        title: "Card 2",
-        description: "Carousel Node",
-      }),
-      createFlowNode({
-        id: buttonOneId,
-        x: carouselX - 120,
-        y: buttonY,
-        inPorts: [cardOneId],
-        metaType: "carouselButton",
-        title: "Button",
-      }),
-      createFlowNode({
-        id: buttonTwoId,
-        x: carouselX + 120,
-        y: buttonY,
-        inPorts: [cardTwoId],
-        metaType: "carouselButton",
-        title: "Button",
-      }),
-    ],
-    edgesToAdd: [
-      createEdge(sourceNodeId, carouselId),
-      createEdge(carouselId, cardOneId),
-      createEdge(carouselId, cardTwoId),
-      createEdge(cardOneId, buttonOneId),
-      createEdge(cardTwoId, buttonTwoId),
-    ],
+    nodesToAdd: nodes,
+    edgesToAdd: edges,
     dataPatch: {
       [carouselId]: {
         type: "carousel",
-        title: "Carousel 1",
-        description: "Swipe to explore cards",
-        cards: [cardOneId, cardTwoId],
-        inPorts: [sourceNodeId],
-      },
-      [cardOneId]: {
-        type: "carouselCard",
-        title: "Card 1",
-        description: "",
-        inPorts: [carouselId],
-      },
-      [cardTwoId]: {
-        type: "carouselCard",
-        title: "Card 2",
-        description: "",
-        inPorts: [carouselId],
-      },
-      [buttonOneId]: {
-        type: "carouselButton",
-        title: "Button 1",
-        description: "",
-        inPorts: [cardOneId],
-      },
-      [buttonTwoId]: {
-        type: "carouselButton",
-        title: "Button 1",
-        description: "",
-        inPorts: [cardTwoId],
+        cards: cardIds,
       },
     },
     selectedNodeId: carouselId,
   };
 }
 
-export function buildFormPayload({ sourceNode, sourceNodeId, nodeData, getNextNodeId }) {
+export function buildFormPayload({
+  sourceNode,
+  sourceNodeId,
+  nodeData,
+  getNextNodeId,
+}) {
   const newNodeId = getNextNodeId();
 
   const newNode = createFlowNode({
@@ -221,49 +205,78 @@ export function buildAddCarouselCardPayload({
   getNextNodeId,
 }) {
   const existingCards = carouselNode?.data?.cards ?? [];
-  const nextCardIndex = existingCards.length + 1;
-  const cardId = getNextNodeId();
-  const buttonId = getNextNodeId();
 
-  // Layout: keep cards spread horizontally under the carousel.
-  // Initial template uses -120 / +120 around carouselX; for additional cards,
-  // extend to the right using a wider spacing so cards never overlap.
-  const spacingX = 240;
-  const cardX =
-    carouselNode.position.x + (existingCards.length - 0.5) * spacingX;
-  const cardY = carouselNode.position.y + 120;
-  const buttonY = cardY + 100;
+  const newCardId = getNextNodeId();
+  const newButtonId = getNextNodeId();
+
+  const allCards = [...existingCards, newCardId];
+
+  const baseX = carouselNode.position.x;
+
+  const cardY = carouselNode.position.y + NODE_HEIGHT + VERTICAL_GAP;
+
+  const buttonY = cardY + NODE_HEIGHT + VERTICAL_GAP;
+
+  //  Recalculate FULL layout (important)
+  const totalWidth =
+    allCards.length * NODE_WIDTH + (allCards.length - 1) * HORIZONTAL_GAP;
+
+  const startX = baseX - totalWidth / 2 + NODE_WIDTH / 2;
+
+  const nodesToAdd = [];
+  const edgesToAdd = [];
+
+  const positionPatch = {};
+
+  allCards.forEach((cardId, index) => {
+    const x = startX + index * (NODE_WIDTH + HORIZONTAL_GAP);
+
+    const isNew = cardId === newCardId;
+
+    //Update existing cards position
+    positionPatch[cardId] = { position: { x, y: cardY } };
+
+    if (isNew) {
+      // Create new card
+      nodesToAdd.push(
+        createFlowNode({
+          id: newCardId,
+          x,
+          y: cardY,
+          inPorts: [selectedNodeId],
+          metaType: "carouselCard",
+          title: `Card ${allCards.length}`,
+        }),
+      );
+
+      // Create button
+      nodesToAdd.push(
+        createFlowNode({
+          id: newButtonId,
+          x,
+          y: buttonY,
+          inPorts: [newCardId],
+          metaType: "carouselButton",
+          title: `Button ${allCards.length}`,
+        }),
+      );
+
+      edgesToAdd.push(createEdge(selectedNodeId, newCardId));
+      edgesToAdd.push(createEdge(newCardId, newButtonId));
+    }
+  });
 
   return {
-    nodesToAdd: [
-      createFlowNode({
-        id: cardId,
-        x: cardX,
-        y: cardY,
-        inPorts: [selectedNodeId],
-        metaType: "carouselCard",
-        title: `Card ${nextCardIndex}`,
-        description: "Carousel Node",
-      }),
-      createFlowNode({
-        id: buttonId,
-        x: cardX,
-        y: buttonY,
-        inPorts: [cardId],
-        metaType: "carouselButton",
-        title: "Button",
-      }),
-    ],
-    edgesToAdd: [
-      createEdge(selectedNodeId, cardId),
-      createEdge(cardId, buttonId),
-    ],
+    nodesToAdd,
+    edgesToAdd,
+
+    //  This is the key addition
+    positionPatch,
+
     dataPatch: {
       [selectedNodeId]: {
-        cards: [...existingCards, cardId],
+        cards: allCards,
       },
-      [cardId]: {},
-      [buttonId]: {},
     },
   };
 }

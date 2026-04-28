@@ -3,14 +3,7 @@ import PropTypes from "prop-types";
 import "./NodeSidebar.css";
 import useNodeUpdater from "../../hooks/useNodeUpdater";
 import TitleDescriptionFields from "./TitleDescriptionFields";
-import CarouselConfig from "./CarouselConfig";
-import FormConfig from "./FormConfig";
-
-// To add a new node type: create a new XxxConfig component and add it here.
-const NODE_CONFIG_MAP = {
-  carousel: CarouselConfig,
-  form: FormConfig,
-};
+import SidebarChecker from "./SidebarChecker";
 
 export default function NodeSidebar({
   selectedNodeId,
@@ -29,7 +22,7 @@ export default function NodeSidebar({
   if (!selectedNode) return null;
 
   const nodeData = selectedNode.data;
-  const ExtraConfig = NODE_CONFIG_MAP[nodeData.type] ?? null;
+  console.log(selectedNode, "Selected Node");
 
   return (
     <aside className="node-sidebar">
@@ -46,17 +39,15 @@ export default function NodeSidebar({
       </div>
 
       <TitleDescriptionFields nodeData={nodeData} updateNode={updateNode} />
-
-      {ExtraConfig && (
-        <ExtraConfig
-          nodeData={nodeData}
-          updateNode={updateNode}
-          selectedNode={selectedNode}
-          setNodes={setNodes}
-          setEdges={setEdges}
-          getNextNodeId={getNextNodeId}
-        />
-      )}
+      <SidebarChecker
+        nodeType={nodeData.type}
+        nodeData={nodeData}
+        updateNode={updateNode}
+        selectedNode={selectedNode}
+        setNodes={setNodes}
+        setEdges={setEdges}
+        getNextNodeId={getNextNodeId}
+      />
     </aside>
   );
 }

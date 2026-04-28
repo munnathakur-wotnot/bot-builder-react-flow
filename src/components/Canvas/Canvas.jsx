@@ -141,6 +141,11 @@ export default function CanvasFlow() {
     setSelectedNodeId(null);
   }, []);
 
+  const onMove = useCallback(() => {
+    setMenuState(null);
+    setSelectedNodeId(null);
+  }, []);
+
   return (
     <div className="canvas-layout">
       <div className="flow-canvas">
@@ -164,6 +169,7 @@ export default function CanvasFlow() {
             onConnect={onConnect}
             onNodeClick={handleNodeClick}
             onPaneClick={handlePaneClick}
+            onMove={onMove}
             fitView
             minZoom={0.1}
           >
@@ -173,15 +179,17 @@ export default function CanvasFlow() {
           </ReactFlow>
         </FlowCallbacksProvider>
 
-        <ContextMenu
-          menuState={menuState}
-          setMenuState={setMenuState}
-          nodes={nodes}
-          setNodes={setNodes}
-          setEdges={setEdges}
-          setSelectedNodeId={setSelectedNodeId}
-          getNextNodeId={getNextNodeId}
-        />
+        {menuState && (
+          <ContextMenu
+            menuState={menuState}
+            setMenuState={setMenuState}
+            nodes={nodes}
+            setNodes={setNodes}
+            setEdges={setEdges}
+            setSelectedNodeId={setSelectedNodeId}
+            getNextNodeId={getNextNodeId}
+          />
+        )}
 
         <NodeSidebar
           selectedNodeId={selectedNodeId}
