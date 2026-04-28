@@ -17,6 +17,7 @@ import { INITIAL_EDGES, INITIAL_NODES } from "./constants";
 import CustomEdge from "../Edges/CustumEdges";
 import { FlowCallbacksProvider } from "./FlowCallbacksContext.jsx";
 import HeaderTooltip from "../headerTooltip/HeaderTooltip.jsx";
+import { removeNodeConnectionsForEdges } from "./utils.js";
 
 const nodeTypes = { custom: CustomNode };
 const edgeTypes = {
@@ -50,38 +51,19 @@ export default function CanvasFlow() {
     (edgeId, sourceId, targetId) => {
       setEdges((eds) => eds.filter((e) => e.id !== edgeId));
       setNodes((nds) =>
-        nds.map((node) => {
-          if (node.id === sourceId) {
-            const newOutPorts = (node.data.outPorts || []).filter(
-              (p) => p !== targetId,
-            );
-            return {
-              ...node,
-              data: {
-                ...node.data,
-                outPorts: newOutPorts,
-                connected: newOutPorts.length > 0,
-              },
-            };
-          }
-          if (node.id === targetId) {
-            const newInPorts = (node.data.inPorts || []).filter(
-              (p) => p !== sourceId,
-            );
-            return {
-              ...node,
-              data: {
-                ...node.data,
-                inPorts: newInPorts,
-                connected: newInPorts.length > 0,
-              },
-            };
-          }
-          return node;
-        }),
+        removeNodeConnectionsForEdges(nds, [
+          { id: edgeId, source: sourceId, target: targetId },
+        ]),
       );
     },
     [setEdges, setNodes],
+  );
+
+  const handleEdgesDelete = useCallback(
+    (deletedEdges) => {
+      setNodes((nds) => removeNodeConnectionsForEdges(nds, deletedEdges));
+    },
+    [setNodes],
   );
 
   const flowCallbacks = useMemo(
@@ -163,6 +145,7 @@ export default function CanvasFlow() {
             edgeTypes={edgeTypes}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
+            onEdgesDelete={handleEdgesDelete}
             onConnect={onConnect}
             onNodeClick={handleNodeClick}
             onPaneClick={handlePaneClick}

@@ -44,21 +44,35 @@ export function createEdge(source, target, isNotDeletable = false) {
   };
 }
 
+function getIncrementalTitle({ allNodes = [], metaType, baseTitle }) {
+  const typeCount = allNodes.filter(
+    (node) => node.data?.type === metaType,
+  ).length;
+  return typeCount === 0 ? baseTitle : `${baseTitle} ${typeCount + 1}`;
+}
+
 export function buildSingleNodePayload({
   sourceNode,
   sourceNodeId,
   nodeData,
   getNextNodeId,
+  allNodes,
 }) {
   const newNodeId = getNextNodeId();
+  const title = getIncrementalTitle({
+    allNodes,
+    metaType: nodeData?.type ?? "collectInput",
+    baseTitle: "Enter Input",
+  });
 
   const newNode = createFlowNode({
     id: newNodeId,
     x: sourceNode.position.x,
     y: sourceNode.position.y + 220,
     inPorts: [sourceNodeId],
-    title: "Enter Input",
+    title,
     description: "Enter Description",
+    metaType: nodeData?.type ?? "collectInput",
   });
   console.log(newNode, "New Node");
 
@@ -76,8 +90,14 @@ export function buildCarouselPayload({
   sourceNode,
   sourceNodeId,
   getNextNodeId,
+  allNodes,
 }) {
   const carouselId = getNextNodeId();
+  const carouselTitle = getIncrementalTitle({
+    allNodes,
+    metaType: "carousel",
+    baseTitle: "Carousel",
+  });
 
   const cardIds = [getNextNodeId(), getNextNodeId()];
   const buttonIds = [getNextNodeId(), getNextNodeId()];
@@ -100,7 +120,7 @@ export function buildCarouselPayload({
     x: baseX,
     y: carouselY,
     inPorts: [sourceNodeId],
-    title: "Carousel",
+    title: carouselTitle,
     description: "Carousel Node",
     metaType: "carousel",
   });
@@ -165,15 +185,21 @@ export function buildFormPayload({
   sourceNodeId,
   nodeData,
   getNextNodeId,
+  allNodes,
 }) {
   const newNodeId = getNextNodeId();
+  const title = getIncrementalTitle({
+    allNodes,
+    metaType: nodeData?.type ?? "form",
+    baseTitle: nodeData?.title ?? "Form",
+  });
 
   const newNode = createFlowNode({
     id: newNodeId,
     x: sourceNode.position.x,
     y: sourceNode.position.y + 220,
     inPorts: [sourceNodeId],
-    title: nodeData.title ?? "Form",
+    title,
     description: nodeData.description ?? "",
     metaType: "form",
   });
@@ -288,4 +314,55 @@ export function buildAddCarouselCardPayload({
       },
     },
   };
+}
+
+export function removeNodeConnectionsForEdges(nodes, edgesToRemove) {
+  if (!Array.isArray(edgesToRemove) || edgesToRemove.length === 0) return nodes;
+
+  const removedBySource = new Map();
+  const removedByTarget = new Map();
+
+  edgesToRemove.forEach((edge) => {
+    if (!edge?.source || !edge?.target) return;
+
+    if (!removedBySource.has(edge.source))
+      removedBySource.set(edge.source, new Set());
+    removedBySource.get(edge.source).add(edge.target);
+
+    if (!removedByTarget.has(edge.target))
+      removedByTarget.set(edge.target, new Set());
+    removedByTarget.get(edge.target).add(edge.source);
+  });
+
+  return nodes.map((node) => {
+    const removedTargets = removedBySource.get(node.id);
+    const removedSources = removedByTarget.get(node.id);
+
+    if (!removedTargets && !removedSources) return node;
+
+    let nextOutPorts = node.data.outPorts || [];
+    let nextInPorts = node.data.inPorts || [];
+
+    if (removedTargets) {
+      nextOutPorts = nextOutPorts.filter(
+        (targetId) => !removedTargets.has(targetId),
+      );
+    }
+
+    if (removedSources) {
+      nextInPorts = nextInPorts.filter(
+        (sourceId) => !removedSources.has(sourceId),
+      );
+    }
+
+    return {
+      ...node,
+      data: {
+        ...node.data,
+        outPorts: nextOutPorts,
+        inPorts: nextInPorts,
+        connected: nextOutPorts.length > 0 || nextInPorts.length > 0,
+      },
+    };
+  });
 }
