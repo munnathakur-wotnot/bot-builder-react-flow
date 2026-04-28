@@ -107,7 +107,11 @@ export default function ContextMenu({
             key={option.id}
             className="context-menu__option"
             type="button"
-            onClick={() => performanceChecker(option.id)}
+            onClick={() =>
+              nuberOfNodes > 1
+                ? performanceChecker(option.id)
+                : handleSelect(option.id)
+            }
           >
             {option.label}
           </button>
