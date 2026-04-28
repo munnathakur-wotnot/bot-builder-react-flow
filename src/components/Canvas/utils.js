@@ -48,7 +48,6 @@ export function buildSingleNodePayload({
   getNextNodeId,
 }) {
   const newNodeId = getNextNodeId();
-  console.log(sourceNode, "Hello");
 
   const newNode = createFlowNode({
     id: newNodeId,

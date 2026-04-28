@@ -7,6 +7,7 @@ import { useFlowCallbacks } from "../Canvas/FlowCallbacksContext.jsx";
 function CustomNode({ id, data }) {
   const { openMenu } = useFlowCallbacks();
   const isStartNode = data.type === "start";
+  const isConnected = data?.connected;
   const hasOutgoing = data.outPorts?.length > 0;
   const showDescription = Boolean(data.description);
 
@@ -46,10 +47,10 @@ function CustomNode({ id, data }) {
   return (
     <div
       className={typeClassName}
-      onClick={isStartNode ? handleOpenMenu : undefined}
-      onKeyDown={isStartNode ? handleKeyDown : undefined}
-      role={isStartNode ? "button" : undefined}
-      tabIndex={isStartNode ? 0 : undefined}
+      onClick={isStartNode && !isConnected ? handleOpenMenu : undefined}
+      onKeyDown={isStartNode && !isConnected ? handleKeyDown : undefined}
+      role={isStartNode && !isConnected ? "button" : undefined}
+      tabIndex={isStartNode && !isConnected ? 0 : undefined}
     >
       {/* Target Handle */}
       {!isStartNode && (
