@@ -4,7 +4,7 @@ import "./CustonEdge.css";
 import { useFlowCallbacks } from "../Canvas/FlowCallbacksContext.jsx";
 import PropTypes from "prop-types";
 
-export function CustomEdge(props) {
+export default function CustomEdge(props) {
   const { id, source, target, sourceX, sourceY, targetX, targetY, selected } =
     props;
 
