@@ -15,21 +15,18 @@ export function getSidebarHandlers({
   };
 
   return {
-    addCarouselCard: () =>
-      handleAddCarousel({
-        selectedNode,
-        nodes,
-        edges,
-        getNextNodeId,
-        setNodes,
-        setEdges,
-        updateNode,
-      }),
-    addFormField: () =>
-      handleAddForm({
-        nodeData,
-        updateNode,
-      }),
+    carousel: {
+      addCarouselCard: () =>
+        handleAddCarousel({
+          selectedNode,
+          nodes,
+          edges,
+          getNextNodeId,
+          setNodes,
+          setEdges,
+          updateNode,
+        }),
+    },
     form: {
       updateFieldLabel: (fieldId, label) => {
         const fields = nodeData?.fields ?? [];
@@ -51,6 +48,11 @@ export function getSidebarHandlers({
         const fields = nodeData?.fields ?? [];
         updateFields(fields.filter((field) => field.id !== fieldId));
       },
+      addFormField: () =>
+        handleAddForm({
+          nodeData,
+          updateNode,
+        }),
     },
   };
 }

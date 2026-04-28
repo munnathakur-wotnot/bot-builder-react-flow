@@ -31,7 +31,11 @@ export default function ContextMenu({
       if (!sourceNode) return;
 
       const actionByOption = buildMenuActionMap({
-        context: { sourceNode, sourceNodeId: menuState.nodeId },
+        context: {
+          sourceNode,
+          sourceNodeId: menuState.nodeId,
+          allNodes: nodes,
+        },
         templates: MENU_NODE_TEMPLATES,
         getNextNodeId,
       });
@@ -110,7 +114,7 @@ export default function ContextMenu({
           }
 
           const actionByOption = buildMenuActionMap({
-            context: { sourceNode, sourceNodeId },
+            context: { sourceNode, sourceNodeId, allNodes: workingNodes },
             templates: MENU_NODE_TEMPLATES,
             getNextNodeId,
           });
