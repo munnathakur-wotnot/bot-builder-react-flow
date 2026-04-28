@@ -6,7 +6,7 @@ export const SIDEBAR_CONFIGS = {
     {
       component: AddButton,
       componentPropsBuilder: ({ handlers }) => ({
-        handleAddButton: handlers.addCarouselCard,
+        handleAddButton: handlers.carousel.addCarouselCard,
         text: "Add Card",
       }),
     },
@@ -22,7 +22,7 @@ export const SIDEBAR_CONFIGS = {
     {
       component: AddButton,
       componentPropsBuilder: ({ handlers }) => ({
-        handleAddButton: handlers.addFormField,
+        handleAddButton: handlers.form.addFormField,
         text: "Add Field",
       }),
     },
