@@ -63,8 +63,6 @@ export default function DragDropList({
     //  stable ids
     const itemIds = useMemo(() => items.map(getId), [items, getId]);
 
-    console.log(items, "Items");
-
     //  drag handler
     const handleDragEnd = useCallback(
         (event) => {

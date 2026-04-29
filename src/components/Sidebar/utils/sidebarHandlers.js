@@ -19,10 +19,7 @@ export function getSidebarHandlers({
   };
 
   const removeItem = (Id, type) => {
-    console.log("Remove Card", "Remove Card");
-
     const items = nodeData?.[type] ?? [];
-    console.log(items, "Remove Card");
 
     updateter(
       items.filter((field) => {

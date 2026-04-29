@@ -23,7 +23,6 @@ export default function NodeSidebar({
   if (!selectedNode) return null;
 
   const nodeData = selectedNode.data;
-  console.log(selectedNode, "Selected Node");
 
   return (
     <aside className="node-sidebar">

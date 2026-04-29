@@ -4,8 +4,6 @@ import DragDropList from "../Common/ListDragDrop";
 import FieldRow from "./Form/FormField";
 
 export default function FormFields({ nodeData, formHandlers }) {
-  console.log(formHandlers, "GGG222");
-
   const fields = nodeData.fields ?? [];
 
   return (

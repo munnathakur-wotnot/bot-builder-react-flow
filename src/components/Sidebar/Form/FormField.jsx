@@ -10,11 +10,8 @@ const FieldRow = React.memo(function FieldRow({
     dragHandleProps,
     dragListeners,
 }) {
-    console.log(dragHandleProps, "HeklloDragHandlerProps");
     const handleLabelChange = useCallback(
         (e) => {
-            console.log(e, field.id, "InLabelChange");
-
             onLabelChange(field.id, e.target.value);
         },
         [field.id, onLabelChange],

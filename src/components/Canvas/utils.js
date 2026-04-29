@@ -74,7 +74,6 @@ export function buildSingleNodePayload({
     description: "Enter Description",
     metaType: nodeData?.type ?? "collectInput",
   });
-  console.log(newNode, "New Node");
 
   return {
     nodesToAdd: [newNode],
@@ -277,7 +276,9 @@ export function buildAddCarouselCardPayload({
       ? existingCardNodes[existingCardNodes.length - 1].position.x
       : carouselNode.position.x;
   const newCardX =
-    existingCards.length > 0 ? lastCardX + NODE_WIDTH + HORIZONTAL_GAP : lastCardX;
+    existingCards.length > 0
+      ? lastCardX + NODE_WIDTH + HORIZONTAL_GAP
+      : lastCardX;
 
   // Create only new card
   nodesToAdd.push(

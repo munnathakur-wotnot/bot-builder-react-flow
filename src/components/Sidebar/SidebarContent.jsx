@@ -5,8 +5,6 @@ export default function SidebarContent({ configs, nodeData, handlers }) {
   return (
     <>
       {configs?.map((config, index) => {
-        console.log(config, "Configsd");
-
         const Component = config.component;
         const componentProps = config.componentPropsBuilder
           ? config.componentPropsBuilder({ nodeData, handlers })
