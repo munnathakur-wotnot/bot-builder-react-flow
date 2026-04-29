@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import "./NodeSidebar.css";
 import useNodeUpdater from "../../hooks/useNodeUpdater";
@@ -20,14 +20,64 @@ export default function NodeSidebar({
     setNodes,
   });
 
-  if (!selectedNode) return null;
+  /**
+   * layerStack is an array of { itemId } entries.
+   *   length === 0  →  layer 0 (first layer, the list view)
+   *   length === 1  →  layer 1 (e.g. card/field detail)
+   *   length === 2  →  layer 2 (e.g. nested sub-detail)
+   *   …and so on for any depth.
+   *
+   * "Back" pops the last entry.
+   * "Navigate into item" pushes { itemId }.
+   * No new state variable is needed when adding more layers.
+   */
+  const [layerStack, setLayerStack] = useState([]);
 
-  const nodeData = selectedNode.data;
+  // Reset to the root layer whenever the selected node changes
+  useEffect(() => {
+    setLayerStack([]);
+  }, [selectedNodeId]);
 
+  const handleNavigate = useCallback((item) => {
+    setLayerStack((prev) => [...prev, { itemId: item.id }]);
+  }, []);
+
+  const handleBack = useCallback(() => {
+    setLayerStack((prev) => prev.slice(0, -1));
+  }, []);
+
+ 
+
+  const nodeData = selectedNode?.data;
+  const layerIndex = layerStack.length;
+  const currentItemId = layerStack[layerStack.length - 1]?.itemId ?? null;
+
+  // Derive the live item context for the current layer from nodes each render.
+  // Carousel cards live as separate nodes; form fields live inside parent data.
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const layerContext = useMemo(() => {
+    if (!currentItemId) return null;
+    const itemNode = nodes.find((n) => n.id === currentItemId);
+    if (itemNode) return { id: itemNode.id, ...itemNode.data };
+    const fields = nodeData?.fields ?? [];
+    return fields.find((f) => f.id === currentItemId) ?? null;
+  }, [currentItemId, nodes, nodeData]);
+ if (!selectedNode) return null;
   return (
     <aside className="node-sidebar">
       <div className="node-sidebar__header">
-        <h3 className="node-sidebar__title">Node Config</h3>
+        {layerIndex > 0 ? (
+          <button
+            type="button"
+            className="node-sidebar__back"
+            onClick={handleBack}
+            aria-label="Back"
+          >
+            ‹ Back
+          </button>
+        ) : (
+          <h3 className="node-sidebar__title">Node Config</h3>
+        )}
         <button
           type="button"
           className="node-sidebar__close"
@@ -38,7 +88,12 @@ export default function NodeSidebar({
         </button>
       </div>
 
-      <TitleDescriptionFields nodeData={nodeData} updateNode={updateNode} />
+      {/* Title/description only visible on the root layer */}
+      {layerIndex === 0 && (
+        <TitleDescriptionFields nodeData={nodeData} updateNode={updateNode} />
+      )}
+
+      {/* Single DynamicRenderer — adapts to any layer depth via layerIndex */}
       <DynamicRenderer
         nodeType={nodeData.type}
         nodeData={nodeData}
@@ -49,6 +104,9 @@ export default function NodeSidebar({
         setNodes={setNodes}
         setEdges={setEdges}
         getNextNodeId={getNextNodeId}
+        layerIndex={layerIndex}
+        layerContext={layerContext}
+        onNavigate={handleNavigate}
       />
     </aside>
   );
@@ -67,3 +125,4 @@ NodeSidebar.propTypes = {
 NodeSidebar.defaultProps = {
   selectedNodeId: null,
 };
+

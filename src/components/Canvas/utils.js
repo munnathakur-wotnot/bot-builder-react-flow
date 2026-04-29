@@ -106,11 +106,17 @@ export function buildCarouselPayload({
   });
 
   const cardIds = [getNextNodeId(), getNextNodeId()];
+  const buttonIds = [getNextNodeId(), getNextNodeId()];
+
+  // Full card objects — include button details so everything is in one place
   const cards = cardIds.map((id, index) => ({
     id,
     title: `Card ${index + 1}`,
+    description: "",
+    buttons: [
+      { id: buttonIds[index], title: `Button ${index + 1}` },
+    ],
   }));
-  const buttonIds = [getNextNodeId(), getNextNodeId()];
 
   const baseX = sourceNode.position.x;
   const baseY = sourceNode.position.y;
@@ -146,9 +152,9 @@ export function buildCarouselPayload({
   cards.forEach((card, index) => {
     const cardId = card.id;
     const x = startX + index * (NODE_WIDTH + HORIZONTAL_GAP);
-    const buttonId = buttonIds[index];
+    const buttonId = card.buttons[0].id;
 
-    // Card — groupId links it to the carousel for group-drag
+    // Card node — stores its own buttons array
     nodes.push(
       createFlowNode({
         id: cardId,
@@ -163,8 +169,10 @@ export function buildCarouselPayload({
         groupId: carouselId,
       }),
     );
+    nodes[nodes.length - 1].data.buttons = card.buttons;
+    nodes[nodes.length - 1].data.description = card.description;
 
-    // Button — groupId links it to the carousel for group-drag
+    // Button node — stores its own details
     nodes.push(
       createFlowNode({
         id: buttonId,
@@ -172,7 +180,7 @@ export function buildCarouselPayload({
         y: buttonY,
         inPorts: [cardId],
         metaType: "carouselButton",
-        title: `Button ${index + 1}`,
+        title: card.buttons[0].title,
         iCategory: "collect",
         groupId: carouselId,
       }),
@@ -270,6 +278,8 @@ export function buildAddCarouselCardPayload({
   const newCard = {
     id: newCardId,
     title: `Card ${existingCards.length + 1}`,
+    description: "",
+    buttons: [{ id: newButtonId, title: `Button ${existingCards.length + 1}` }],
   };
 
   const allCards = [...existingCards, newCard];
@@ -292,23 +302,24 @@ export function buildAddCarouselCardPayload({
       ? lastCardX + NODE_WIDTH + HORIZONTAL_GAP
       : lastCardX;
 
-  // Create only new card — groupId links it to the carousel for group-drag
-  nodesToAdd.push(
-    createFlowNode({
-      id: newCardId,
-      x: newCardX,
-      y: cardY,
-      inPorts: [selectedNodeId],
-      connected: true,
-      outPorts: [newButtonId],
-      metaType: "carouselCard",
-      title: newCard.title,
-      iCategory: "collect",
-      groupId: selectedNodeId,
-    }),
-  );
+  // New card node — stores its own buttons array
+  const cardNode = createFlowNode({
+    id: newCardId,
+    x: newCardX,
+    y: cardY,
+    inPorts: [selectedNodeId],
+    connected: true,
+    outPorts: [newButtonId],
+    metaType: "carouselCard",
+    title: newCard.title,
+    iCategory: "collect",
+    groupId: selectedNodeId,
+  });
+  cardNode.data.buttons = newCard.buttons;
+  cardNode.data.description = newCard.description;
+  nodesToAdd.push(cardNode);
 
-  // Create only new button — groupId links it to the carousel for group-drag
+  // New button node
   nodesToAdd.push(
     createFlowNode({
       id: newButtonId,
@@ -316,7 +327,7 @@ export function buildAddCarouselCardPayload({
       y: buttonY,
       inPorts: [newCardId],
       metaType: "carouselButton",
-      title: `Button ${allCards.length}`,
+      title: newCard.buttons[0].title,
       iCategory: "collect",
       groupId: selectedNodeId,
     }),

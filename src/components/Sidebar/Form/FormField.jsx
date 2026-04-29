@@ -1,30 +1,21 @@
 import React, { useCallback } from "react";
 import PropTypes from "prop-types";
-import AppInput from "../../Common/AppInput";
 
 const FieldRow = React.memo(function FieldRow({
     field,
-    onLabelChange,
-    onTypeChange,
     onRemove,
+    onNavigate,
     dragHandleProps,
     dragListeners,
 }) {
-    const handleLabelChange = useCallback(
-        (e) => {
-            onLabelChange(field.id, e.target.value);
-        },
-        [field.id, onLabelChange],
-    );
-
-    const handleTypeChange = useCallback(
-        (e) => onTypeChange(field.id, e.target.value),
-        [field.id, onTypeChange],
-    );
-
     const handleRemove = useCallback(
         () => onRemove(field.id),
         [field.id, onRemove],
+    );
+
+    const handleOpen = useCallback(
+        () => onNavigate?.(field),
+        [field, onNavigate],
     );
 
     return (
@@ -32,32 +23,22 @@ const FieldRow = React.memo(function FieldRow({
             <span
                 {...dragHandleProps}
                 {...dragListeners}
-                style={{
-                    cursor: "grab",
-                    padding: "4px",
-                    marginRight: "8px",
-                }}
+                style={{ cursor: "grab", padding: "4px", marginRight: "8px" }}
             >
                 ☰
             </span>
-            <AppInput
-                className="node-sidebar__input node-sidebar__field-label"
-                value={field.label}
-                onChange={handleLabelChange}
-                placeholder="Field label"
-            />
 
-            <select
-                className="node-sidebar__field-type"
-                value={field.type}
-                onChange={handleTypeChange}
+            <span className="node-sidebar__field-row-label">{field.label || "Untitled"}</span>
+            <span className="node-sidebar__field-row-type">{field.type}</span>
+
+            <button
+                type="button"
+                className="node-sidebar__field-chevron"
+                onClick={handleOpen}
+                aria-label="Edit field"
             >
-                <option value="text">Text</option>
-                <option value="email">Email</option>
-                <option value="tel">Phone</option>
-                <option value="number">Number</option>
-                <option value="date">Date</option>
-            </select>
+                ›
+            </button>
 
             <button
                 type="button"
@@ -73,9 +54,8 @@ const FieldRow = React.memo(function FieldRow({
 
 FieldRow.propTypes = {
     field: PropTypes.object.isRequired,
-    onLabelChange: PropTypes.func.isRequired,
-    onTypeChange: PropTypes.func.isRequired,
     onRemove: PropTypes.func.isRequired,
+    onNavigate: PropTypes.func,
     dragHandleProps: PropTypes.object,
     dragListeners: PropTypes.object,
 };

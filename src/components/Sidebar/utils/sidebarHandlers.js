@@ -53,6 +53,60 @@ export function getSidebarHandlers({
           setEdges,
           updateNode,
         }),
+      updateCardTitle: (cardId, title) => {
+        // 1. Update the card node's own title
+        setNodes((nds) =>
+          nds.map((n) =>
+            n.id === cardId
+              ? { ...n, data: { ...n.data, title } }
+              : n,
+          ),
+        );
+        // 2. Keep the carousel's cards array in sync
+        const cards = nodeData?.cards ?? [];
+        updateter(
+          cards.map((card) => {
+            const id = typeof card === "string" ? card : card?.id;
+            if (id !== cardId) return card;
+            return typeof card === "string"
+              ? { id: card, title }
+              : { ...card, title };
+          }),
+          "cards",
+        );
+      },
+      updateButtonTitle: (cardId, buttonId, title) => {
+        // 1. Update the button node's own title
+        setNodes((nds) =>
+          nds.map((n) =>
+            n.id === buttonId
+              ? { ...n, data: { ...n.data, title } }
+              : n,
+          ),
+        );
+        // 2. Update the card node's buttons array
+        setNodes((nds) =>
+          nds.map((n) => {
+            if (n.id !== cardId) return n;
+            const buttons = (n.data.buttons ?? []).map((b) =>
+              b.id === buttonId ? { ...b, title } : b,
+            );
+            return { ...n, data: { ...n.data, buttons } };
+          }),
+        );
+        // 3. Keep the carousel's cards array in sync
+        const cards = nodeData?.cards ?? [];
+        updateter(
+          cards.map((card) => {
+            if ((typeof card === "string" ? card : card?.id) !== cardId) return card;
+            const buttons = (card.buttons ?? []).map((b) =>
+              b.id === buttonId ? { ...b, title } : b,
+            );
+            return { ...card, buttons };
+          }),
+          "cards",
+        );
+      },
     },
     form: {
       reorderFields: (fields) => updateter(fields, "fields"),

@@ -5,18 +5,33 @@ import { getSidebarHandlers } from "./utils/sidebarHandlers";
 import { CATEGORY_CONFIGS } from "./utils/categoryConfigs";
 
 export default function DynamicRenderer(props) {
-  const { nodeType, nodeData } = props;
+  const { nodeType, nodeData, layerIndex = 0, layerContext, onNavigate } = props;
 
   const categoryConfigs = CATEGORY_CONFIGS[nodeData?.iCategory] ?? {};
-  const configs = categoryConfigs?.getComponets
+  const rawConfig = categoryConfigs?.getComponets
     ? categoryConfigs?.getComponets(nodeType)
-    : [];
+    : null;
 
-  if (configs?.length === 0) return null;
+  if (!rawConfig) return null;
+
+  // Support both legacy flat array and new { layers: [[],[],…] } shape.
+  // layerIndex 0 = root list, 1 = item detail, 2 = nested detail, etc.
+  const configs = Array.isArray(rawConfig)
+    ? rawConfig
+    : (rawConfig?.layers?.[layerIndex] ?? []);
+
+  if (configs.length === 0) return null;
+
   const handlers = getSidebarHandlers(props);
 
   return (
-    <SidebarContent configs={configs} nodeData={nodeData} handlers={handlers} />
+    <SidebarContent
+      configs={configs}
+      nodeData={nodeData}
+      handlers={handlers}
+      onNavigate={onNavigate}
+      layerContext={layerContext}
+    />
   );
 }
 
@@ -30,4 +45,7 @@ DynamicRenderer.propTypes = {
   getNextNodeId: PropTypes.func.isRequired,
   updateNode: PropTypes.func.isRequired,
   nodeData: PropTypes.object,
+  layerIndex: PropTypes.number,
+  layerContext: PropTypes.object,
+  onNavigate: PropTypes.func,
 };

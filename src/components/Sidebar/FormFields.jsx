@@ -3,7 +3,7 @@ import React from "react";
 import DragDropList from "../Common/ListDragDrop";
 import FieldRow from "./Form/FormField";
 
-export default function FormFields({ nodeData, formHandlers }) {
+export default function FormFields({ nodeData, formHandlers, onNavigate }) {
   const fields = nodeData.fields ?? [];
 
   return (
@@ -18,9 +18,8 @@ export default function FormFields({ nodeData, formHandlers }) {
             field={field}
             dragHandleProps={dragHandleProps}
             dragListeners={dragListeners}
-            onLabelChange={formHandlers.updateFieldLabel}
-            onTypeChange={formHandlers.updateFieldType}
             onRemove={formHandlers.removeField}
+            onNavigate={onNavigate}
           />
         )}
       />
@@ -31,9 +30,8 @@ export default function FormFields({ nodeData, formHandlers }) {
 FormFields.propTypes = {
   nodeData: PropTypes.object,
   formHandlers: PropTypes.shape({
-    updateFieldLabel: PropTypes.func,
-    updateFieldType: PropTypes.func,
     removeField: PropTypes.func,
-    reorderFields: PropTypes.func, // 👈 important
+    reorderFields: PropTypes.func,
   }).isRequired,
+  onNavigate: PropTypes.func,
 };
