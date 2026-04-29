@@ -42,3 +42,10 @@
   stroke: red;
   stroke-width: 2;
 }
+
+/* Highlight any non-start node when a connection drag hovers over it */
+.flow-connecting .react-flow__node:hover .custom-node:not(.custom-node--start) {
+  border-color: #1fb26a;
+  background: rgba(31, 178, 106, 0.08);
+  box-shadow: 0 0 0 2px rgba(31, 178, 106, 0.25);
+}

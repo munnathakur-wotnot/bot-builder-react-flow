@@ -154,11 +154,11 @@
   border-color: #ef4444;
 }
 
-.custom-node--connection-hover .custom-node__handle--target-full {
+.flow-connecting .custom-node:not(.custom-node--start) .custom-node__handle--target-full {
   pointer-events: auto;
 }
 
-.custom-node__handle--target-full.connecting.valid {
+.flow-connecting .custom-node:not(.custom-node--start) .custom-node__handle--target-full.connecting.valid {
   border-color: #1fb26a;
   background: rgba(31, 178, 106, 0.12);
   box-shadow: inset 0 0 0 1px rgba(31, 178, 106, 0.15);

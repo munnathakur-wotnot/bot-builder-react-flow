@@ -50,12 +50,11 @@ function CustomNode({ id, data }) {
       role={isStartNode && !isConnected ? "button" : undefined}
       tabIndex={isStartNode && !isConnected ? 0 : undefined}
     >
-      {/* Full-node target handle: allows dropping a connection on any node area */}
       {!isStartNode && (
         <Handle
           type="target"
           position={Position.Top}
-          className="custom-node__handle custom-node__handle--target "
+          className="custom-node__handle custom-node__handle--target"
         />
       )}
 

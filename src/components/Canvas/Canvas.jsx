@@ -39,42 +39,14 @@ export default function CanvasFlow() {
   const [nuberOfNodes, setNumberOfNodes] = useState(0);
   const [menuState, setMenuState] = useState(null);
   const nextIdRef = useRef(2);
+  const flowWrapperRef = useRef(null);
+  const nodesRef = useRef(nodes);
+  nodesRef.current = nodes;
 
-  const openMenu = useCallback(
-    ({ nodeId, x, y }) => {
-      setMenuState({ nodeId, x, y });
-    },
-    [setMenuState],
-  );
-
-  const handleDeleteEdge = useCallback(
-    (edgeId, sourceId, targetId) => {
-      setEdges((eds) => eds.filter((e) => e.id !== edgeId));
-      setNodes((nds) =>
-        removeNodeConnectionsForEdges(nds, [
-          { id: edgeId, source: sourceId, target: targetId },
-        ]),
-      );
-    },
-    [setEdges, setNodes],
-  );
-
-  const handleEdgesDelete = useCallback(
-    (deletedEdges) => {
-      setNodes((nds) => removeNodeConnectionsForEdges(nds, deletedEdges));
-    },
-    [setNodes],
-  );
-
-  const flowCallbacks = useMemo(
-    () => ({
-      openMenu,
-      deleteEdge: handleDeleteEdge,
-    }),
-    [openMenu, handleDeleteEdge],
-  );
-
-  const onConnect = useCallback(
+  const handleConnectStart = useCallback(() => {
+    flowWrapperRef.current?.classList.add("flow-connecting");
+  }, []);
+    const onConnect = useCallback(
     (params) => {
       // Allow only one outgoing connection per source node
       const alreadyConnected = edges.some((e) => e.source === params.source);
@@ -112,6 +84,66 @@ export default function CanvasFlow() {
     [edges, setNodes, setEdges],
   );
 
+  const handleConnectEnd = useCallback(
+    (event, connectionState) => {
+      flowWrapperRef.current?.classList.remove("flow-connecting");
+
+      // Already landed on a valid handle — React Flow handles it
+      if (connectionState?.isValid) return;
+
+      const sourceNodeId = connectionState?.fromNode?.id;
+      if (!sourceNodeId) return;
+
+      // Find which node the cursor is over
+      const targetEl = event.target?.closest?.("[data-id]");
+      const targetNodeId = targetEl?.getAttribute?.("data-id");
+      if (!targetNodeId || targetNodeId === sourceNodeId) return;
+
+      // Don't connect to start nodes
+      const targetNode = nodesRef.current.find((n) => n.id === targetNodeId);
+      if (!targetNode || targetNode.data?.type === "start") return;
+
+      onConnect({ source: sourceNodeId, target: targetNodeId });
+    },
+    [onConnect],
+  );
+
+  const openMenu = useCallback(
+    ({ nodeId, x, y }) => {
+      setMenuState({ nodeId, x, y });
+    },
+    [setMenuState],
+  );
+
+  const handleDeleteEdge = useCallback(
+    (edgeId, sourceId, targetId) => {
+      setEdges((eds) => eds.filter((e) => e.id !== edgeId));
+      setNodes((nds) =>
+        removeNodeConnectionsForEdges(nds, [
+          { id: edgeId, source: sourceId, target: targetId },
+        ]),
+      );
+    },
+    [setEdges, setNodes],
+  );
+
+  const handleEdgesDelete = useCallback(
+    (deletedEdges) => {
+      setNodes((nds) => removeNodeConnectionsForEdges(nds, deletedEdges));
+    },
+    [setNodes],
+  );
+
+  const flowCallbacks = useMemo(
+    () => ({
+      openMenu,
+      deleteEdge: handleDeleteEdge,
+    }),
+    [openMenu, handleDeleteEdge],
+  );
+
+
+
   const handleNodeClick = useCallback((_, node) => {
     setSelectedNodeId(node.id);
   }, []);
@@ -130,7 +162,7 @@ export default function CanvasFlow() {
 
   return (
     <div className="canvas-layout">
-      <div className="flow-canvas">
+      <div className="flow-canvas" ref={flowWrapperRef}>
         <HeaderTooltip
           setNodes={setNodes}
           edges={edges}
@@ -150,6 +182,8 @@ export default function CanvasFlow() {
             onEdgesChange={onEdgesChange}
             onEdgesDelete={handleEdgesDelete}
             onConnect={onConnect}
+            onConnectStart={handleConnectStart}
+            onConnectEnd={handleConnectEnd}
             onNodeClick={handleNodeClick}
             // connectionRadius={30}
             // connectionMode="loose"
