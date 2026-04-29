@@ -42,10 +42,68 @@ export default function CanvasFlow() {
   const flowWrapperRef = useRef(null);
   const nodesRef = useRef(nodes);
   nodesRef.current = nodes;
+  // Records each group member's position at the start of a drag
+  const dragStartRef = useRef({});
 
   const handleConnectStart = useCallback(() => {
     flowWrapperRef.current?.classList.add("flow-connecting");
   }, []);
+
+  // ── Group drag ──────────────────────────────────────────────────────────
+  // Resolves the groupId for a node:
+  //   carousel node  → its own id (it IS the group root)
+  //   card / button  → data.groupId (set at creation time)
+  const getGroupId = useCallback(
+    (node) =>
+      node.data?.type === "carousel"
+        ? node.id
+        : (node.data?.groupId ?? null),
+    [],
+  );
+
+  const onGroupNodeDragStart = useCallback(
+    (_, node) => {
+      const groupId = getGroupId(node);
+      if (!groupId) return;
+      // Snapshot absolute positions of every group member
+      const snapshot = {};
+      nodesRef.current.forEach((n) => {
+        if (n.id === groupId || n.data?.groupId === groupId) {
+          snapshot[n.id] = { x: n.position.x, y: n.position.y };
+        }
+      });
+      dragStartRef.current = snapshot;
+    },
+    [getGroupId],
+  );
+
+  const onGroupNodeDrag = useCallback(
+    (_, node) => {
+      const groupId = getGroupId(node);
+      if (!groupId) return;
+      const startPos = dragStartRef.current[node.id];
+      if (!startPos) return;
+      const dx = node.position.x - startPos.x;
+      const dy = node.position.y - startPos.y;
+      if (dx === 0 && dy === 0) return;
+      setNodes((nds) =>
+        nds.map((n) => {
+          // The drag system owns the actively dragged node — skip it.
+          if (n.id === node.id) return n;
+          // Only co-move nodes that belong to the same group.
+          if (n.id !== groupId && n.data?.groupId !== groupId) return n;
+          const nStart = dragStartRef.current[n.id];
+          if (!nStart) return n;
+          return {
+            ...n,
+            position: { x: nStart.x + dx, y: nStart.y + dy },
+          };
+        }),
+      );
+    },
+    [getGroupId, setNodes],
+  );
+  // ────────────────────────────────────────────────────────────────────────
     const onConnect = useCallback(
     (params) => {
       // Allow only one outgoing connection per source node
@@ -184,6 +242,8 @@ export default function CanvasFlow() {
             onConnect={onConnect}
             onConnectStart={handleConnectStart}
             onConnectEnd={handleConnectEnd}
+            onNodeDragStart={onGroupNodeDragStart}
+            onNodeDrag={onGroupNodeDrag}
             onNodeClick={handleNodeClick}
             // connectionRadius={30}
             // connectionMode="loose"

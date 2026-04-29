@@ -14,10 +14,11 @@ export function createFlowNode({
   connected = false,
   title = "",
   description = "",
-  metaType = "", // your custom type (carousel, card, etc.)
+  metaType = "",
   iCategory = "",
+  groupId,
 }) {
-  return {
+  const node = {
     id,
     type,
     position: { x, y },
@@ -32,6 +33,9 @@ export function createFlowNode({
       iCategory: iCategory,
     },
   };
+  // groupId enables group-drag: dragging any member moves the whole carousel group.
+  if (groupId) node.data.groupId = groupId;
+  return node;
 }
 
 export function createEdge(source, target, isNotDeletable = false) {
@@ -120,7 +124,7 @@ export function buildCarouselPayload({
 
   const startX = baseX - totalWidth / 2 + NODE_WIDTH / 2;
 
-  //  Carousel Node
+  //  Carousel Node (absolute position)
   const carouselNode = createFlowNode({
     id: carouselId,
     x: baseX,
@@ -142,10 +146,9 @@ export function buildCarouselPayload({
   cards.forEach((card, index) => {
     const cardId = card.id;
     const x = startX + index * (NODE_WIDTH + HORIZONTAL_GAP);
-
     const buttonId = buttonIds[index];
 
-    // Card
+    // Card — groupId links it to the carousel for group-drag
     nodes.push(
       createFlowNode({
         id: cardId,
@@ -157,10 +160,11 @@ export function buildCarouselPayload({
         outPorts: [buttonId],
         title: card.title,
         iCategory: "collect",
+        groupId: carouselId,
       }),
     );
 
-    // Button
+    // Button — groupId links it to the carousel for group-drag
     nodes.push(
       createFlowNode({
         id: buttonId,
@@ -170,6 +174,7 @@ export function buildCarouselPayload({
         metaType: "carouselButton",
         title: `Button ${index + 1}`,
         iCategory: "collect",
+        groupId: carouselId,
       }),
     );
 
@@ -287,7 +292,7 @@ export function buildAddCarouselCardPayload({
       ? lastCardX + NODE_WIDTH + HORIZONTAL_GAP
       : lastCardX;
 
-  // Create only new card
+  // Create only new card — groupId links it to the carousel for group-drag
   nodesToAdd.push(
     createFlowNode({
       id: newCardId,
@@ -299,10 +304,11 @@ export function buildAddCarouselCardPayload({
       metaType: "carouselCard",
       title: newCard.title,
       iCategory: "collect",
+      groupId: selectedNodeId,
     }),
   );
 
-  // Create only new button
+  // Create only new button — groupId links it to the carousel for group-drag
   nodesToAdd.push(
     createFlowNode({
       id: newButtonId,
@@ -312,6 +318,7 @@ export function buildAddCarouselCardPayload({
       metaType: "carouselButton",
       title: `Button ${allCards.length}`,
       iCategory: "collect",
+      groupId: selectedNodeId,
     }),
   );
 
