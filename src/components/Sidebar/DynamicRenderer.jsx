@@ -7,7 +7,7 @@ import { CATEGORY_CONFIGS } from "./utils/categoryConfigs";
 export default function DynamicRenderer(props) {
   const { nodeType, nodeData } = props;
 
-  const categoryConfigs = CATEGORY_CONFIGS[nodeType] ?? {};
+  const categoryConfigs = CATEGORY_CONFIGS[nodeData?.iCategory] ?? {};
   const configs = categoryConfigs?.getComponets
     ? categoryConfigs?.getComponets(nodeType)
     : [];

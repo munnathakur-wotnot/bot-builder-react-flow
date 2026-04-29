@@ -15,6 +15,7 @@ export function createFlowNode({
   title = "",
   description = "",
   metaType = "", // your custom type (carousel, card, etc.)
+  iCategory = "",
 }) {
   return {
     id,
@@ -28,6 +29,7 @@ export function createFlowNode({
       title,
       description,
       type: metaType,
+      iCategory: iCategory,
     },
   };
 }
@@ -73,6 +75,7 @@ export function buildSingleNodePayload({
     title,
     description: "Enter Description",
     metaType: nodeData?.type ?? "collectInput",
+    iCategory: "collect",
   });
 
   return {
@@ -126,6 +129,7 @@ export function buildCarouselPayload({
     title: carouselTitle,
     description: "Carousel Node",
     metaType: "carousel",
+    iCategory: "collect",
   });
 
   carouselNode.data.cards = cards;
@@ -152,6 +156,7 @@ export function buildCarouselPayload({
         connected: true,
         outPorts: [buttonId],
         title: card.title,
+        iCategory: "collect",
       }),
     );
 
@@ -164,6 +169,7 @@ export function buildCarouselPayload({
         inPorts: [cardId],
         metaType: "carouselButton",
         title: `Button ${index + 1}`,
+        iCategory: "collect",
       }),
     );
 
@@ -206,6 +212,7 @@ export function buildFormPayload({
     title,
     description: nodeData.description ?? "",
     metaType: "form",
+    iCategory: "collect",
   });
 
   // Embed fields directly into the node's data
@@ -291,6 +298,7 @@ export function buildAddCarouselCardPayload({
       outPorts: [newButtonId],
       metaType: "carouselCard",
       title: newCard.title,
+      iCategory: "collect",
     }),
   );
 
@@ -303,6 +311,7 @@ export function buildAddCarouselCardPayload({
       inPorts: [newCardId],
       metaType: "carouselButton",
       title: `Button ${allCards.length}`,
+      iCategory: "collect",
     }),
   );
 
