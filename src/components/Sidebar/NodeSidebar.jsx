@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import "./NodeSidebar.css";
 import useNodeUpdater from "../../hooks/useNodeUpdater";
 import TitleDescriptionFields from "./TitleDescriptionFields";
-import SidebarChecker from "./SidebarChecker";
+import DynamicRenderer from "./DynamicRenderer";
 
 export default function NodeSidebar({
   selectedNodeId,
@@ -40,7 +40,7 @@ export default function NodeSidebar({
       </div>
 
       <TitleDescriptionFields nodeData={nodeData} updateNode={updateNode} />
-      <SidebarChecker
+      <DynamicRenderer
         nodeType={nodeData.type}
         nodeData={nodeData}
         updateNode={updateNode}

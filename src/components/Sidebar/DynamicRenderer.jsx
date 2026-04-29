@@ -1,14 +1,16 @@
 import React from "react";
 import PropTypes from "prop-types";
 import SidebarContent from "./SidebarContent";
-import { SIDEBAR_CONFIGS } from "./utils/sidebarConfigs";
 import { getSidebarHandlers } from "./utils/sidebarHandlers";
+import { CATEGORY_CONFIGS } from "./utils/categoryConfigs";
 
-export default function SidebarChecker(props) {
+export default function DynamicRenderer(props) {
   const { nodeType, nodeData } = props;
 
-  const configs = SIDEBAR_CONFIGS[nodeType] ?? [];
-  if (configs.length === 0) return null;
+  const categoryConfigs = CATEGORY_CONFIGS[nodeType] ?? {};
+  const configs = categoryConfigs?.getComponets(nodeType);
+
+  if (configs?.length === 0) return null;
   const handlers = getSidebarHandlers(props);
 
   return (
@@ -16,7 +18,7 @@ export default function SidebarChecker(props) {
   );
 }
 
-SidebarChecker.propTypes = {
+DynamicRenderer.propTypes = {
   nodeType: PropTypes.string,
   selectedNode: PropTypes.object,
   nodes: PropTypes.array.isRequired,

@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 export default function SidebarContent({ configs, nodeData, handlers }) {
   return (
     <>
-      {configs.map((config, index) => {
+      {configs?.map((config, index) => {
         const Component = config.component;
         const componentProps = config.componentPropsBuilder
           ? config.componentPropsBuilder({ nodeData, handlers })

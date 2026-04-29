@@ -28,8 +28,12 @@ export function getSidebarHandlers({
         }),
     },
     form: {
+      reorderFields: (fields) => {
+        updateFields(fields);
+      },
       updateFieldLabel: (fieldId, label) => {
         const fields = nodeData?.fields ?? [];
+
         updateFields(
           fields.map((field) =>
             field.id === fieldId ? { ...field, label } : field,
