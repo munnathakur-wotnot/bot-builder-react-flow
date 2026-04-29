@@ -142,12 +142,18 @@ export default function CanvasFlow() {
             nodes={nodes}
             edges={edges}
             nodeTypes={nodeTypes}
+            // onlyRenderVisibleElements={true}
             edgeTypes={edgeTypes}
+            autoPanOnConnect={false}
+            autoPanOnNodeDrag={false}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onEdgesDelete={handleEdgesDelete}
             onConnect={onConnect}
             onNodeClick={handleNodeClick}
+            // connectionRadius={30}
+            // connectionMode="loose"
+            // snapToGrid={true}
             onPaneClick={handlePaneClick}
             onMove={onMove}
             fitView
