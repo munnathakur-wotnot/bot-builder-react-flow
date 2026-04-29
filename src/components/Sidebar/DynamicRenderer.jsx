@@ -8,7 +8,9 @@ export default function DynamicRenderer(props) {
   const { nodeType, nodeData } = props;
 
   const categoryConfigs = CATEGORY_CONFIGS[nodeType] ?? {};
-  const configs = categoryConfigs?.getComponets(nodeType);
+  const configs = categoryConfigs?.getComponets
+    ? categoryConfigs?.getComponets(nodeType)
+    : [];
 
   if (configs?.length === 0) return null;
   const handlers = getSidebarHandlers(props);
