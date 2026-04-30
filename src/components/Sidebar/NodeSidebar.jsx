@@ -4,6 +4,7 @@ import "./NodeSidebar.css";
 import useNodeUpdater from "../../hooks/useNodeUpdater";
 import TitleDescriptionFields from "./TitleDescriptionFields";
 import DynamicRenderer from "./DynamicRenderer";
+import SidebarHeader from "./SidebarHeader";
 
 export default function NodeSidebar({
   selectedNodeId,
@@ -42,19 +43,12 @@ export default function NodeSidebar({
     setLayerStack((prev) => [...prev, { itemId: item.id }]);
   }, []);
 
-  const handleBack = useCallback(() => {
-    setLayerStack((prev) => prev.slice(0, -1));
-  }, []);
-
- 
-
   const nodeData = selectedNode?.data;
   const layerIndex = layerStack.length;
   const currentItemId = layerStack[layerStack.length - 1]?.itemId ?? null;
 
   // Derive the live item context for the current layer from nodes each render.
   // Carousel cards live as separate nodes; form fields live inside parent data.
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const layerContext = useMemo(() => {
     if (!currentItemId) return null;
     const itemNode = nodes.find((n) => n.id === currentItemId);
@@ -62,31 +56,16 @@ export default function NodeSidebar({
     const fields = nodeData?.fields ?? [];
     return fields.find((f) => f.id === currentItemId) ?? null;
   }, [currentItemId, nodes, nodeData]);
- if (!selectedNode) return null;
+
+  if (!selectedNode) return null;
+
   return (
     <aside className="node-sidebar">
-      <div className="node-sidebar__header">
-        {layerIndex > 0 ? (
-          <button
-            type="button"
-            className="node-sidebar__back"
-            onClick={handleBack}
-            aria-label="Back"
-          >
-            ‹ Back
-          </button>
-        ) : (
-          <h3 className="node-sidebar__title">Node Config</h3>
-        )}
-        <button
-          type="button"
-          className="node-sidebar__close"
-          onClick={onClose}
-          aria-label="Close sidebar"
-        >
-          ×
-        </button>
-      </div>
+      <SidebarHeader
+        onClose={onClose}
+        layerIndex={layerIndex}
+        setLayerStack={setLayerStack}
+      />
 
       {/* Title/description only visible on the root layer */}
       {layerIndex === 0 && (
@@ -125,4 +104,3 @@ NodeSidebar.propTypes = {
 NodeSidebar.defaultProps = {
   selectedNodeId: null,
 };
-
