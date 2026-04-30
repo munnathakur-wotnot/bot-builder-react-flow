@@ -46,8 +46,12 @@ export default function NodeSidebar({
   // Carousel cards live as separate nodes; form fields live inside parent data.
   const layerContext = useMemo(() => {
     if (!currentItemId) return null;
+
+    //for Nodes like card Buttuon Ids
     const itemNode = nodes.find((n) => n.id === currentItemId);
     if (itemNode) return { id: itemNode.id, ...itemNode.data };
+
+    //fields
     const fields = nodeData?.fields ?? [];
     return fields.find((f) => f.id === currentItemId) ?? null;
   }, [currentItemId, nodes, nodeData]);
