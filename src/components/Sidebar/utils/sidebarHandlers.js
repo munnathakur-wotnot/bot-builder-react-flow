@@ -2,6 +2,7 @@ import {
   handleAddCarousel,
   handleAddForm,
   handleRemoveCarouselCard,
+  updateCarouselCard,
 } from "../helper";
 
 export function getSidebarHandlers({
@@ -15,6 +16,8 @@ export function getSidebarHandlers({
   nodeData,
 }) {
   const updateter = (updatedData, type) => {
+    console.log(updatedData, "hello");
+
     updateNode({ [type]: updatedData });
   };
 
@@ -53,6 +56,25 @@ export function getSidebarHandlers({
           setEdges,
           updateNode,
         }),
+      updateCard: (cardId, patch) =>
+        updateCarouselCard(cardId, patch, nodeData, setNodes, updateNode),
+      secondLayer: {
+        cardUpdater: (cardId, newTitle) => {
+          updateSingleNode(nodeId, (node) => {
+            const updatedCards = (node.data.cards || []).map((card) =>
+              card.id === cardId ? { ...card, title: newTitle } : card,
+            );
+
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                cards: updatedCards,
+              },
+            };
+          });
+        },
+      },
     },
     form: {
       reorderFields: (fields) => updateter(fields, "fields"),

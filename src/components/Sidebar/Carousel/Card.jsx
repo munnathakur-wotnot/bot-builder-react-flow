@@ -3,7 +3,7 @@ import "./Card.css";
 import PropTypes from "prop-types";
 import DragDropList from "../../Common/ListDragDrop";
 
-const Card = ({ nodeData, removeCard, reorderCards }) => {
+const Card = ({ nodeData, removeCard, reorderCards, setlayer }) => {
   const cards = nodeData?.cards ?? [];
 
   return (
@@ -16,7 +16,10 @@ const Card = ({ nodeData, removeCard, reorderCards }) => {
         }
         renderItem={(card, { dragHandleProps, dragListeners }) => (
           <div className="card-container" style={{ marginBottom: "10px" }}>
-            <div className="card">
+            <div
+              className="card"
+              onClick={() => setlayer({ number: 2, data: card })}
+            >
               <div className="card-left">
                 <span
                   {...dragHandleProps}
@@ -33,9 +36,10 @@ const Card = ({ nodeData, removeCard, reorderCards }) => {
 
               <div
                 className="card-delete"
-                onClick={() =>
-                  removeCard(typeof card === "string" ? card : card?.id)
-                }
+                onClick={(e) => {
+                  e.stopPropagation();
+                  removeCard(typeof card === "string" ? card : card?.id);
+                }}
                 style={{
                   width: "30px",
                   color: "red",
@@ -55,8 +59,8 @@ export default Card;
 
 Card.propTypes = {
   nodeData: PropTypes.object,
-  onClick: PropTypes.func,
-  onDelete: PropTypes.func,
   removeCard: PropTypes.func,
   reorderCards: PropTypes.func,
+  onCardClick: PropTypes.func,
+  setlayer: PropTypes.func,
 };

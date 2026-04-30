@@ -114,3 +114,44 @@ export function handleRemoveCarouselCard({
   setEdges(remainingEdges);
   updateNode({ cards: nextCards });
 }
+
+export const updateCarouselCard = (
+  cardId,
+  patch,
+  nodeData,
+  setNodes,
+  updateNode,
+) => {
+  if (!cardId || !patch) return;
+
+  const currentCards = nodeData?.cards ?? [];
+  const nextCards = currentCards.map((card, index) => {
+    if (typeof card === "string") {
+      if (card !== cardId) return card;
+
+      return {
+        id: card,
+        title: `Card ${index + 1}`,
+        ...patch,
+      };
+    }
+
+    if (card.id !== cardId) return card;
+    return { ...card, ...patch };
+  });
+
+  setNodes((prevNodes) =>
+    prevNodes.map((node) => {
+      if (node.id !== cardId) return node;
+
+      return {
+        ...node,
+        data: {
+          ...node.data,
+          ...patch,
+        },
+      };
+    }),
+  );
+  updateNode({ cards: nextCards });
+};

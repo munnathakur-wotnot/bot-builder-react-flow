@@ -1,13 +1,24 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-export default function SidebarContent({ configs, nodeData, handlers }) {
+export default function SidebarContent({
+  configs,
+  nodeData,
+  handlers,
+  setlayer,
+  layer,
+}) {
   return (
     <>
       {configs?.map((config, index) => {
         const Component = config.component;
         const componentProps = config.componentPropsBuilder
-          ? config.componentPropsBuilder({ nodeData, handlers })
+          ? config.componentPropsBuilder({
+            nodeData,
+            handlers,
+            setlayer,
+            layer,
+          })
           : {};
 
         return (
@@ -28,6 +39,8 @@ SidebarContent.propTypes = {
     }),
   ).isRequired,
   nodeData: PropTypes.object,
+  setlayer: PropTypes.func,
+  layer: PropTypes.object,
   handlers: PropTypes.shape({
     addCarouselCard: PropTypes.func,
     addFormField: PropTypes.func,
