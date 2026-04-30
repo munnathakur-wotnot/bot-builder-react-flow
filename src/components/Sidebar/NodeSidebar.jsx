@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import "./NodeSidebar.css";
-import useNodeUpdater from "../../hooks/useNodeUpdater";
 import TitleDescriptionFields from "./TitleDescriptionFields";
 import DynamicRenderer from "./DynamicRenderer";
 import SidebarHeader from "./SidebarHeader";
@@ -13,14 +12,10 @@ export default function NodeSidebar({
   setNodes,
   setEdges,
   getNextNodeId,
+  selectedNode,
+  updateNode,
   onClose,
 }) {
-  const selectedNode = nodes.find((n) => n.id === selectedNodeId) ?? null;
-  const { updateNode } = useNodeUpdater({
-    nodeId: selectedNode?.id,
-    setNodes,
-  });
-
   /**
    * layerStack is an array of { itemId } entries.
    *   length === 0  →  layer 0 (first layer, the list view)
@@ -99,6 +94,8 @@ NodeSidebar.propTypes = {
   setEdges: PropTypes.func.isRequired,
   getNextNodeId: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
+  selectedNode: PropTypes.object.isRequired,
+  updateNode: PropTypes.func.isRequired,
 };
 
 NodeSidebar.defaultProps = {

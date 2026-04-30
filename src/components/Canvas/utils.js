@@ -16,6 +16,7 @@ export function createFlowNode({
   description = "",
   metaType = "",
   iCategory = "",
+  icon = "",
   groupId,
   isValidDragConn = true,
 }) {
@@ -27,6 +28,7 @@ export function createFlowNode({
       id,
       inPorts,
       outPorts,
+      icon,
       connected,
       title,
       description,
@@ -65,6 +67,7 @@ export function buildSingleNodePayload({
   nodeData,
   getNextNodeId,
   allNodes,
+  delay = false,
 }) {
   const newNodeId = getNextNodeId();
   const title = getIncrementalTitle({
@@ -72,17 +75,35 @@ export function buildSingleNodePayload({
     metaType: nodeData?.type ?? "collectInput",
     baseTitle: "Enter Input",
   });
+  let newNode = {};
 
-  const newNode = createFlowNode({
-    id: newNodeId,
-    x: sourceNode.position.x,
-    y: sourceNode.position.y + 220,
-    inPorts: [sourceNodeId],
-    title,
-    description: "Enter Description",
-    metaType: nodeData?.type ?? "collectInput",
-    iCategory: "collect",
-  });
+  if (delay) {
+    const newNodeDelay = createFlowNode({
+      id: newNodeId,
+      x: sourceNode.position.x,
+      y: sourceNode.position.y + 220,
+      inPorts: [sourceNodeId],
+      title: "Delay",
+      metaType: "delay",
+      icon: "◔",
+      iCategory: "collect",
+    });
+    newNode = {
+      ...newNodeDelay,
+      data: { ...newNodeDelay.data, delayDuration: 1 },
+    };
+  } else {
+    newNode = createFlowNode({
+      id: newNodeId,
+      x: sourceNode.position.x,
+      y: sourceNode.position.y + 220,
+      inPorts: [sourceNodeId],
+      title,
+      description: "Enter Description",
+      metaType: nodeData?.type ?? "collectInput",
+      iCategory: "collect",
+    });
+  }
 
   return {
     nodesToAdd: [newNode],
@@ -254,6 +275,13 @@ export function buildMenuActionMap({ context, templates, getNextNodeId }) {
         ...context,
         nodeData: templates.form,
         getNextNodeId,
+      }),
+    delay: () =>
+      buildSingleNodePayload({
+        ...context,
+        nodeData: templates.collectInput,
+        getNextNodeId,
+        delay: true,
       }),
   };
 }

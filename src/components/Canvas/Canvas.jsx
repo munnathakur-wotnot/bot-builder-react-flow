@@ -12,12 +12,12 @@ import "@xyflow/react/dist/style.css";
 import "./Canvas.css";
 import CustomNode from "../Nodes/CustomNode";
 import ContextMenu from "../Menu/ContextMenu";
-import NodeSidebar from "../Sidebar/NodeSidebar";
 import { INITIAL_EDGES, INITIAL_NODES } from "./constants";
 import CustomEdge from "../Edges/CustumEdges";
 import { FlowCallbacksProvider } from "./FlowCallbacksContext.jsx";
 import HeaderTooltip from "../headerTooltip/HeaderTooltip.jsx";
 import { removeNodeConnectionsForEdges } from "./utils.js";
+import SidebarIndex from "../Sidebar/index.jsx";
 
 const nodeTypes = { custom: CustomNode };
 const edgeTypes = {
@@ -273,7 +273,7 @@ export default function CanvasFlow() {
           />
         )}
 
-        <NodeSidebar
+        <SidebarIndex
           selectedNodeId={selectedNodeId}
           nodes={nodes}
           edges={edges}

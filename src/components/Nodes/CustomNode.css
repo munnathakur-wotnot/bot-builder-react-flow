@@ -23,7 +23,20 @@
   box-shadow: 0 4px 10px rgba(17, 24, 39, 0.14);
   cursor: pointer;
 }
-
+.custom-node--delay {
+  width: fit-content;
+  min-width: 140px;
+  border: none;
+  border-radius: 999px;
+  background: #cecfce;
+  box-shadow: 0 4px 10px rgba(17, 24, 39, 0.14);
+  cursor: pointer;
+}
+.custom-node__header-delay{
+   display: flex;
+   justify-content: center;
+   font-size: 12px;
+}
 .custom-node--start .custom-node__header {
   padding: 10px 16px;
   background: transparent;

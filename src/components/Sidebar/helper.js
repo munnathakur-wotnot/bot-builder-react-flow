@@ -114,3 +114,6 @@ export function handleRemoveCarouselCard({
   setEdges(remainingEdges);
   updateNode({ cards: nextCards });
 }
+
+export const renderSidebarMapping = (type) =>
+  type === "delay" ? "delay" : "default";
