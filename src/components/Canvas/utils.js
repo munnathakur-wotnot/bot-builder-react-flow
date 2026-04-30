@@ -17,6 +17,7 @@ export function createFlowNode({
   metaType = "",
   iCategory = "",
   groupId,
+  isValidDragConn = true,
 }) {
   const node = {
     id,
@@ -31,6 +32,7 @@ export function createFlowNode({
       description,
       type: metaType,
       iCategory: iCategory,
+      isValidDragConn,
     },
   };
   // groupId enables group-drag: dragging any member moves the whole carousel group.
@@ -113,9 +115,7 @@ export function buildCarouselPayload({
     id,
     title: `Card ${index + 1}`,
     description: "",
-    buttons: [
-      { id: buttonIds[index], title: `Button ${index + 1}` },
-    ],
+    buttons: [{ id: buttonIds[index], title: `Button ${index + 1}` }],
   }));
 
   const baseX = sourceNode.position.x;
@@ -160,6 +160,7 @@ export function buildCarouselPayload({
         id: cardId,
         x,
         y: cardY,
+        isValidDragConn: false,
         inPorts: [carouselId],
         metaType: "carouselCard",
         connected: true,
@@ -178,6 +179,7 @@ export function buildCarouselPayload({
         id: buttonId,
         x,
         y: buttonY,
+        isValidDragConn: false,
         inPorts: [cardId],
         metaType: "carouselButton",
         title: card.buttons[0].title,
@@ -306,6 +308,7 @@ export function buildAddCarouselCardPayload({
   const cardNode = createFlowNode({
     id: newCardId,
     x: newCardX,
+    isValidDragConn: false,
     y: cardY,
     inPorts: [selectedNodeId],
     connected: true,
@@ -324,6 +327,7 @@ export function buildAddCarouselCardPayload({
     createFlowNode({
       id: newButtonId,
       x: newCardX,
+      isValidDragConn: false,
       y: buttonY,
       inPorts: [newCardId],
       metaType: "carouselButton",

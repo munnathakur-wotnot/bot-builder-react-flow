@@ -154,9 +154,14 @@ export default function CanvasFlow() {
       const targetNodeId = targetEl?.getAttribute?.("data-id");
       if (!targetNodeId || targetNodeId === sourceNodeId) return;
 
-      // Don't connect to start nodes
+      // Don't connect to start nodes or Custom nodes should not be allowed to connect with other nodes.
       const targetNode = nodesRef.current.find((n) => n.id === targetNodeId);
-      if (!targetNode || targetNode.data?.type === "start") return;
+      if (
+        !targetNode ||
+        targetNode.data?.type === "start" ||
+        !targetNode.data?.isValidDragConn
+      )
+        return;
 
       onConnect({ source: sourceNodeId, target: targetNodeId });
     },
