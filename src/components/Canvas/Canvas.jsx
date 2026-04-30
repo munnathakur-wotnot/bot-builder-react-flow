@@ -54,10 +54,7 @@ export default function CanvasFlow() {
   //   carousel node  → its own id (it IS the group root)
   //   card / button  → data.groupId (set at creation time)
   const getGroupId = useCallback(
-    (node) =>
-      node.data?.type === "carousel"
-        ? node.id
-        : (node.data?.groupId ?? null),
+    (node) => (node.data?.type === "carousel" ? node.id : null),
     [],
   );
 
@@ -104,7 +101,7 @@ export default function CanvasFlow() {
     [getGroupId, setNodes],
   );
   // ────────────────────────────────────────────────────────────────────────
-    const onConnect = useCallback(
+  const onConnect = useCallback(
     (params) => {
       // Allow only one outgoing connection per source node
       const alreadyConnected = edges.some((e) => e.source === params.source);
@@ -199,8 +196,6 @@ export default function CanvasFlow() {
     }),
     [openMenu, handleDeleteEdge],
   );
-
-
 
   const handleNodeClick = useCallback((_, node) => {
     setSelectedNodeId(node.id);
