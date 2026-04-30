@@ -41,6 +41,9 @@ function CustomNode({ id, data }) {
   if (!data) return null;
 
   const typeClassName = `custom-node custom-node--${data.type ?? "default"}`;
+  const titleClassName =
+    data.type === "delay" ? "custom-node__header-delay" : `custom-node__header`;
+  const titlteTextClassName = data.type === "delay" ? "" : "custom-node__title";
 
   return (
     <div
@@ -59,9 +62,12 @@ function CustomNode({ id, data }) {
       )}
 
       {/* Header */}
-      <div className="custom-node__header">
-        <div className="custom-node__icon" />
-        <p className="custom-node__title">{data.title}</p>
+      <div className={titleClassName}>
+        {!data.icon && <div className="custom-node__icon" />}
+        <p className={titlteTextClassName}>
+          {data.icon} {data.title}{" "}
+          {data.delayDuration ? `(${data.delayDuration}s)` : ""}
+        </p>
       </div>
 
       {/* Description */}
@@ -99,7 +105,8 @@ export default memo(CustomNode, (prev, next) => {
     prevData.description === nextData.description &&
     prevData.type === nextData.type &&
     prevData.outPorts === nextData.outPorts && // reference check (fast)
-    prevData.inPorts === nextData.inPorts
+    prevData.inPorts === nextData.inPorts &&
+    prevData.delayDuration === nextData.delayDuration
   );
 });
 CustomNode.displayName = "CustomNode";

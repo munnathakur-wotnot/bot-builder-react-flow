@@ -9,6 +9,7 @@ const MENU_OPTIONS = [
   { id: "collectInput", label: "Collect Input" },
   { id: "carousel", label: "Carousel" },
   { id: "form", label: "Form" },
+  { id: "delay", label: "Delay" },
 ];
 
 export default function ContextMenu({

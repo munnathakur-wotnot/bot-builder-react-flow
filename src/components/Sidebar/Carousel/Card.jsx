@@ -43,14 +43,16 @@ const Card = ({ nodeData, removeCard, reorderCards, onNavigate }) => {
                   >
                     ›
                   </button>
-                  <button
-                    type="button"
-                    className="card-delete"
-                    onClick={() => removeCard(cardId)}
-                    aria-label="Remove card"
-                  >
-                    ✕
-                  </button>
+                  {cards?.length > 1 && (
+                    <button
+                      type="button"
+                      className="card-delete"
+                      onClick={() => removeCard(cardId)}
+                      aria-label="Remove card"
+                    >
+                      ✕
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

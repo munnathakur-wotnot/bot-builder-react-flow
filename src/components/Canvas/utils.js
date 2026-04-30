@@ -16,7 +16,9 @@ export function createFlowNode({
   description = "",
   metaType = "",
   iCategory = "",
+  icon = "",
   groupId,
+  isValidDragConn = true,
 }) {
   const node = {
     id,
@@ -26,11 +28,13 @@ export function createFlowNode({
       id,
       inPorts,
       outPorts,
+      icon,
       connected,
       title,
       description,
       type: metaType,
       iCategory: iCategory,
+      isValidDragConn,
     },
   };
   // groupId enables group-drag: dragging any member moves the whole carousel group.
@@ -63,6 +67,7 @@ export function buildSingleNodePayload({
   nodeData,
   getNextNodeId,
   allNodes,
+  delay = false,
 }) {
   const newNodeId = getNextNodeId();
   const title = getIncrementalTitle({
@@ -70,17 +75,35 @@ export function buildSingleNodePayload({
     metaType: nodeData?.type ?? "collectInput",
     baseTitle: "Enter Input",
   });
+  let newNode = {};
 
-  const newNode = createFlowNode({
-    id: newNodeId,
-    x: sourceNode.position.x,
-    y: sourceNode.position.y + 220,
-    inPorts: [sourceNodeId],
-    title,
-    description: "Enter Description",
-    metaType: nodeData?.type ?? "collectInput",
-    iCategory: "collect",
-  });
+  if (delay) {
+    const newNodeDelay = createFlowNode({
+      id: newNodeId,
+      x: sourceNode.position.x,
+      y: sourceNode.position.y + 220,
+      inPorts: [sourceNodeId],
+      title: "Delay",
+      metaType: "delay",
+      icon: "◔",
+      iCategory: "collect",
+    });
+    newNode = {
+      ...newNodeDelay,
+      data: { ...newNodeDelay.data, delayDuration: 1 },
+    };
+  } else {
+    newNode = createFlowNode({
+      id: newNodeId,
+      x: sourceNode.position.x,
+      y: sourceNode.position.y + 220,
+      inPorts: [sourceNodeId],
+      title,
+      description: "Enter Description",
+      metaType: nodeData?.type ?? "collectInput",
+      iCategory: "collect",
+    });
+  }
 
   return {
     nodesToAdd: [newNode],
@@ -113,9 +136,7 @@ export function buildCarouselPayload({
     id,
     title: `Card ${index + 1}`,
     description: "",
-    buttons: [
-      { id: buttonIds[index], title: `Button ${index + 1}` },
-    ],
+    buttons: [{ id: buttonIds[index], title: `Button ${index + 1}` }],
   }));
 
   const baseX = sourceNode.position.x;
@@ -160,6 +181,7 @@ export function buildCarouselPayload({
         id: cardId,
         x,
         y: cardY,
+        isValidDragConn: false,
         inPorts: [carouselId],
         metaType: "carouselCard",
         connected: true,
@@ -178,6 +200,7 @@ export function buildCarouselPayload({
         id: buttonId,
         x,
         y: buttonY,
+        isValidDragConn: false,
         inPorts: [cardId],
         metaType: "carouselButton",
         title: card.buttons[0].title,
@@ -253,6 +276,13 @@ export function buildMenuActionMap({ context, templates, getNextNodeId }) {
         nodeData: templates.form,
         getNextNodeId,
       }),
+    delay: () =>
+      buildSingleNodePayload({
+        ...context,
+        nodeData: templates.collectInput,
+        getNextNodeId,
+        delay: true,
+      }),
   };
 }
 
@@ -306,6 +336,7 @@ export function buildAddCarouselCardPayload({
   const cardNode = createFlowNode({
     id: newCardId,
     x: newCardX,
+    isValidDragConn: false,
     y: cardY,
     inPorts: [selectedNodeId],
     connected: true,
@@ -324,6 +355,7 @@ export function buildAddCarouselCardPayload({
     createFlowNode({
       id: newButtonId,
       x: newCardX,
+      isValidDragConn: false,
       y: buttonY,
       inPorts: [newCardId],
       metaType: "carouselButton",

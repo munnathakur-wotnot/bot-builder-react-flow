@@ -12,12 +12,12 @@ import "@xyflow/react/dist/style.css";
 import "./Canvas.css";
 import CustomNode from "../Nodes/CustomNode";
 import ContextMenu from "../Menu/ContextMenu";
-import NodeSidebar from "../Sidebar/NodeSidebar";
 import { INITIAL_EDGES, INITIAL_NODES } from "./constants";
 import CustomEdge from "../Edges/CustumEdges";
 import { FlowCallbacksProvider } from "./FlowCallbacksContext.jsx";
 import HeaderTooltip from "../headerTooltip/HeaderTooltip.jsx";
 import { removeNodeConnectionsForEdges } from "./utils.js";
+import SidebarIndex from "../Sidebar/index.jsx";
 
 const nodeTypes = { custom: CustomNode };
 const edgeTypes = {
@@ -54,10 +54,7 @@ export default function CanvasFlow() {
   //   carousel node  → its own id (it IS the group root)
   //   card / button  → data.groupId (set at creation time)
   const getGroupId = useCallback(
-    (node) =>
-      node.data?.type === "carousel"
-        ? node.id
-        : (node.data?.groupId ?? null),
+    (node) => (node.data?.type === "carousel" ? node.id : null),
     [],
   );
 
@@ -104,7 +101,7 @@ export default function CanvasFlow() {
     [getGroupId, setNodes],
   );
   // ────────────────────────────────────────────────────────────────────────
-    const onConnect = useCallback(
+  const onConnect = useCallback(
     (params) => {
       // Allow only one outgoing connection per source node
       const alreadyConnected = edges.some((e) => e.source === params.source);
@@ -157,9 +154,14 @@ export default function CanvasFlow() {
       const targetNodeId = targetEl?.getAttribute?.("data-id");
       if (!targetNodeId || targetNodeId === sourceNodeId) return;
 
-      // Don't connect to start nodes
+      // Don't connect to start nodes or Custom nodes should not be allowed to connect with other nodes.
       const targetNode = nodesRef.current.find((n) => n.id === targetNodeId);
-      if (!targetNode || targetNode.data?.type === "start") return;
+      if (
+        !targetNode ||
+        targetNode.data?.type === "start" ||
+        !targetNode.data?.isValidDragConn
+      )
+        return;
 
       onConnect({ source: sourceNodeId, target: targetNodeId });
     },
@@ -200,8 +202,6 @@ export default function CanvasFlow() {
     [openMenu, handleDeleteEdge],
   );
 
-
-
   const handleNodeClick = useCallback((_, node) => {
     setSelectedNodeId(node.id);
   }, []);
@@ -232,7 +232,7 @@ export default function CanvasFlow() {
             nodes={nodes}
             edges={edges}
             nodeTypes={nodeTypes}
-            // onlyRenderVisibleElements={true}
+            onlyRenderVisibleElements={true}
             edgeTypes={edgeTypes}
             autoPanOnConnect={false}
             autoPanOnNodeDrag={false}
@@ -246,8 +246,8 @@ export default function CanvasFlow() {
             onNodeDrag={onGroupNodeDrag}
             onNodeClick={handleNodeClick}
             // connectionRadius={30}
-            // connectionMode="loose"
-            // snapToGrid={true}
+            connectionMode="loose"
+            snapToGrid={true}
             onPaneClick={handlePaneClick}
             onMove={onMove}
             fitView
@@ -273,7 +273,7 @@ export default function CanvasFlow() {
           />
         )}
 
-        <NodeSidebar
+        <SidebarIndex
           selectedNodeId={selectedNodeId}
           nodes={nodes}
           edges={edges}

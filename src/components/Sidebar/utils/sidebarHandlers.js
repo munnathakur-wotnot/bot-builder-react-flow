@@ -57,9 +57,7 @@ export function getSidebarHandlers({
         // 1. Update the card node's own title
         setNodes((nds) =>
           nds.map((n) =>
-            n.id === cardId
-              ? { ...n, data: { ...n.data, title } }
-              : n,
+            n.id === cardId ? { ...n, data: { ...n.data, title } } : n,
           ),
         );
         // 2. Keep the carousel's cards array in sync
@@ -79,9 +77,7 @@ export function getSidebarHandlers({
         // 1. Update the button node's own title
         setNodes((nds) =>
           nds.map((n) =>
-            n.id === buttonId
-              ? { ...n, data: { ...n.data, title } }
-              : n,
+            n.id === buttonId ? { ...n, data: { ...n.data, title } } : n,
           ),
         );
         // 2. Update the card node's buttons array
@@ -98,7 +94,8 @@ export function getSidebarHandlers({
         const cards = nodeData?.cards ?? [];
         updateter(
           cards.map((card) => {
-            if ((typeof card === "string" ? card : card?.id) !== cardId) return card;
+            if ((typeof card === "string" ? card : card?.id) !== cardId)
+              return card;
             const buttons = (card.buttons ?? []).map((b) =>
               b.id === buttonId ? { ...b, title } : b,
             );

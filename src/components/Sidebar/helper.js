@@ -3,6 +3,8 @@ import {
   buildAddCarouselCardPayload,
   removeNodeConnectionsForEdges,
 } from "../Canvas/utils";
+import DurationSelector from "./delay";
+import NodeSidebar from "./NodeSidebar";
 
 export function handleAddCarousel({
   selectedNode,
@@ -114,3 +116,10 @@ export function handleRemoveCarouselCard({
   setEdges(remainingEdges);
   updateNode({ cards: nextCards });
 }
+
+export const RENDER_MAPPING = {
+  delay: DurationSelector,
+  default: NodeSidebar,
+};
+export const renderSidebarMapping = (type) =>
+  type === "delay" ? "delay" : "default";
