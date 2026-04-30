@@ -15,6 +15,7 @@ FlowCallbacksProvider.propTypes = {
   value: PropTypes.shape({
     openMenu: PropTypes.func.isRequired,
     deleteEdge: PropTypes.func.isRequired,
+    isConnectingRef: PropTypes.object,
   }).isRequired,
   children: PropTypes.node.isRequired,
 };

@@ -1,0 +1,111 @@
+.card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.card-container {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center;
+}
+
+.card {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  width: 100%;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 44px;
+  min-width: 0;
+  text-align: left;
+}
+
+.card:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+  transform: translateY(-1px);
+}
+
+.card:active {
+  transform: scale(0.98);
+}
+
+.card-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.card-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eef2ff;
+  color: #4f46e5;
+  border-radius: 8px;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-right {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.card-arrow {
+  font-size: 18px;
+  color: #9ca3af;
+  transition: transform 0.2s ease;
+}
+
+.card:hover .card-arrow {
+  transform: translateX(3px);
+}
+
+.card-delete {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fee2e2;
+  color: #dc2626;
+  font-size: 14px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.card-delete:hover {
+  background: #fecaca;
+  border-color: #fca5a5;
+  transform: scale(1.05);
+}
+
+.card-delete:active {
+  transform: scale(0.9);
+}

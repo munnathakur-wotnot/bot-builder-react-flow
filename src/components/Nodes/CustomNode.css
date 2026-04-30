@@ -137,6 +137,33 @@
   top: -6px;
 }
 
+.custom-node__handle--target-full {
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  border: 1px solid transparent;
+  border-radius: inherit;
+  background: transparent;
+  z-index: 20;
+  pointer-events: none; /* enabled only while dragging a connection over this node */
+}
+
+.custom-node--connection-hover {
+  border-color: #ef4444;
+}
+
+.flow-connecting .custom-node:not(.custom-node--start) .custom-node__handle--target-full {
+  pointer-events: auto;
+}
+
+.flow-connecting .custom-node:not(.custom-node--start) .custom-node__handle--target-full.connecting.valid {
+  border-color: #1fb26a;
+  background: rgba(31, 178, 106, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(31, 178, 106, 0.15);
+}
+
 .custom-node__handle--source {
   bottom: 0;
   width: 28px;
@@ -157,6 +184,26 @@
   line-height: 1;
   color: #667085;
   pointer-events: none;
+}
+
+.custom-node__handle--source-add {
+  cursor: crosshair;
+}
+
+.custom-node__handle--source-connected {
+  bottom: -6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #1fb26a;
+  background: #fff;
+  box-shadow: none;
+  cursor: default;
+  pointer-events: none; /* avoid accidental clicks when already connected */
+}
+
+.custom-node__handle--source-connected::after {
+  display: none;
 }
 
 .custom-node__handle--source:hover {

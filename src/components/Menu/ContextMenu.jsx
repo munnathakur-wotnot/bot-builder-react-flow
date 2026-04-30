@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import "./ContextMenu.css";
 import { buildMenuActionMap } from "../Canvas/utils";
 import { MENU_NODE_TEMPLATES } from "../Canvas/constants";
-import { buildLaidOutGraph } from "../Canvas/layout";
 import AppInput from "../Common/AppInput";
 
 const MENU_OPTIONS = [
@@ -64,11 +63,7 @@ export default function ContextMenu({
       });
       const mergedNodes = [...nextNodes, ...payload.nodesToAdd];
       const mergedEdges = [...edges, ...payload.edgesToAdd];
-      const { nodes: laidOutNodes } = buildLaidOutGraph(
-        mergedNodes,
-        mergedEdges,
-      );
-      setNodes(laidOutNodes);
+      setNodes(mergedNodes);
       setEdges(mergedEdges);
       setSelectedNodeId(payload.selectedNodeId);
       setMenuState(null);
@@ -164,11 +159,7 @@ export default function ContextMenu({
           return;
         }
 
-        const { nodes: laidOutNodes } = buildLaidOutGraph(
-          workingNodes,
-          workingEdges,
-        );
-        setNodes(laidOutNodes);
+        setNodes(workingNodes);
         setEdges(workingEdges);
         if (finalSelectedNodeId) setSelectedNodeId(finalSelectedNodeId);
         setMenuState(null);

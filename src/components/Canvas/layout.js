@@ -30,7 +30,6 @@ export function layoutNodesDagre(nodes, edges, options = {}) {
   for (const n of nodes) {
     const width = n.style?.width || n.width || 240;
     const height = n.style?.height || n.height || 120;
-
     g.setNode(n.id, { width, height });
   }
 
@@ -43,6 +42,7 @@ export function layoutNodesDagre(nodes, edges, options = {}) {
 
   return nodes.map((n) => {
     const { x, y, width, height } = g.node(n.id) ?? {};
+    if (typeof x !== "number" || typeof y !== "number") return n;
     if (typeof x !== "number" || typeof y !== "number") return n;
 
     // Dagre gives center coordinates; ReactFlow expects top-left.

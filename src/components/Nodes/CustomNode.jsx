@@ -50,7 +50,6 @@ function CustomNode({ id, data }) {
       role={isStartNode && !isConnected ? "button" : undefined}
       tabIndex={isStartNode && !isConnected ? 0 : undefined}
     >
-      {/* Target Handle */}
       {!isStartNode && (
         <Handle
           type="target"
@@ -73,9 +72,9 @@ function CustomNode({ id, data }) {
       {/* Source Handle */}
       <Handle
         type="source"
+        style={isStartNode && isConnected ? { visibility: "hidden" } : {}}
         position={Position.Bottom}
-        className={`custom-node__handle custom-node__handle--source ${hasOutgoing ? "custom-node__handle--source-hidden" : ""
-          }`}
+        className={`custom-node__handle custom-node__handle--source ${hasOutgoing ? "custom-node__handle--source-connected" : "custom-node__handle--source-add"} `}
         isConnectable={!hasOutgoing}
         onClick={!isStartNode && !hasOutgoing ? handleOpenMenu : undefined}
       />

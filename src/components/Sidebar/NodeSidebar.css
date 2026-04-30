@@ -164,3 +164,115 @@
   color: #1fb26a;
   background: #f0fdf7;
 }
+
+/* ── Back button (second layer header) ──────────────────────── */
+.node-sidebar__back {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: none;
+  color: #1fb26a;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.node-sidebar__back:hover {
+  color: #027a48;
+}
+
+/* ── Chevron on field rows ───────────────────────────────────── */
+.node-sidebar__field-chevron {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border: 1px solid #d0d5dd;
+  border-radius: 6px;
+  background: #fff;
+  color: #667085;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.node-sidebar__field-chevron:hover {
+  background: #f9fafb;
+  color: #344054;
+}
+
+/* Label + type pill on compact field rows */
+.node-sidebar__field-row-label {
+  flex: 1;
+  font-size: 13px;
+  color: #101828;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.node-sidebar__field-row-type {
+  font-size: 11px;
+  color: #667085;
+  background: #f2f4f7;
+  border-radius: 4px;
+  padding: 2px 6px;
+  flex-shrink: 0;
+}
+
+/* ── Second layer content padding ───────────────────────────── */
+.node-sidebar__second-layer-content {
+  padding-top: 4px;
+}
+
+/* ── Card actions (chevron + delete) ────────────────────────── */
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.card-chevron {
+  width: 26px;
+  height: 26px;
+  border: 1px solid #d0d5dd;
+  border-radius: 6px;
+  background: #fff;
+  color: #667085;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-chevron:hover {
+  background: #f9fafb;
+  color: #344054;
+}
+
+.card-delete {
+  width: 26px;
+  height: 26px;
+  border: 1px solid #fda29b;
+  border-radius: 6px;
+  background: #fff;
+  color: #f04438;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-delete:hover {
+  background: #fef3f2;
+}
+
