@@ -1,5 +1,5 @@
 import React from "react";
-import "./Card.css";
+import "./card.css";
 import PropTypes from "prop-types";
 import DragDropList from "../../Common/ListDragDrop";
 
@@ -36,7 +36,9 @@ const Card = ({ nodeData, removeCard, reorderCards, onNavigate }) => {
                   <button
                     type="button"
                     className="card-chevron"
-                    onClick={() => onNavigate?.({ id: cardId, title: cardTitle })}
+                    onClick={() =>
+                      onNavigate?.({ id: cardId, title: cardTitle })
+                    }
                     aria-label="Edit card"
                   >
                     ›
@@ -67,4 +69,3 @@ Card.propTypes = {
   reorderCards: PropTypes.func,
   onNavigate: PropTypes.func,
 };
-
