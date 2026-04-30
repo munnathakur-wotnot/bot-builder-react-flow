@@ -8,7 +8,6 @@ const durations = [1, 2, 5, 10];
 export default function DurationSelector({ selectedNode, updateNode }) {
     const [selected, setSelected] = useState(selectedNode?.data?.delayDuration);
     const { flowToScreenPosition } = useReactFlow(selectedNode);
-    console.log("hello 12345");
 
     //  Convert flow position → screen position
     const position = useMemo(() => {

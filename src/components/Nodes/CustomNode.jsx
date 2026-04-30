@@ -44,7 +44,6 @@ function CustomNode({ id, data }) {
   const titleClassName =
     data.type === "delay" ? "custom-node__header-delay" : `custom-node__header`;
   const titlteTextClassName = data.type === "delay" ? "" : "custom-node__title";
-  console.log(data, "data IS Present");
 
   return (
     <div
