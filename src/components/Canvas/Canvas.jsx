@@ -232,7 +232,7 @@ export default function CanvasFlow() {
             nodes={nodes}
             edges={edges}
             nodeTypes={nodeTypes}
-            // onlyRenderVisibleElements={true}
+            onlyRenderVisibleElements={true}
             edgeTypes={edgeTypes}
             autoPanOnConnect={false}
             autoPanOnNodeDrag={false}
@@ -246,8 +246,8 @@ export default function CanvasFlow() {
             onNodeDrag={onGroupNodeDrag}
             onNodeClick={handleNodeClick}
             // connectionRadius={30}
-            // connectionMode="loose"
-            // snapToGrid={true}
+            connectionMode="loose"
+            snapToGrid={true}
             onPaneClick={handlePaneClick}
             onMove={onMove}
             fitView
