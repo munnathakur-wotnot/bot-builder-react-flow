@@ -42,11 +42,19 @@ export function createFlowNode({
   return node;
 }
 
-export function createEdge(source, target, isNotDeletable = false) {
+export function createEdge(
+  source,
+  target,
+  isNotDeletable = false,
+  sourceHandle = "",
+) {
+  const handle = sourceHandle || "default";
+
   return {
-    id: `edge_${source}_${target}`,
+    id: `edge_${source}_${handle}_${target}`,
     source,
     target,
+    sourceHandle: handle,
     data: {
       isNotDeletable,
     },
@@ -68,6 +76,8 @@ export function buildSingleNodePayload({
   getNextNodeId,
   allNodes,
   delay = false,
+  doubleHandler = false,
+  sourceHandle = "",
 }) {
   const newNodeId = getNextNodeId();
   const title = getIncrementalTitle({
@@ -92,6 +102,26 @@ export function buildSingleNodePayload({
       ...newNodeDelay,
       data: { ...newNodeDelay.data, delayDuration: 1 },
     };
+  } else if (doubleHandler) {
+    const newNodeDelay = createFlowNode({
+      id: newNodeId,
+      x: sourceNode.position.x,
+      y: sourceNode.position.y + 220,
+      inPorts: [sourceNodeId],
+      title: "AI Answer",
+      metaType: "ai_answer",
+      icon: "🤖",
+      iCategory: "ai",
+    });
+    newNode = {
+      ...newNodeDelay,
+      data: {
+        ...newNodeDelay.data,
+        doubleHandler: true,
+        successOutport: [],
+        failureOutport: [],
+      },
+    };
   } else {
     newNode = createFlowNode({
       id: newNodeId,
@@ -107,7 +137,7 @@ export function buildSingleNodePayload({
 
   return {
     nodesToAdd: [newNode],
-    edgesToAdd: [createEdge(sourceNodeId, newNodeId)],
+    edgesToAdd: [createEdge(sourceNodeId, newNodeId, false, sourceHandle)],
     dataPatch: {
       [newNodeId]: { ...nodeData, inPorts: [sourceNodeId] },
     },
@@ -120,6 +150,7 @@ export function buildCarouselPayload({
   sourceNodeId,
   getNextNodeId,
   allNodes,
+  sourceHandle = "",
 }) {
   const carouselId = getNextNodeId();
   const carouselTitle = getIncrementalTitle({
@@ -168,7 +199,7 @@ export function buildCarouselPayload({
   carouselNode.data.connected = cards.length > 0;
 
   const nodes = [carouselNode];
-  const edges = [createEdge(sourceNodeId, carouselId)];
+  const edges = [createEdge(sourceNodeId, carouselId, false, sourceHandle)];
 
   cards.forEach((card, index) => {
     const cardId = card.id;
@@ -232,6 +263,7 @@ export function buildFormPayload({
   nodeData,
   getNextNodeId,
   allNodes,
+  sourceHandle = "",
 }) {
   const newNodeId = getNextNodeId();
   const title = getIncrementalTitle({
@@ -256,25 +288,33 @@ export function buildFormPayload({
 
   return {
     nodesToAdd: [newNode],
-    edgesToAdd: [createEdge(sourceNodeId, newNodeId)],
+    edgesToAdd: [createEdge(sourceNodeId, newNodeId, sourceHandle)],
     selectedNodeId: newNodeId,
   };
 }
 
-export function buildMenuActionMap({ context, templates, getNextNodeId }) {
+export function buildMenuActionMap({
+  context,
+  templates,
+  getNextNodeId,
+  sourceHandle,
+}) {
   return {
-    carousel: () => buildCarouselPayload({ ...context, getNextNodeId }),
+    carousel: () =>
+      buildCarouselPayload({ ...context, getNextNodeId, sourceHandle }),
     collectInput: () =>
       buildSingleNodePayload({
         ...context,
         nodeData: templates.collectInput,
         getNextNodeId,
+        sourceHandle,
       }),
     form: () =>
       buildFormPayload({
         ...context,
         nodeData: templates.form,
         getNextNodeId,
+        sourceHandle,
       }),
     delay: () =>
       buildSingleNodePayload({
@@ -282,6 +322,15 @@ export function buildMenuActionMap({ context, templates, getNextNodeId }) {
         nodeData: templates.collectInput,
         getNextNodeId,
         delay: true,
+        sourceHandle,
+      }),
+    answer_ai: () =>
+      buildSingleNodePayload({
+        ...context,
+        nodeData: templates.collectInput,
+        getNextNodeId,
+        doubleHandler: true,
+        sourceHandle,
       }),
   };
 }
@@ -389,12 +438,19 @@ export function removeNodeConnectionsForEdges(nodes, edgesToRemove) {
   edgesToRemove.forEach((edge) => {
     if (!edge?.source || !edge?.target) return;
 
-    if (!removedBySource.has(edge.source))
-      removedBySource.set(edge.source, new Set());
-    removedBySource.get(edge.source).add(edge.target);
+    if (!removedBySource.has(edge.source)) {
+      removedBySource.set(edge.source, []);
+    }
 
-    if (!removedByTarget.has(edge.target))
+    removedBySource.get(edge.source).push({
+      target: edge.target,
+      handle: edge.sourceHandle,
+    });
+
+    if (!removedByTarget.has(edge.target)) {
       removedByTarget.set(edge.target, new Set());
+    }
+
     removedByTarget.get(edge.target).add(edge.source);
   });
 
@@ -406,18 +462,33 @@ export function removeNodeConnectionsForEdges(nodes, edgesToRemove) {
 
     let nextOutPorts = node.data.outPorts || [];
     let nextInPorts = node.data.inPorts || [];
+    let nextSuccess = node.data.successOutport || [];
+    let nextFailure = node.data.failureOutport || [];
 
     if (removedTargets) {
-      nextOutPorts = nextOutPorts.filter(
-        (targetId) => !removedTargets.has(targetId),
-      );
+      removedTargets.forEach(({ target, handle }) => {
+        if (handle === "success") {
+          nextSuccess = nextSuccess.filter((t) => t !== target);
+        } else if (handle === "failure") {
+          nextFailure = nextFailure.filter((t) => t !== target);
+        } else {
+          nextOutPorts = nextOutPorts.filter((t) => t !== target);
+        }
+      });
     }
 
+    // Handle target side (incoming)
     if (removedSources) {
       nextInPorts = nextInPorts.filter(
         (sourceId) => !removedSources.has(sourceId),
       );
     }
+
+    const isConnected =
+      nextOutPorts.length > 0 ||
+      nextInPorts.length > 0 ||
+      nextSuccess.length > 0 ||
+      nextFailure.length > 0;
 
     return {
       ...node,
@@ -425,7 +496,9 @@ export function removeNodeConnectionsForEdges(nodes, edgesToRemove) {
         ...node.data,
         outPorts: nextOutPorts,
         inPorts: nextInPorts,
-        connected: nextOutPorts.length > 0 || nextInPorts.length > 0,
+        successOutport: nextSuccess,
+        failureOutport: nextFailure,
+        connected: isConnected,
       },
     };
   });

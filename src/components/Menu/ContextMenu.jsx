@@ -10,6 +10,7 @@ const MENU_OPTIONS = [
   { id: "carousel", label: "Carousel" },
   { id: "form", label: "Form" },
   { id: "delay", label: "Delay" },
+  { id: "answer_ai", label: "Answer Ai" },
 ];
 
 export default function ContextMenu({
@@ -38,6 +39,7 @@ export default function ContextMenu({
         },
         templates: MENU_NODE_TEMPLATES,
         getNextNodeId,
+        sourceHandle: menuState.type,
       });
 
       const buildPayload = actionByOption[optionId];
@@ -53,12 +55,33 @@ export default function ContextMenu({
       const nextNodes = nodes.map((node) => {
         if (node.id !== sourceNode.id) return node;
 
+        let updatedData = { ...node.data };
+
+        if (menuState.type === "success") {
+          const existing = node.data.successOutport || [];
+          updatedData.successOutport = Array.from(
+            new Set([...existing, ...directTargets]),
+          );
+        } else if (menuState.type === "failure") {
+          const existing = node.data.failureOutport || [];
+          updatedData.failureOutport = Array.from(
+            new Set([...existing, ...directTargets]),
+          );
+        } else {
+          const existing = node.data.outPorts || [];
+          updatedData.outPorts = Array.from(
+            new Set([...existing, ...directTargets]),
+          );
+        }
+
         return {
           ...node,
           data: {
-            ...node.data,
-            outPorts: [...(node.data.outPorts || []), ...directTargets],
-            connected: directTargets.length > 0,
+            ...updatedData,
+            connected:
+              (updatedData.outPorts?.length || 0) > 0 ||
+              (updatedData.successOutport?.length || 0) > 0 ||
+              (updatedData.failureOutport?.length || 0) > 0,
           },
         };
       });
@@ -227,6 +250,7 @@ ContextMenu.propTypes = {
     nodeId: PropTypes.string,
     x: PropTypes.number,
     y: PropTypes.number,
+    type: PropTypes.string,
   }),
   setMenuState: PropTypes.func.isRequired,
   nodes: PropTypes.array.isRequired,

@@ -104,19 +104,40 @@ export default function CanvasFlow() {
   const onConnect = useCallback(
     (params) => {
       // Allow only one outgoing connection per source node
-      const alreadyConnected = edges.some((e) => e.source === params.source);
+      const alreadyConnected = edges.some(
+        (e) =>
+          e.source === params.source && e.sourceHandle === params.sourceHandle,
+      );
+
       if (alreadyConnected) return;
 
       setEdges((eds) => addEdge({ ...params, type: "custom" }, eds));
       setNodes((nds) =>
         nds.map((node) => {
           if (node.id === params.source) {
-            const newOutPorts = [...(node.data.outPorts || []), params.target];
+            let updatedData = { ...node.data };
+
+            if (params.sourceHandle === "success") {
+              updatedData.successOutport = [
+                ...(node.data.successOutport || []),
+                params.target,
+              ];
+            } else if (params.sourceHandle === "failure") {
+              updatedData.failureOutport = [
+                ...(node.data.failureOutport || []),
+                params.target,
+              ];
+            } else {
+              updatedData.outPorts = [
+                ...(node.data.outPorts || []),
+                params.target,
+              ];
+            }
+
             return {
               ...node,
               data: {
-                ...node.data,
-                outPorts: newOutPorts,
+                ...updatedData,
                 connected: true,
               },
             };
@@ -163,24 +184,33 @@ export default function CanvasFlow() {
       )
         return;
 
-      onConnect({ source: sourceNodeId, target: targetNodeId });
+      onConnect({
+        source: sourceNodeId,
+        target: targetNodeId,
+        sourceHandle: connectionState.fromHandle?.id,
+      });
     },
     [onConnect],
   );
 
   const openMenu = useCallback(
-    ({ nodeId, x, y }) => {
-      setMenuState({ nodeId, x, y });
+    ({ nodeId, x, y, type }) => {
+      setMenuState({ nodeId, x, y, type });
     },
     [setMenuState],
   );
 
   const handleDeleteEdge = useCallback(
-    (edgeId, sourceId, targetId) => {
+    (edgeId, sourceId, targetId, sourceHandleId) => {
       setEdges((eds) => eds.filter((e) => e.id !== edgeId));
       setNodes((nds) =>
         removeNodeConnectionsForEdges(nds, [
-          { id: edgeId, source: sourceId, target: targetId },
+          {
+            id: edgeId,
+            source: sourceId,
+            target: targetId,
+            sourceHandle: sourceHandleId,
+          },
         ]),
       );
     },
@@ -246,7 +276,6 @@ export default function CanvasFlow() {
             onNodeDrag={onGroupNodeDrag}
             onNodeClick={handleNodeClick}
             // connectionRadius={30}
-            connectionMode="loose"
             snapToGrid={true}
             onPaneClick={handlePaneClick}
             onMove={onMove}

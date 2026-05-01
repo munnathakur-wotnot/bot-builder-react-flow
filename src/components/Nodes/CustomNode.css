@@ -243,3 +243,13 @@
 .custom-node__handle--source-hidden::after {
   display: none !important;
 }
+
+.success-node-handler{
+   background:#079455;
+   color: #07663b;
+}
+
+.failed-node-handler{
+  color: #6d120c;
+  background: #b42318;
+}

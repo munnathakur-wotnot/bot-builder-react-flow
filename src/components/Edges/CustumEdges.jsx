@@ -10,8 +10,17 @@ import { useFlowCallbacks } from "../Canvas/FlowCallbacksContext.jsx";
 import PropTypes from "prop-types";
 
 export default function CustomEdge(props) {
-  const { id, source, target, sourceX, sourceY, targetX, targetY, data } =
-    props;
+  const {
+    id,
+    source,
+    target,
+    sourceX,
+    sourceY,
+    targetX,
+    targetY,
+    data,
+    sourceHandleId,
+  } = props;
 
   const { deleteEdge } = useFlowCallbacks();
   const hideTimeoutRef = useRef(null);
@@ -25,23 +34,24 @@ export default function CustomEdge(props) {
   const isVerticalChain = Math.abs(sourceX - targetX) < 2;
   const [edgePath, fallbackX, fallbackY] = isVerticalChain
     ? getStraightPath({
-        sourceX,
-        sourceY,
-        targetX,
-        targetY,
-      })
+      sourceX,
+      sourceY,
+      targetX,
+      targetY,
+    })
     : getSmoothStepPath({
-        sourceX,
-        sourceY,
-        targetX,
-        targetY,
-        borderRadius: 24,
-        offset: 30,
-      });
+      sourceX,
+      sourceY,
+      targetX,
+      targetY,
+      borderRadius: 24,
+      offset: 30,
+    });
 
   const handleDelete = (e) => {
     e.stopPropagation();
-    deleteEdge?.(id, source, target);
+
+    deleteEdge?.(id, source, target, sourceHandleId);
   };
 
   const clearHideTimeout = useCallback(() => {
@@ -149,5 +159,6 @@ CustomEdge.propTypes = {
   sourceY: PropTypes.number,
   targetX: PropTypes.number,
   targetY: PropTypes.number,
+  sourceHandleId: PropTypes.string,
   data: PropTypes.object,
 };
