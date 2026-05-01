@@ -1,28 +1,17 @@
-import React, { useMemo, useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./DurationSelector.css";
 import PropTypes from "prop-types";
-import { useReactFlow } from "@xyflow/react";
+import { NodeToolbar, Position } from "@xyflow/react";
 
 const durations = [1, 2, 5, 10];
 
 export default function DurationSelector({ selectedNode, updateNode }) {
     const [selected, setSelected] = useState(selectedNode?.data?.delayDuration);
-    const { flowToScreenPosition } = useReactFlow(selectedNode);
 
-    //  Convert flow position → screen position
-    const position = useMemo(() => {
-        if (!selectedNode || !flowToScreenPosition) return { x: 0, y: 0 };
-
-        const { x, y } = flowToScreenPosition({
-            x: selectedNode.position.x,
-            y: selectedNode.position.y,
-        });
-
-        return {
-            x: x + 180, //  right side offset (adjust)
-            y: y - 20, //  top offset (adjust)
-        };
-    }, [selectedNode, flowToScreenPosition]);
+    // keep state in sync if node changes
+    useEffect(() => {
+        setSelected(selectedNode?.data?.delayDuration);
+    }, [selectedNode]);
 
     const handleSelect = (value) => {
         setSelected(value);
@@ -32,39 +21,32 @@ export default function DurationSelector({ selectedNode, updateNode }) {
     };
 
     return (
-        <div
-            className="duration-tooltip"
-            style={{
-                position: "absolute",
-                left: position.x,
-                top: position.y,
-            }}
+        <NodeToolbar
+            nodeId={selectedNode.id}
+            isVisible={true}
+            position={Position.Right} // 👈 attaches to right side
+            offset={10} // 👈 spacing from node
         >
-            <p className="title">Select duration</p>
+            <div className="duration-tooltip">
+                <p className="title">Select duration</p>
 
-            <div className="button-group">
-                {durations.map((item) => (
-                    <button
-                        key={item}
-                        className={`duration-btn ${selected === item ? "active" : ""}`}
-                        onClick={() => handleSelect(item)}
-                    >
-                        {item + "s"}
-                    </button>
-                ))}
+                <div className="button-group">
+                    {durations.map((item) => (
+                        <button
+                            key={item}
+                            className={`duration-btn ${selected === item ? "active" : ""}`}
+                            onClick={() => handleSelect(item)}
+                        >
+                            {item + "s"}
+                        </button>
+                    ))}
+                </div>
             </div>
-        </div>
+        </NodeToolbar>
     );
 }
 
 DurationSelector.propTypes = {
-    selectedNodeId: PropTypes.string,
-    nodes: PropTypes.array.isRequired,
-    edges: PropTypes.array.isRequired,
-    setNodes: PropTypes.func.isRequired,
-    setEdges: PropTypes.func.isRequired,
-    getNextNodeId: PropTypes.func.isRequired,
-    onClose: PropTypes.func.isRequired,
     selectedNode: PropTypes.object.isRequired,
     updateNode: PropTypes.func.isRequired,
 };
