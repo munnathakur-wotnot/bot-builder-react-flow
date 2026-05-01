@@ -6,7 +6,7 @@ import DynamicRenderer from "./DynamicRenderer";
 import SidebarHeader from "./SidebarHeader";
 
 export default function NodeSidebar({
-  selectedNodeId,
+  selectedNodeDetails,
   nodes,
   edges,
   setNodes,
@@ -32,7 +32,7 @@ export default function NodeSidebar({
   // Reset to the root layer whenever the selected node changes
   useEffect(() => {
     setLayerStack([]);
-  }, [selectedNodeId]);
+  }, [selectedNodeDetails]);
 
   const handleNavigate = useCallback((item) => {
     setLayerStack((prev) => [...prev, { itemId: item.id }]);
@@ -91,7 +91,7 @@ export default function NodeSidebar({
 }
 
 NodeSidebar.propTypes = {
-  selectedNodeId: PropTypes.string,
+  selectedNodeDetails: PropTypes.string,
   nodes: PropTypes.array.isRequired,
   edges: PropTypes.array.isRequired,
   setNodes: PropTypes.func.isRequired,
@@ -103,5 +103,5 @@ NodeSidebar.propTypes = {
 };
 
 NodeSidebar.defaultProps = {
-  selectedNodeId: null,
+  selectedNodeDetails: null,
 };

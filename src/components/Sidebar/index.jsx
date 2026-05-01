@@ -4,7 +4,7 @@ import { RENDER_MAPPING, renderSidebarMapping } from "./helper";
 import useNodeUpdater from "../../hooks/useNodeUpdater";
 
 export default function SidebarIndex({
-    selectedNodeId,
+    selectedNodeDetails,
     nodes,
     edges,
     setNodes,
@@ -12,7 +12,10 @@ export default function SidebarIndex({
     getNextNodeId,
     onClose,
 }) {
-    const selectedNode = nodes.find((n) => n.id === selectedNodeId) ?? null;
+    console.log(selectedNodeDetails, "SelectedNodeDetails");
+
+    const selectedNode =
+        nodes.find((n) => n.id === selectedNodeDetails?.nodeId) ?? null;
     const { updateNode } = useNodeUpdater({
         nodeId: selectedNode?.id,
         setNodes,
@@ -22,7 +25,7 @@ export default function SidebarIndex({
     const RenderNodeClicker = RENDER_MAPPING[type];
     return (
         <RenderNodeClicker
-            selectedNodeId={selectedNodeId}
+            selectedNodeDetails={selectedNodeDetails}
             nodes={nodes}
             edges={edges}
             setNodes={setNodes}
@@ -36,7 +39,7 @@ export default function SidebarIndex({
 }
 
 SidebarIndex.propTypes = {
-    selectedNodeId: PropTypes.string,
+    selectedNodeDetails: PropTypes.string,
     nodes: PropTypes.array.isRequired,
     edges: PropTypes.array.isRequired,
     setNodes: PropTypes.func.isRequired,

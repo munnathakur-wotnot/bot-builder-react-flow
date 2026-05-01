@@ -5,9 +5,14 @@ import { useReactFlow } from "@xyflow/react";
 
 const durations = [1, 2, 5, 10];
 
-export default function DurationSelector({ selectedNode, updateNode }) {
+export default function DurationSelector({
+    selectedNode,
+    updateNode,
+    selectedNodeDetails,
+}) {
     const [selected, setSelected] = useState(selectedNode?.data?.delayDuration);
     const { flowToScreenPosition } = useReactFlow(selectedNode);
+    console.log(selectedNodeDetails, "InDelay");
 
     //  Convert flow position → screen position
     const position = useMemo(() => {
@@ -36,8 +41,8 @@ export default function DurationSelector({ selectedNode, updateNode }) {
             className="duration-tooltip"
             style={{
                 position: "absolute",
-                left: position.x,
-                top: position.y,
+                left: selectedNodeDetails.x + 80,
+                top: selectedNodeDetails.y - 40,
             }}
         >
             <p className="title">Select duration</p>
@@ -67,4 +72,5 @@ DurationSelector.propTypes = {
     onClose: PropTypes.func.isRequired,
     selectedNode: PropTypes.object.isRequired,
     updateNode: PropTypes.func.isRequired,
+    selectedNodeDetails: PropTypes.object,
 };

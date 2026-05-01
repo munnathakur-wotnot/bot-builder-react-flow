@@ -20,7 +20,6 @@ export default function ContextMenu({
   edges,
   setNodes,
   setEdges,
-  setSelectedNodeId,
   getNextNodeId,
   nuberOfNodes,
 }) {
@@ -89,19 +88,10 @@ export default function ContextMenu({
       const mergedEdges = [...edges, ...payload.edgesToAdd];
       setNodes(mergedNodes);
       setEdges(mergedEdges);
-      setSelectedNodeId(payload.selectedNodeId);
+      //setSelectedNodeId(payload.selectedNodeId);
       setMenuState(null);
     },
-    [
-      menuState,
-      nodes,
-      edges,
-      setNodes,
-      setEdges,
-      setSelectedNodeId,
-      getNextNodeId,
-      setMenuState,
-    ],
+    [menuState, nodes, edges, setNodes, setEdges, getNextNodeId, setMenuState],
   );
 
   const bulkAddFromSource = useCallback(
@@ -118,7 +108,7 @@ export default function ContextMenu({
       let workingNodes = nodes;
       let workingEdges = edges;
       let created = 0;
-      let finalSelectedNodeId = null;
+      // let finalSelectedNodeId = null;
       const batchSize = 25;
       let aborted = false;
 
@@ -174,7 +164,7 @@ export default function ContextMenu({
 
           workingNodes = [...nextNodes, ...(payload.nodesToAdd || [])];
           workingEdges = [...workingEdges, ...(payload.edgesToAdd || [])];
-          finalSelectedNodeId = payload.selectedNodeId || finalSelectedNodeId;
+          //  finalSelectedNodeId = payload.selectedNodeId || finalSelectedNodeId;
           created++;
         }
 
@@ -185,7 +175,7 @@ export default function ContextMenu({
 
         setNodes(workingNodes);
         setEdges(workingEdges);
-        if (finalSelectedNodeId) setSelectedNodeId(finalSelectedNodeId);
+        // if (finalSelectedNodeId) setSelectedNodeId(finalSelectedNodeId);
         setMenuState(null);
       };
 
@@ -200,7 +190,6 @@ export default function ContextMenu({
       handleSelect,
       setNodes,
       setEdges,
-      setSelectedNodeId,
       setMenuState,
     ],
   );

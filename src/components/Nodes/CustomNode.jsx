@@ -5,7 +5,7 @@ import "./CustomNode.css";
 import { useFlowCallbacks } from "../Canvas/FlowCallbacksContext.jsx";
 
 function CustomNode({ id, data }) {
-  const { openMenu } = useFlowCallbacks();
+  const { openMenu, setSelectedNodeDetails } = useFlowCallbacks();
 
   const isStartNode = data.type === "start";
   const isConnected = data?.connected;
@@ -20,6 +20,13 @@ function CustomNode({ id, data }) {
     : data.outPorts?.length > 0;
 
   const showDescription = Boolean(data?.description);
+
+  const onsetSelectedNodeDetails = useCallback((event) => {
+    setSelectedNodeDetails({
+      x: event?.clientX,
+      y: event?.clientY + 10,
+    });
+  }, []);
 
   // Safe menu open
   const handleOpenMenu = useCallback(
@@ -92,7 +99,9 @@ function CustomNode({ id, data }) {
       onClick={
         isStartNode && !isConnected
           ? (e) => handleOpenMenu({ event: e })
-          : undefined
+          : data.type === "delay"
+            ? onsetSelectedNodeDetails
+            : undefined
       }
       onKeyDown={isStartNode && !isConnected ? handleKeyDown : undefined}
       role={isStartNode && !isConnected ? "button" : undefined}

@@ -35,7 +35,7 @@ const StaticControls = React.memo(function StaticControls() {
 export default function CanvasFlow() {
   const [nodes, setNodes, onNodesChange] = useNodesState(INITIAL_NODES);
   const [edges, setEdges, onEdgesChange] = useEdgesState(INITIAL_EDGES);
-  const [selectedNodeId, setSelectedNodeId] = useState(null);
+  const [selectedNode, setSelectedNode] = useState(null);
   const [nuberOfNodes, setNumberOfNodes] = useState(0);
   const [menuState, setMenuState] = useState(null);
   const nextIdRef = useRef(2);
@@ -224,28 +224,36 @@ export default function CanvasFlow() {
     [setNodes],
   );
 
+  const setSelectedNodeDetails = useCallback(
+    (data) => {
+      setSelectedNode((prev) => ({ ...prev, ...data }));
+    },
+    [setSelectedNode],
+  );
+
   const flowCallbacks = useMemo(
     () => ({
       openMenu,
       deleteEdge: handleDeleteEdge,
+      setSelectedNodeDetails: setSelectedNodeDetails,
     }),
     [openMenu, handleDeleteEdge],
   );
 
   const handleNodeClick = useCallback((_, node) => {
-    setSelectedNodeId(node.id);
+    setSelectedNode((prev) => ({ ...prev, nodeId: node.id }));
   }, []);
 
   const getNextNodeId = useCallback(() => `node_${nextIdRef.current++}`, []);
 
   const handlePaneClick = useCallback(() => {
     setMenuState(null);
-    setSelectedNodeId(null);
+    setSelectedNode(null);
   }, []);
 
   const onMove = useCallback(() => {
     setMenuState(null);
-    setSelectedNodeId(null);
+    setSelectedNode(null);
   }, []);
 
   return (
@@ -294,21 +302,21 @@ export default function CanvasFlow() {
               nodes={nodes}
               edges={edges}
               nuberOfNodes={nuberOfNodes}
-              setNodes={setNodes}
               setEdges={setEdges}
-              setSelectedNodeId={setSelectedNodeId}
+              setNodes={setNodes}
+              // setSelectedNode={setSelectedNode}
               getNextNodeId={getNextNodeId}
             />
           )}
 
           <SidebarIndex
-            selectedNodeId={selectedNodeId}
+            selectedNodeDetails={selectedNode}
             nodes={nodes}
             edges={edges}
             setNodes={setNodes}
             setEdges={setEdges}
             getNextNodeId={getNextNodeId}
-            onClose={() => setSelectedNodeId(null)}
+            onClose={() => setSelectedNode(null)}
           />
         </FlowCallbacksProvider>
       </div>
