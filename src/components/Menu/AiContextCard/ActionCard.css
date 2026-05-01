@@ -1,0 +1,44 @@
+.action-card {
+    width: 260px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    padding: 8px 0;
+    font-family: sans-serif;
+  }
+  
+  .action-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  
+  .action-item:hover {
+    background: #f5f7fa;
+  }
+  
+  .icon {
+    font-size: 18px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+  }
+  
+  .rotate {
+    color: #22c55e; /* green */
+  }
+  
+  .plus {
+    color: #2563eb; /* blue */
+  }
+  
+  .label {
+    font-size: 14px;
+    color: #111827;
+  }

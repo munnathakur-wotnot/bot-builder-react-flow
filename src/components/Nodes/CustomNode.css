@@ -253,3 +253,26 @@
   color: #6d120c;
   background: #b42318;
 }
+
+.custom-node__handle--self-loop {
+  position: absolute;
+}
+
+/* icon container */
+.custom-node__handle--self-loop::after {
+  content: "↻"; /* simple loop icon (or use SVG if you want exact match) */
+  position: absolute;
+  bottom: -3px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #d1fae5;
+  color: #047857;
+  font-size: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  border: 1px solid #a7f3d0;
+}

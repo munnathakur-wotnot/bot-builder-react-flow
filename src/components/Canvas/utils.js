@@ -47,6 +47,7 @@ export function createEdge(
   target,
   isNotDeletable = false,
   sourceHandle = "",
+  hidden,
 ) {
   const handle = sourceHandle || "default";
 
@@ -54,6 +55,7 @@ export function createEdge(
     id: `edge_${source}_${handle}_${target}`,
     source,
     target,
+    hidden,
     sourceHandle: handle,
     data: {
       isNotDeletable,
@@ -110,6 +112,7 @@ export function buildSingleNodePayload({
       inPorts: [sourceNodeId],
       title: "AI Answer",
       metaType: "ai_answer",
+      description: "Ai Answer",
       icon: "🤖",
       iCategory: "ai",
     });

@@ -11,13 +11,13 @@ import {
 import "@xyflow/react/dist/style.css";
 import "./Canvas.css";
 import CustomNode from "../Nodes/CustomNode";
-import ContextMenu from "../Menu/ContextMenu";
 import { INITIAL_EDGES, INITIAL_NODES } from "./constants";
 import CustomEdge from "../Edges/CustumEdges";
 import { FlowCallbacksProvider } from "./FlowCallbacksContext.jsx";
 import HeaderTooltip from "../headerTooltip/HeaderTooltip.jsx";
 import { removeNodeConnectionsForEdges } from "./utils.js";
 import SidebarIndex from "../Sidebar/index.jsx";
+import ConextMenuIndex from "../Menu/index.jsx";
 
 const nodeTypes = { custom: CustomNode };
 const edgeTypes = {
@@ -194,8 +194,8 @@ export default function CanvasFlow() {
   );
 
   const openMenu = useCallback(
-    ({ nodeId, x, y, type }) => {
-      setMenuState({ nodeId, x, y, type });
+    ({ nodeId, x, y, type, isSelfLoop }) => {
+      setMenuState({ nodeId, x, y, type, isSelfLoop });
     },
     [setMenuState],
   );
@@ -286,31 +286,31 @@ export default function CanvasFlow() {
             <MiniMap />
             <StaticControls />
           </ReactFlow>
-        </FlowCallbacksProvider>
 
-        {menuState && (
-          <ContextMenu
-            menuState={menuState}
-            setMenuState={setMenuState}
+          {menuState && (
+            <ConextMenuIndex
+              menuState={menuState}
+              setMenuState={setMenuState}
+              nodes={nodes}
+              edges={edges}
+              nuberOfNodes={nuberOfNodes}
+              setNodes={setNodes}
+              setEdges={setEdges}
+              setSelectedNodeId={setSelectedNodeId}
+              getNextNodeId={getNextNodeId}
+            />
+          )}
+
+          <SidebarIndex
+            selectedNodeId={selectedNodeId}
             nodes={nodes}
             edges={edges}
-            nuberOfNodes={nuberOfNodes}
             setNodes={setNodes}
             setEdges={setEdges}
-            setSelectedNodeId={setSelectedNodeId}
             getNextNodeId={getNextNodeId}
+            onClose={() => setSelectedNodeId(null)}
           />
-        )}
-
-        <SidebarIndex
-          selectedNodeId={selectedNodeId}
-          nodes={nodes}
-          edges={edges}
-          setNodes={setNodes}
-          setEdges={setEdges}
-          getNextNodeId={getNextNodeId}
-          onClose={() => setSelectedNodeId(null)}
-        />
+        </FlowCallbacksProvider>
       </div>
     </div>
   );

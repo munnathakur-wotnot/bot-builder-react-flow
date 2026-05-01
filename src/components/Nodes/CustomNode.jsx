@@ -10,6 +10,7 @@ function CustomNode({ id, data }) {
   const isStartNode = data.type === "start";
   const isConnected = data?.connected;
   const isDoubleOutport = data?.doubleHandler ?? false;
+  const isSelfLoop = data?.successOutport?.[0] === id;
 
   const hasSuccessOutport = data?.successOutport?.length > 0;
   const hasFailureOutport = data?.failureOutport?.length > 0;
@@ -22,13 +23,15 @@ function CustomNode({ id, data }) {
 
   // Safe menu open
   const handleOpenMenu = useCallback(
-    ({ event, type }) => {
+    ({ event, type, isSelfLoop }) => {
       event?.stopPropagation();
+
       openMenu({
         nodeId: id,
-        x: event.clientX,
-        y: event.clientY + 10,
+        x: event?.clientX,
+        y: event?.clientY + 10,
         type,
+        isSelfLoop,
       });
     },
     [id, openMenu],
@@ -65,7 +68,7 @@ function CustomNode({ id, data }) {
 
         // treat as click if small movement
         if (dx < 5 && dy < 5 && !hasOutgoing) {
-          handleOpenMenu({ event: upEvent, type: type });
+          handleOpenMenu({ event: upEvent, type: type, isSelfLoop });
         }
 
         document.removeEventListener("mouseup", handleMouseUp);
@@ -73,7 +76,7 @@ function CustomNode({ id, data }) {
 
       document.addEventListener("mouseup", handleMouseUp);
     },
-    [handleOpenMenu, hasOutgoing],
+    [handleOpenMenu, hasOutgoing, isSelfLoop],
   );
 
   if (!data) return null;
@@ -86,7 +89,11 @@ function CustomNode({ id, data }) {
   return (
     <div
       className={typeClassName}
-      onClick={isStartNode && !isConnected ? handleOpenMenu : undefined}
+      onClick={
+        isStartNode && !isConnected
+          ? (e) => handleOpenMenu({ event: e })
+          : undefined
+      }
       onKeyDown={isStartNode && !isConnected ? handleKeyDown : undefined}
       role={isStartNode && !isConnected ? "button" : undefined}
       tabIndex={isStartNode && !isConnected ? 0 : undefined}
@@ -126,11 +133,13 @@ function CustomNode({ id, data }) {
                 ? { visibility: "hidden", left: "30%" }
                 : { left: "30%" }
             }
-            className={`custom-node__handle custom-node__handle--source success-node-handler ${hasSuccessOutport
-                ? "custom-node__handle--source-connected"
-                : "custom-node__handle--source-add"
+            className={`custom-node__handle custom-node__handle--source success-node-handler ${isSelfLoop
+                ? "custom-node__handle--self-loop"
+                : hasSuccessOutport
+                  ? "custom-node__handle--source-connected"
+                  : "custom-node__handle--source-add"
               }`}
-            isConnectable={!hasSuccessOutport}
+            isConnectable={!hasSuccessOutport || isSelfLoop}
             onMouseDown={(e) => handleMouseDown(e, "success")}
           />
 
