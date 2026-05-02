@@ -4,7 +4,7 @@ import SidebarContent from "./SidebarContent";
 import { CATEGORY_CONFIGS } from "./utils/categoryConfigs";
 
 export default function DynamicRenderer(props) {
-  const { nodeType, nodeData, layerIndex = 0, layerContext, onNavigate } = props;
+  const { nodeType, nodeData, layerIndex = 0, currentItemId, currentItemType, onNavigate } = props;
 
   const categoryConfig = CATEGORY_CONFIGS[nodeData?.iCategory] ?? {};
   const rawConfig = categoryConfig?.getComponents
@@ -20,7 +20,7 @@ export default function DynamicRenderer(props) {
     : (rawConfig?.layers?.[layerIndex] ?? []);
 
   // Filter out entries that declare shouldRender and evaluate to false.
-  const renderContext = { nodeData, layerContext: props.layerContext };
+  const renderContext = { nodeData, currentItemType };
   const configs = allConfigs.filter((c) =>
     typeof c.shouldRender === "function" ? c.shouldRender(renderContext) : true
   );
@@ -33,9 +33,11 @@ export default function DynamicRenderer(props) {
     <SidebarContent
       configs={configs}
       nodeData={nodeData}
+      nodes={props.nodes}
       handlers={handlers}
       onNavigate={onNavigate}
-      layerContext={layerContext}
+      currentItemId={currentItemId}
+      currentItemType={currentItemType}
     />
   );
 }
@@ -51,6 +53,7 @@ DynamicRenderer.propTypes = {
   updateNode: PropTypes.func.isRequired,
   nodeData: PropTypes.object,
   layerIndex: PropTypes.number,
-  layerContext: PropTypes.object,
+  currentItemId: PropTypes.string,
+  currentItemType: PropTypes.string,
   onNavigate: PropTypes.func,
 };

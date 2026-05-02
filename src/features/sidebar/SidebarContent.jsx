@@ -4,9 +4,11 @@ import PropTypes from "prop-types";
 export default function SidebarContent({
   configs,
   nodeData,
+  nodes,
   handlers,
   onNavigate,
-  layerContext,
+  currentItemId,
+  currentItemType,
 }) {
   return (
     <>
@@ -15,9 +17,11 @@ export default function SidebarContent({
         const componentProps = config.componentPropsBuilder
           ? config.componentPropsBuilder({
               nodeData,
+              nodes,
               handlers,
               onNavigate,
-              layerContext,
+              currentItemId,
+              currentItemType,
             })
           : {};
 
@@ -39,7 +43,9 @@ SidebarContent.propTypes = {
     }),
   ).isRequired,
   nodeData: PropTypes.object,
+  nodes: PropTypes.array,
   handlers: PropTypes.object.isRequired,
   onNavigate: PropTypes.func,
-  layerContext: PropTypes.object,
+  currentItemId: PropTypes.string,
+  currentItemType: PropTypes.string,
 };

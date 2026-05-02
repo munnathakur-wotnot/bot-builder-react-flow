@@ -41,25 +41,25 @@ export const AI_CONFIGS = {
           }),
         },
       ],
-      // layer 1 – KB or Function detail (discriminated by layerContext._type)
+      // layer 1 – KB or Function detail (discriminated by currentItemType)
       [
         {
           component: KbLayer,
           // only render for KB items
-          shouldRender: ({ layerContext }) => layerContext?._type === "kb",
-          componentPropsBuilder: ({ layerContext, handlers }) => ({
-            layerContext,
-            handlers,
-          }),
+          shouldRender: ({ currentItemType }) => currentItemType === "kb",
+          componentPropsBuilder: ({ nodeData, currentItemId, handlers }) => {
+            const kb = nodeData?.knowledgeBases?.find((k) => k.id === currentItemId) ?? {};
+            return { kb, handlers };
+          },
         },
         {
           component: FunctionLayer,
           // only render for function items
-          shouldRender: ({ layerContext }) => layerContext?._type === "fn",
-          componentPropsBuilder: ({ layerContext, handlers }) => ({
-            layerContext,
-            handlers,
-          }),
+          shouldRender: ({ currentItemType }) => currentItemType === "fn",
+          componentPropsBuilder: ({ nodeData, currentItemId, handlers }) => {
+            const fn = nodeData?.availableFunctions?.find((f) => f.id === currentItemId) ?? {};
+            return { fn, handlers };
+          },
         },
       ],
     ],

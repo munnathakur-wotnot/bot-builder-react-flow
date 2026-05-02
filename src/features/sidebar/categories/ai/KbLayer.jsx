@@ -14,8 +14,7 @@ const KB_MODELS = [
   { id: "gemini-1.5-flash", name: "Gemini 1.5 Flash" },
 ];
 
-export default function KbLayer({ layerContext, handlers }) {
-  const kb = layerContext ?? {};
+export default function KbLayer({ kb = {}, handlers }) {
   const [name, setName] = useState(kb.name ?? "");
   const [model, setModel] = useState(kb.model ?? "gpt-4o");
 
@@ -80,6 +79,6 @@ export default function KbLayer({ layerContext, handlers }) {
 }
 
 KbLayer.propTypes = {
-  layerContext: PropTypes.object,
+  kb: PropTypes.object,
   handlers: PropTypes.object.isRequired,
 };

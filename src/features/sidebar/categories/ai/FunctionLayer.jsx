@@ -10,8 +10,7 @@ async function handler(message, context) {
   return { result: "" };
 }`;
 
-export default function FunctionLayer({ layerContext, handlers }) {
-  const fn = layerContext ?? {};
+export default function FunctionLayer({ fn = {}, handlers }) {
   const [name, setName] = useState(fn.name ?? "");
   const [code, setCode] = useState(fn.code ?? DEFAULT_FN_SNIPPET);
 
@@ -72,6 +71,6 @@ export default function FunctionLayer({ layerContext, handlers }) {
 }
 
 FunctionLayer.propTypes = {
-  layerContext: PropTypes.object,
+  fn: PropTypes.object,
   handlers: PropTypes.object.isRequired,
 };

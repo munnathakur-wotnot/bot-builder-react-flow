@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import "./NodeSidebar.css";
 import TitleDescriptionFields from "./TitleDescriptionFields";
@@ -35,39 +35,13 @@ export default function NodeSidebar({
   }, [selectedNodeId]);
 
   const handleNavigate = useCallback((item) => {
-    setLayerStack((prev) => [...prev, { itemId: item.id }]);
+    setLayerStack((prev) => [...prev, { itemId: item.id, itemType: item._type ?? null }]);
   }, []);
 
   const nodeData = selectedNode?.data;
   const layerIndex = layerStack.length;
   const currentItemId = layerStack[layerStack.length - 1]?.itemId ?? null;
-
-  // Derive the live item context for the current layer from nodes each render.
-  // Carousel cards live as separate nodes; form fields live inside parent data.
-  const layerContext = useMemo(() => {
-    if (!currentItemId) return null;
-
-    //for Nodes like card Buttuon Ids
-    const itemNode = nodes.find((n) => n.id === currentItemId);
-    if (itemNode) return { id: itemNode.id, ...itemNode.data };
-
-    // form fields
-    const fields = nodeData?.fields ?? [];
-    const field = fields.find((f) => f.id === currentItemId);
-    if (field) return field;
-
-    // ai knowledge bases
-    const kbs = nodeData?.knowledgeBases ?? [];
-    const kb = kbs.find((k) => k.id === currentItemId);
-    if (kb) return { ...kb, _type: "kb" };
-
-    // ai functions
-    const fns = nodeData?.availableFunctions ?? [];
-    const fn = fns.find((f) => f.id === currentItemId);
-    if (fn) return { ...fn, _type: "fn" };
-
-    return null;
-  }, [currentItemId, nodes, nodeData]);
+  const currentItemType = layerStack[layerStack.length - 1]?.itemType ?? null;
 
   if (!selectedNode) return null;
 
@@ -97,7 +71,8 @@ export default function NodeSidebar({
           setEdges={setEdges}
           getNextNodeId={getNextNodeId}
           layerIndex={layerIndex}
-          layerContext={layerContext}
+          currentItemId={currentItemId}
+          currentItemType={currentItemType}
           onNavigate={handleNavigate}
         />
       </div>

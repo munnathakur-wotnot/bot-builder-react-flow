@@ -26,15 +26,19 @@ export const COLLECT_CONFIGS = {
           }),
         },
       ],
-      // layer 1 â€” card detail
+      // layer 1 – card detail
       [
         {
           component: CardSecondLayer,
-          componentPropsBuilder: ({ handlers, layerContext }) => ({
-            card: layerContext,
-            onTitleChange: handlers.carousel.updateCardTitle,
-            onButtonTitleChange: handlers.carousel.updateButtonTitle,
-          }),
+          componentPropsBuilder: ({ nodes, currentItemId, handlers }) => {
+            const cardNode = nodes?.find((n) => n.id === currentItemId);
+            const card = cardNode ? { id: cardNode.id, ...cardNode.data } : null;
+            return {
+              card,
+              onTitleChange: handlers.carousel.updateCardTitle,
+              onButtonTitleChange: handlers.carousel.updateButtonTitle,
+            };
+          },
         },
       ],
     ],
@@ -59,15 +63,18 @@ export const COLLECT_CONFIGS = {
           }),
         },
       ],
-      // layer 1 â€” field detail
+      // layer 1 – field detail
       [
         {
           component: FieldSecondLayer,
-          componentPropsBuilder: ({ handlers, layerContext }) => ({
-            field: layerContext,
-            onLabelChange: handlers.form.updateFieldLabel,
-            onTypeChange: handlers.form.updateFieldType,
-          }),
+          componentPropsBuilder: ({ nodeData, currentItemId, handlers }) => {
+            const field = nodeData?.fields?.find((f) => f.id === currentItemId) ?? null;
+            return {
+              field,
+              onLabelChange: handlers.form.updateFieldLabel,
+              onTypeChange: handlers.form.updateFieldType,
+            };
+          },
         },
       ],
     ],
