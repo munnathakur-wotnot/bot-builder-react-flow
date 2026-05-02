@@ -1,5 +1,6 @@
 import React, { useCallback } from "react";
 import PropTypes from "prop-types";
+import DraggableRow from "../../../../shared/ui/molecules/DraggableRow";
 
 const FieldRow = React.memo(function FieldRow({
     field,
@@ -19,36 +20,15 @@ const FieldRow = React.memo(function FieldRow({
     );
 
     return (
-        <div className="node-sidebar__field-row">
-            <span
-                {...dragHandleProps}
-                {...dragListeners}
-                style={{ cursor: "grab", padding: "4px", marginRight: "8px" }}
-            >
-                ☰
-            </span>
-
-            <span className="node-sidebar__field-row-label">{field.label || "Untitled"}</span>
-            <span className="node-sidebar__field-row-type">{field.type}</span>
-
-            <button
-                type="button"
-                className="node-sidebar__field-chevron"
-                onClick={handleOpen}
-                aria-label="Edit field"
-            >
-                ›
-            </button>
-
-            <button
-                type="button"
-                className="node-sidebar__field-remove"
-                onClick={handleRemove}
-                aria-label="Remove field"
-            >
-                ×
-            </button>
-        </div>
+        <DraggableRow
+            dragHandleProps={dragHandleProps}
+            dragListeners={dragListeners}
+            onNavigate={handleOpen}
+            onRemove={handleRemove}
+        >
+            <span className="field-row__label">{field.label || "Untitled"}</span>
+            <span className="field-row__type-badge">{field.type}</span>
+        </DraggableRow>
     );
 });
 

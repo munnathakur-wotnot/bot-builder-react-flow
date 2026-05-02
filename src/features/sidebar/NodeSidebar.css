@@ -188,63 +188,44 @@
   margin-top: 4px;
 }
 
-.node-sidebar__field-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+/* Label & type badge inside DraggableRow children */
+.field-row__label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.node-sidebar__field-label { flex: 1; margin-top: 0 !important; }
+.field-row__type-badge {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-tertiary);
+  background: var(--color-bg-hover);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xs, 4px);
+  padding: 1px 6px;
+  flex-shrink: 0;
+  text-transform: capitalize;
+}
 
+/* ── Field-type select (layer 1 detail) ──────────────────────── */
 .node-sidebar__field-type {
-  width: 86px;
+  width: 100%;
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: 7px 6px;
-  font-size: 12.5px;
+  padding: 7px 8px;
+  font-size: 13px;
   color: var(--color-text-primary);
   background: var(--color-bg-white);
   cursor: pointer;
   outline: none;
+  margin-top: 5px;
   transition: border-color var(--transition-base);
+  box-sizing: border-box;
 }
 
 .node-sidebar__field-type:focus {
   border-color: var(--color-border-focus);
-}
-
-.node-sidebar__field-remove,
-.node-sidebar__field-chevron {
-  width: 28px;
-  height: 28px;
-  flex-shrink: 0;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-white);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
-  line-height: 1;
-  transition: background var(--transition-base), border-color var(--transition-base), color var(--transition-base);
-}
-
-.node-sidebar__field-remove {
-  border-color: var(--color-danger-border);
-  color: var(--color-danger);
-}
-
-.node-sidebar__field-remove:hover {
-  background: var(--color-danger-bg);
-}
-
-.node-sidebar__field-chevron {
-  color: var(--color-text-tertiary);
-}
-
-.node-sidebar__field-chevron:hover {
-  border-color: var(--color-border-focus);
-  color: var(--color-border-focus);
-  background: var(--color-bg-hover);
 }

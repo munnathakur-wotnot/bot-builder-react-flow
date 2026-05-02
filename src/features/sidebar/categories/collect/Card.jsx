@@ -2,7 +2,8 @@
 import "./card.css";
 import PropTypes from "prop-types";
 import DragDropList from "../../../../shared/ui/molecules/ListDragDrop";
-import { DragIcon, CardIcon } from "../../../../shared/ui/atoms/icons";
+import DraggableRow from "../../../../shared/ui/molecules/DraggableRow";
+import { CardIcon } from "../../../../shared/ui/atoms/icons";
 
 const Card = ({ nodeData, removeCard, reorderCards, onNavigate }) => {
   const cards = nodeData?.cards ?? [];
@@ -19,45 +20,15 @@ const Card = ({ nodeData, removeCard, reorderCards, onNavigate }) => {
           const cardId = typeof card === "string" ? card : card?.id;
           const cardTitle = typeof card === "string" ? card : card?.title;
           return (
-            <div className="card-container">
-              <div className="card">
-                <div className="card-left">
-                  <span
-                    {...dragHandleProps}
-                    {...dragListeners}
-                    className="card-drag-handle"
-                    title="Drag to reorder"
-                  >
-                    <DragIcon />
-                  </span>
-                  <div className="card-icon">
-                    <CardIcon />
-                  </div>
-                  <span className="card-title">{cardTitle}</span>
-                </div>
-
-                <div className="card-actions">
-                  <button
-                    type="button"
-                    className="card-chevron"
-                    onClick={() => onNavigate?.({ id: cardId, title: cardTitle })}
-                    aria-label="Edit card"
-                  >
-                    {"\u203A"}
-                  </button>
-                  {cards?.length > 1 && (
-                    <button
-                      type="button"
-                      className="card-delete"
-                      onClick={() => removeCard(cardId)}
-                      aria-label="Remove card"
-                    >
-                      {"\u00D7"}
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
+            <DraggableRow
+              dragHandleProps={dragHandleProps}
+              dragListeners={dragListeners}
+              onNavigate={() => onNavigate?.({ id: cardId, title: cardTitle })}
+              onRemove={cards?.length > 1 ? () => removeCard(cardId) : undefined}
+            >
+              <div className="card-icon"><CardIcon /></div>
+              <span className="card-title">{cardTitle}</span>
+            </DraggableRow>
           );
         }}
       />
