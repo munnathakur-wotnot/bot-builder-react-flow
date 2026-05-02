@@ -1,0 +1,336 @@
+﻿/* ── Base node ───────────────────────────────────────────────── */
+.custom-node {
+  position: relative;
+  width: 220px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-white);
+  box-shadow: var(--shadow-sm);
+  overflow: visible;
+  transition: box-shadow var(--transition-base), border-color var(--transition-base);
+  cursor: default;
+}
+
+.custom-node:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-border-hover);
+}
+
+/* ── Start node ───────────────────────────────────────────────── */
+.custom-node--start {
+  width: auto;
+  min-width: 120px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--color-accent-start);
+  box-shadow: 0 4px 14px rgba(31, 178, 106, 0.35);
+  cursor: pointer;
+}
+
+.custom-node--start:hover {
+  box-shadow: 0 6px 20px rgba(31, 178, 106, 0.45);
+  border: none;
+}
+
+.custom-node--start .custom-node__header {
+  padding: 10px 20px;
+  background: transparent;
+  gap: 8px;
+}
+
+.custom-node--start .custom-node__icon {
+  width: 14px;
+  height: 14px;
+  border-radius: 0;
+  background: rgba(255,255,255,0.9);
+  clip-path: polygon(0 0, 80% 0, 60% 50%, 80% 100%, 0 100%);
+}
+
+.custom-node--start .custom-node__icon::before { content: none; }
+
+.custom-node--start .custom-node__title {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.custom-node--start .custom-node__description { display: none; }
+
+/* ── Delay node ───────────────────────────────────────────────── */
+.custom-node--delay {
+  width: auto;
+  min-width: 140px;
+  border-radius: var(--radius-full);
+  border-color: #fde68a;
+  background: #fffbeb;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
+}
+
+.custom-node--delay:hover {
+  border-color: var(--color-accent-delay);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.custom-node__header-delay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #92400e;
+}
+
+/* ── Carousel sub-nodes ───────────────────────────────────────── */
+.custom-node--carouselCard,
+.custom-node--carouselButton {
+  width: 120px;
+  background: var(--color-bg-white);
+}
+
+.custom-node--carouselCard .custom-node__header,
+.custom-node--carouselButton .custom-node__header {
+  background: var(--color-bg-white);
+  padding: 9px 10px;
+}
+
+.custom-node--carouselCard .custom-node__icon,
+.custom-node--carouselButton .custom-node__icon { display: none; }
+
+.custom-node--carouselCard .custom-node__title,
+.custom-node--carouselButton .custom-node__title {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.custom-node--carouselCard .custom-node__add-button { display: none; }
+
+/* ── AI Answer node ───────────────────────────────────────────── */
+.custom-node--ai_answer {
+  border-color: #e9d5ff;
+  background: #faf5ff;
+}
+
+.custom-node--ai_answer:hover {
+  border-color: #c084fc;
+}
+
+.custom-node--ai_answer .custom-node__header {
+  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+}
+
+/* ── Header ───────────────────────────────────────────────────── */
+.custom-node__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 12px 9px;
+  background: linear-gradient(135deg, var(--color-bg-subtle) 0%, var(--color-bg-white) 100%);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+/* Per-type header accent stripe */
+.custom-node--collectInput .custom-node__header { background: linear-gradient(135deg, #eff6ff 0%, var(--color-bg-white) 60%); }
+.custom-node--form        .custom-node__header { background: linear-gradient(135deg, #ecfeff 0%, var(--color-bg-white) 60%); }
+.custom-node--carousel    .custom-node__header { background: linear-gradient(135deg, #f5f3ff 0%, var(--color-bg-white) 60%); }
+
+/* ── Icon ─────────────────────────────────────────────────────── */
+.custom-node__icon {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent-collect);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.custom-node__icon::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 2px solid rgba(255,255,255,0.85);
+  border-radius: 2px;
+}
+
+.custom-node--form        .custom-node__icon { background: var(--color-accent-form); }
+.custom-node--carousel    .custom-node__icon { background: var(--color-accent-carousel); }
+.custom-node--ai_answer   .custom-node__icon { background: var(--color-accent-ai); }
+.custom-node--collectInput .custom-node__icon { background: var(--color-accent-collect); }
+
+/* ── Title ────────────────────────────────────────────────────── */
+.custom-node__title {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+/* ── Description ──────────────────────────────────────────────── */
+.custom-node__description {
+  margin: 0;
+  padding: 8px 12px 10px;
+  color: var(--color-text-tertiary);
+  font-size: 12px;
+  line-height: 1.4;
+  border-top: 1px solid var(--color-border);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Handles ──────────────────────────────────────────────────── */
+.custom-node__handle {
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--color-green-500);
+  background: var(--color-bg-white);
+  transition: transform var(--transition-fast);
+}
+
+.custom-node__handle--target {
+  top: -5px;
+}
+
+/* Full-node invisible target for drag-to-connect */
+.custom-node__handle--target-full {
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  border: 2px solid transparent;
+  border-radius: inherit;
+  background: transparent;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.flow-connecting .custom-node:not(.custom-node--start) .custom-node__handle--target-full {
+  pointer-events: auto;
+}
+
+.flow-connecting .custom-node:not(.custom-node--start) .custom-node__handle--target-full.connecting.valid {
+  border-color: var(--color-green-500);
+  background: rgba(31, 178, 106, 0.08);
+}
+
+/* ── Source handle (+) button ─────────────────────────────────── */
+/* ReactFlow default applies transform: translate(-50%, 50%) which shifts the
+   handle down by half its own height. With bottom: 0 the centre lands exactly
+   on the node's bottom edge — 50 % inside, 50 % outside.               */
+.custom-node__handle--source {
+  bottom: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-border-hover);
+  background: var(--color-bg-white);
+  box-shadow: var(--shadow-sm);
+  cursor: crosshair;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color var(--transition-base), background var(--transition-base), box-shadow var(--transition-base);
+}
+
+.custom-node__handle--source::after {
+  content: "+";
+  font-size: 18px;
+  line-height: 1;
+  color: var(--color-text-tertiary);
+  pointer-events: none;
+  transition: color var(--transition-base);
+}
+
+.custom-node__handle--source:hover {
+  border-color: var(--color-green-500);
+  background: var(--color-green-50);
+  box-shadow: 0 0 0 3px rgba(31, 178, 106, 0.15);
+}
+
+.custom-node__handle--source:hover::after {
+  color: var(--color-green-500);
+}
+
+/* Connected source dot */
+.custom-node__handle--source-connected {
+  bottom: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--color-green-500);
+  background: var(--color-bg-white);
+  box-shadow: none;
+  cursor: default;
+  pointer-events: none;
+}
+
+.custom-node__handle--source-connected::after { display: none; }
+
+/* Hidden anchor for already-connected */
+.custom-node__handle--source-hidden {
+  width: 8px !important;
+  height: 8px !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  bottom: 0 !important;
+  cursor: default !important;
+  pointer-events: none;
+}
+
+.custom-node__handle--source-hidden::after { display: none !important; }
+
+/* ── Double outport (AI Answer) ───────────────────────────────── */
+.success-node-handler {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+  border-radius: var(--radius-full);
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.failed-node-handler {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+  border-radius: var(--radius-full);
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ── Self-loop handle ─────────────────────────────────────────── */
+.custom-node__handle--self-loop {
+  position: absolute;
+}
+
+.custom-node__handle--self-loop::after {
+  content: "\21BB";
+  position: absolute;
+  bottom: -3px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-green-100);
+  color: #047857;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid #a7f3d0;
+}
