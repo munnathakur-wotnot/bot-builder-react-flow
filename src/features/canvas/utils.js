@@ -506,3 +506,53 @@ export function removeNodeConnectionsForEdges(nodes, edgesToRemove) {
     };
   });
 }
+
+/**
+ * Returns updated node array after a new connection is made.
+ * Pure function — no side effects.
+ */
+export function applyConnectionToNodes(nodes, params) {
+  return nodes.map((node) => {
+    if (node.id === params.source) {
+      let updatedData = { ...node.data };
+      if (params.sourceHandle === "success") {
+        updatedData.successOutport = [
+          ...(node.data.successOutport || []),
+          params.target,
+        ];
+      } else if (params.sourceHandle === "failure") {
+        updatedData.failureOutport = [
+          ...(node.data.failureOutport || []),
+          params.target,
+        ];
+      } else {
+        updatedData.outPorts = [
+          ...(node.data.outPorts || []),
+          params.target,
+        ];
+      }
+      return { ...node, data: { ...updatedData, connected: true } };
+    }
+    if (node.id === params.target) {
+      return {
+        ...node,
+        data: {
+          ...node.data,
+          inPorts: [...(node.data.inPorts || []), params.source],
+          connected: true,
+        },
+      };
+    }
+    return node;
+  });
+}
+
+/**
+ * Returns true when connecting from sourceHandle on sourceId is still allowed
+ * (no existing edge from the same source+handle pair).
+ */
+export function isConnectionAllowed(edges, source, sourceHandle) {
+  return !edges.some(
+    (e) => e.source === source && e.sourceHandle === sourceHandle,
+  );
+}
