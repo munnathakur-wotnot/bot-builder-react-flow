@@ -15,9 +15,15 @@ export default function DynamicRenderer(props) {
 
   // Support both legacy flat array and new { layers: [[],[],…] } shape.
   // layerIndex 0 = root list, 1 = item detail, 2 = nested detail, etc.
-  const configs = Array.isArray(rawConfig)
+  const allConfigs = Array.isArray(rawConfig)
     ? rawConfig
     : (rawConfig?.layers?.[layerIndex] ?? []);
+
+  // Filter out entries that declare shouldRender and evaluate to false.
+  const renderContext = { nodeData, layerContext: props.layerContext };
+  const configs = allConfigs.filter((c) =>
+    typeof c.shouldRender === "function" ? c.shouldRender(renderContext) : true
+  );
 
   if (configs.length === 0) return null;
 

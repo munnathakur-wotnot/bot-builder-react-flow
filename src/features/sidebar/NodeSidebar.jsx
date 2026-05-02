@@ -51,9 +51,22 @@ export default function NodeSidebar({
     const itemNode = nodes.find((n) => n.id === currentItemId);
     if (itemNode) return { id: itemNode.id, ...itemNode.data };
 
-    //fields
+    // form fields
     const fields = nodeData?.fields ?? [];
-    return fields.find((f) => f.id === currentItemId) ?? null;
+    const field = fields.find((f) => f.id === currentItemId);
+    if (field) return field;
+
+    // ai knowledge bases
+    const kbs = nodeData?.knowledgeBases ?? [];
+    const kb = kbs.find((k) => k.id === currentItemId);
+    if (kb) return { ...kb, _type: "kb" };
+
+    // ai functions
+    const fns = nodeData?.availableFunctions ?? [];
+    const fn = fns.find((f) => f.id === currentItemId);
+    if (fn) return { ...fn, _type: "fn" };
+
+    return null;
   }, [currentItemId, nodes, nodeData]);
 
   if (!selectedNode) return null;
@@ -67,8 +80,8 @@ export default function NodeSidebar({
       />
 
       <div className="node-sidebar__body">
-        {/* Title/description only visible on the root layer */}
-        {layerIndex === 0 && (
+        {/* Title/description only on root layer  */}
+        {layerIndex === 0  && (
           <TitleDescriptionFields nodeData={nodeData} updateNode={updateNode} />
         )}
 

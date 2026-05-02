@@ -4,7 +4,7 @@ import Card from "../categories/collect/Card";
 import CardSecondLayer from "../categories/collect/CardSecondLayer";
 import FieldSecondLayer from "../categories/collect/FieldSecondLayer";
 
-export const SIDEBAR_CONFIGS = {
+export const COLLECT_CONFIGS = {
   carousel: {
     layers: [
       // layer 0 â€” card list
