@@ -182,8 +182,17 @@ export default function ContextMenu({
 
   if (!menuState) return null;
 
+  const MENU_MAX_HEIGHT = 440;
+  const VIEWPORT_PADDING = 12;
+  const availableHeight = window.innerHeight - menuState.y - VIEWPORT_PADDING;
+  const menuHeight = Math.min(MENU_MAX_HEIGHT, Math.max(availableHeight, 200));
+
   return (
-    <div className="context-menu" style={{ top: menuState.y, left: menuState.x }} role="menu">
+    <div
+      className="context-menu"
+      style={{ top: menuState.y, left: menuState.x, maxHeight: menuHeight }}
+      role="menu"
+    >
       <div className="context-menu__header">
         <span className="context-menu__search-icon">{Icons.search}</span>
         <AppInput
