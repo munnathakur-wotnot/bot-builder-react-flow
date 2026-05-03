@@ -15,18 +15,22 @@ import {
  *   - handleEdgesDelete called by ReactFlow's built-in edge deletion
  */
 export function useFlowConnections({ edges, setEdges, setNodes, nodesRef, flowWrapperRef }) {
+  // Stable ref so callbacks don't need edges in their dep arrays
+  const edgesRef = useRef(edges);
+  edgesRef.current = edges;
+
   const handleConnectStart = useCallback(() => {
     flowWrapperRef.current?.classList.add("flow-connecting");
   }, [flowWrapperRef]);
 
   const onConnect = useCallback(
     (params) => {
-      if (!isConnectionAllowed(edges, params.source, params.sourceHandle)) return;
+      if (!isConnectionAllowed(edgesRef.current, params.source, params.sourceHandle)) return;
 
       setEdges((eds) => addEdge({ ...params, type: "custom" }, eds));
       setNodes((nds) => applyConnectionToNodes(nds, params));
     },
-    [edges, setEdges, setNodes],
+    [setEdges, setNodes],
   );
 
   const handleConnectEnd = useCallback(

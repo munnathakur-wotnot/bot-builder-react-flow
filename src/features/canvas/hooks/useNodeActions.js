@@ -1,9 +1,12 @@
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { removeNodeConnectionsForEdges } from "../utils";
 
 /**
  * Encapsulates delete / copy / clone logic for canvas nodes.
  * Carousel-aware: delete removes the full group; clone deep-copies it.
+ *
+ * All returned callbacks are stable references (never change between renders)
+ * so that FlowCallbacksContext consumers don't re-render unnecessarily.
  */
 export function useNodeActions({
   nodesRef,
@@ -13,6 +16,9 @@ export function useNodeActions({
   setSelectedNodeId,
   getNextNodeId,
 }) {
+  // Keep edges readable inside callbacks without adding it to deps.
+  const edgesRef = useRef(edges);
+  edgesRef.current = edges;
   // ── Delete ────────────────────────────────────────────────────
   const deleteNode = useCallback(
     (nodeId) => {
@@ -146,7 +152,7 @@ export function useNodeActions({
       }));
 
       const groupIds = new Set(idMap.keys());
-      const clonedEdges = edges
+      const clonedEdges = edgesRef.current
         .filter((e) => groupIds.has(e.source) && groupIds.has(e.target))
         .map((e) => ({
           ...e,
@@ -159,7 +165,7 @@ export function useNodeActions({
       setEdges((eds) => [...eds, ...clonedEdges]);
       setSelectedNodeId(newCarouselId);
     },
-    [nodesRef, edges, getNextNodeId, setNodes, setEdges, setSelectedNodeId],
+    [nodesRef, getNextNodeId, setNodes, setEdges, setSelectedNodeId],
   );
 
   // ── Multi-select: delete all selected root nodes (+ their groups) ──
@@ -270,7 +276,7 @@ export function useNodeActions({
       });
 
       // Clone all edges whose both ends are inside the expanded selection
-      const clonedEdges = edges
+      const clonedEdges = edgesRef.current
         .filter((e) => expandedIds.has(e.source) && expandedIds.has(e.target))
         .map((e) => ({
           ...e,
@@ -282,7 +288,7 @@ export function useNodeActions({
       setNodes((nds) => [...nds, ...clonedNodes]);
       setEdges((eds) => [...eds, ...clonedEdges]);
     },
-    [nodesRef, edges, getNextNodeId, setNodes, setEdges],
+    [nodesRef, getNextNodeId, setNodes, setEdges],
   );
 
   return { deleteNode, copyNode, cloneNode, deleteNodes, copyNodes, cloneNodes };
