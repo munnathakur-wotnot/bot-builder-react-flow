@@ -18,6 +18,7 @@ import SidebarIndex from "../sidebar/index.jsx";
 import ConextMenuIndex from "../context-menu/index.jsx";
 import { useGroupDrag } from "./hooks/useGroupDrag";
 import { useFlowConnections } from "./hooks/useFlowConnections";
+import { useNodeActions } from "./hooks/useNodeActions";
 
 const nodeTypes = { custom: CustomNode };
 const edgeTypes = { custom: CustomEdge };
@@ -58,16 +59,25 @@ export default function CanvasFlow() {
     [],
   );
 
-  const flowCallbacks = useMemo(
-    () => ({ openMenu, deleteEdge: handleDeleteEdge }),
-    [openMenu, handleDeleteEdge],
-  );
-
   const handleNodeClick = useCallback((_, node) => {
     setSelectedNodeId(node.id);
   }, []);
 
   const getNextNodeId = useCallback(() => `node_${nextIdRef.current++}`, []);
+
+  const { deleteNode, copyNode, cloneNode } = useNodeActions({
+    nodesRef,
+    edges,
+    setNodes,
+    setEdges,
+    setSelectedNodeId,
+    getNextNodeId,
+  });
+
+  const flowCallbacks = useMemo(
+    () => ({ openMenu, deleteEdge: handleDeleteEdge, deleteNode, copyNode, cloneNode }),
+    [openMenu, handleDeleteEdge, deleteNode, copyNode, cloneNode],
+  );
 
   const handlePaneClick = useCallback(() => {
     setMenuState(null);

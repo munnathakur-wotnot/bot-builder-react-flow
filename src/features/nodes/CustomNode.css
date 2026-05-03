@@ -16,6 +16,66 @@
   border-color: var(--color-border-hover);
 }
 
+/* ── Node hover toolbar ──────────────────────────────────────── */
+.node-toolbar {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 10px);
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  z-index: 10;
+}
+
+/* Invisible bridge that fills the gap between node edge and toolbar,
+   so the cursor stays within .custom-node's hover area while crossing. */
+.node-toolbar::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 100%;
+  width: 10px;
+  height: 100%;
+}
+
+.custom-node:hover .node-toolbar {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.node-toolbar__btn {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-white);
+  color: var(--color-text-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: background var(--transition-base), border-color var(--transition-base),
+    color var(--transition-base), box-shadow var(--transition-base);
+}
+
+.node-toolbar__btn:hover {
+  background: var(--color-bg-hover);
+  border-color: var(--color-border-focus);
+  color: var(--color-accent-collect);
+  box-shadow: var(--shadow-md);
+}
+
+.node-toolbar__btn--danger:hover {
+  background: var(--color-danger-bg);
+  border-color: var(--color-danger-border);
+  color: var(--color-danger);
+}
+
 /* ── Start node ───────────────────────────────────────────────── */
 .custom-node--start {
   width: auto;

@@ -3,9 +3,10 @@ import PropTypes from "prop-types";
 import { Handle, Position } from "@xyflow/react";
 import "./CustomNode.css";
 import { useFlowCallbacks } from "../canvas/FlowCallbacksContext.jsx";
+import NodeTooltips from "./NodeTooltips.jsx";
 
 function CustomNode({ id, data }) {
-  const { openMenu } = useFlowCallbacks();
+  const { openMenu} = useFlowCallbacks();
 
   const isStartNode = data.type === "start";
   const isConnected = data?.connected;
@@ -79,6 +80,9 @@ function CustomNode({ id, data }) {
     [handleOpenMenu, hasOutgoing, isSelfLoop],
   );
 
+  const isSubNode = data.type === "carouselCard" || data.type === "carouselButton";
+  const showToolbar = !isStartNode && !isSubNode;
+
   if (!data) return null;
 
   const typeClassName = `custom-node custom-node--${data.type ?? "default"}`;
@@ -119,6 +123,11 @@ function CustomNode({ id, data }) {
       {/* Description */}
       {showDescription && (
         <p className="custom-node__description">{data.description}</p>
+      )}
+
+      {/* Hover toolbar */}
+      {showToolbar && (
+        <NodeTooltips id={id} />
       )}
 
       {/* Source Handles */}
