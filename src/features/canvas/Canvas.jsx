@@ -19,6 +19,7 @@ import ConextMenuIndex from "../context-menu/index.jsx";
 import { useGroupDrag } from "./hooks/useGroupDrag";
 import { useFlowConnections } from "./hooks/useFlowConnections";
 import { useNodeActions } from "./hooks/useNodeActions";
+import MultiSelectToolbar from "./MultiSelectToolbar";
 
 const nodeTypes = { custom: CustomNode };
 const edgeTypes = { custom: CustomEdge };
@@ -35,6 +36,7 @@ export default function CanvasFlow() {
   const [nodes, setNodes, onNodesChange] = useNodesState(INITIAL_NODES);
   const [edges, setEdges, onEdgesChange] = useEdgesState(INITIAL_EDGES);
   const [selectedNodeId, setSelectedNodeId] = useState(null);
+  const [selectedNodeIds, setSelectedNodeIds] = useState([]);
   const [nuberOfNodes, setNumberOfNodes] = useState(0);
   const [menuState, setMenuState] = useState(null);
   const nextIdRef = useRef(2);
@@ -63,9 +65,17 @@ export default function CanvasFlow() {
     setSelectedNodeId(node.id);
   }, []);
 
+  const handleSelectionChange = useCallback(({ nodes: selected }) => {
+    // Only track root-level selectable nodes (skip carousel sub-nodes)
+    const ids = (selected ?? [])
+      .filter((n) => n.data?.type !== "carouselCard" && n.data?.type !== "carouselButton")
+      .map((n) => n.id);
+    setSelectedNodeIds(ids);
+  }, []);
+
   const getNextNodeId = useCallback(() => `node_${nextIdRef.current++}`, []);
 
-  const { deleteNode, copyNode, cloneNode } = useNodeActions({
+  const { deleteNode, copyNode, cloneNode, deleteNodes, copyNodes, cloneNodes } = useNodeActions({
     nodesRef,
     edges,
     setNodes,
@@ -82,6 +92,7 @@ export default function CanvasFlow() {
   const handlePaneClick = useCallback(() => {
     setMenuState(null);
     setSelectedNodeId(null);
+    setSelectedNodeIds([]);
   }, []);
 
   const onMove = useCallback(() => {
@@ -116,6 +127,7 @@ export default function CanvasFlow() {
             onNodeDragStart={onGroupNodeDragStart}
             onNodeDrag={onGroupNodeDrag}
             onNodeClick={handleNodeClick}
+            onSelectionChange={handleSelectionChange}
             snapToGrid={true}
             onPaneClick={handlePaneClick}
             onMove={onMove}
@@ -125,6 +137,14 @@ export default function CanvasFlow() {
             <StaticBackground />
             <MiniMap />
             <StaticControls />
+            {selectedNodeIds.length >= 2 && (
+              <MultiSelectToolbar
+                selectedIds={selectedNodeIds}
+                onCopy={copyNodes}
+                onClone={cloneNodes}
+                onDelete={(ids) => { deleteNodes(ids); setSelectedNodeIds([]); }}
+              />
+            )}
           </ReactFlow>
 
           {menuState && (
