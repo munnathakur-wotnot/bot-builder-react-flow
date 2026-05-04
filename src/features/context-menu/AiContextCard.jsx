@@ -32,7 +32,6 @@ export default function AiMenu({
             deleteEdge?.(connectedEdge.id, nodeId, nodeId);
             updateNode({ successOutport: [] });
         }
-
         setMenuState(null);
     };
     return (
@@ -49,10 +48,7 @@ export default function AiMenu({
             </div>
 
             {!isSelfLoop && (
-                <div
-                    className="action-item"
-                    onClick={onAddBlock}
-                >
+                <div className="action-item" onClick={onAddBlock}>
                     <span className="icon plus">+</span>
                     <span className="label">Add another block</span>
                 </div>

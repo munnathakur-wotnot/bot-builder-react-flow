@@ -9,7 +9,7 @@ export default function SidebarIndex({
     nodes,
     setNodes,
     onClose,
-    ...rest   // all other props (edges, setEdges, getNextNodeId, …) forwarded as-is
+    ...rest // all other props (edges, setEdges, getNextNodeId, …) forwarded as-is
 }) {
     const selectedNode = nodes.find((n) => n.id === selectedNodeId) ?? null;
     const { updateNode } = useNodeUpdater({
@@ -18,7 +18,7 @@ export default function SidebarIndex({
     });
 
     const iCategory = selectedNode?.data?.iCategory;
-    const nodeType  = selectedNode?.data?.type;
+    const nodeType = selectedNode?.data?.type;
     const categoryConfig = CATEGORY_CONFIGS[iCategory];
 
     // Full prop set available to every category config:
@@ -30,8 +30,8 @@ export default function SidebarIndex({
         nodes,
         setNodes,
         onClose,
-        selectedNode,   // derived — always the live object
-        updateNode,     // derived — stable updater for the selected node
+        selectedNode, // derived — always the live object
+        updateNode, // derived — stable updater for the selected node
     };
 
     // getSidebarComponent receives nodeType + the full prop set and returns
@@ -52,4 +52,3 @@ SidebarIndex.propTypes = {
     getNextNodeId: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
 };
-

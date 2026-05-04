@@ -2,6 +2,7 @@
 import PropTypes from "prop-types";
 import AppInput from "../../../../shared/ui/atoms/AppInput";
 import { TrashIcon } from "../../../../shared/ui/atoms/icons";
+import "./AiAnswerSidebar.css";
 
 const DEFAULT_FN_SNIPPET = `// Function receives user message and context
 // Return a value to pass to the AI as context
@@ -19,12 +20,15 @@ export default function FunctionLayer({ fn = {}, handlers }) {
     setCode(fn.code ?? DEFAULT_FN_SNIPPET);
   }, [fn.id]);
 
-  const isDirty = name !== (fn.name ?? "") || code !== (fn.code ?? DEFAULT_FN_SNIPPET);
+  const isDirty =
+    name !== (fn.name ?? "") || code !== (fn.code ?? DEFAULT_FN_SNIPPET);
 
   return (
     <div className="ai-layer">
       <div className="ai-field">
-        <label className="ai-field__label" htmlFor="fn-name">Function name</label>
+        <label className="ai-field__label" htmlFor="fn-name">
+          Function name
+        </label>
         <AppInput
           id="fn-name"
           className="node-sidebar__input"
@@ -60,7 +64,13 @@ export default function FunctionLayer({ fn = {}, handlers }) {
         <button
           type="button"
           className={`ai-layer__btn ai-layer__btn--primary${isDirty ? " ai-layer__btn--active" : ""}`}
-          onClick={() => handlers.ai.saveFunction({ ...fn, name: name.trim() || "Untitled", code })}
+          onClick={() =>
+            handlers.ai.saveFunction({
+              ...fn,
+              name: name.trim() || "Untitled",
+              code,
+            })
+          }
           disabled={!isDirty}
         >
           Save

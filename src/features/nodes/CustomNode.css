@@ -381,7 +381,7 @@
 .custom-node__handle--self-loop::after {
   content: "\21BB";
   position: absolute;
-  bottom: -3px;
+  bottom: -1px;
   width: 28px;
   height: 28px;
   border-radius: 50%;

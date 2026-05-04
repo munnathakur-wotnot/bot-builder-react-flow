@@ -35,7 +35,10 @@ export default function NodeSidebar({
   }, [selectedNodeId]);
 
   const handleNavigate = useCallback((item) => {
-    setLayerStack((prev) => [...prev, { itemId: item.id, itemType: item._type ?? null }]);
+    setLayerStack((prev) => [
+      ...prev,
+      { itemId: item.id, itemType: item._type ?? null },
+    ]);
   }, []);
 
   const nodeData = selectedNode?.data;
@@ -55,7 +58,7 @@ export default function NodeSidebar({
 
       <div className="node-sidebar__body">
         {/* Title/description only on root layer  */}
-        {layerIndex === 0  && (
+        {layerIndex === 0 && (
           <TitleDescriptionFields nodeData={nodeData} updateNode={updateNode} />
         )}
 

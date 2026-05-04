@@ -23,6 +23,7 @@ export default function CustomEdge(props) {
   } = props;
 
   const { deleteEdge } = useFlowCallbacks();
+  //Used to delay hiding the delete button (smooth UX).
   const hideTimeoutRef = useRef(null);
   const [hoverState, setHoverState] = useState({
     isVisible: false,

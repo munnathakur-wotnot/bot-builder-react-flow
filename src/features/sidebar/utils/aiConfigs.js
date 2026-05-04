@@ -1,9 +1,9 @@
 ﻿import AiQuestionField from "../categories/ai/AiQuestionField";
-import AiPromptField   from "../categories/ai/AiPromptField";
-import AiKbDropdown    from "../categories/ai/AiKbDropdown";
-import AiFnDropdown    from "../categories/ai/AiFnDropdown";
-import FunctionLayer   from "../categories/ai/FunctionLayer";
-import KbLayer         from "../categories/ai/KbLayer";
+import AiPromptField from "../categories/ai/AiPromptField";
+import AiKbDropdown from "../categories/ai/AiKbDropdown";
+import AiFnDropdown from "../categories/ai/AiFnDropdown";
+import FunctionLayer from "../categories/ai/FunctionLayer";
+import KbLayer from "../categories/ai/KbLayer";
 
 export const AI_CONFIGS = {
   ai_answer: {
@@ -48,7 +48,9 @@ export const AI_CONFIGS = {
           // only render for KB items
           shouldRender: ({ currentItemType }) => currentItemType === "kb",
           componentPropsBuilder: ({ nodeData, currentItemId, handlers }) => {
-            const kb = nodeData?.knowledgeBases?.find((k) => k.id === currentItemId) ?? {};
+            const kb =
+              nodeData?.knowledgeBases?.find((k) => k.id === currentItemId) ??
+              {};
             return { kb, handlers };
           },
         },
@@ -57,7 +59,10 @@ export const AI_CONFIGS = {
           // only render for function items
           shouldRender: ({ currentItemType }) => currentItemType === "fn",
           componentPropsBuilder: ({ nodeData, currentItemId, handlers }) => {
-            const fn = nodeData?.availableFunctions?.find((f) => f.id === currentItemId) ?? {};
+            const fn =
+              nodeData?.availableFunctions?.find(
+                (f) => f.id === currentItemId,
+              ) ?? {};
             return { fn, handlers };
           },
         },

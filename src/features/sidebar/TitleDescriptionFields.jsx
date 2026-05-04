@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import useDebouncedCallback from "../../shared/hooks/useDebouncedCallback";
 import AppInput from "../../shared/ui/atoms/AppInput";
+import AppTextarea from "../../shared/ui/atoms/AppTextArea";
 
 export default function TitleDescriptionFields({ nodeData, updateNode }) {
   const [title, setTitle] = useState(nodeData.title ?? "");
@@ -50,14 +51,12 @@ export default function TitleDescriptionFields({ nodeData, updateNode }) {
           onChange={(e) => setTitle(e.target.value)}
         />
       </label>
-      <label className="node-sidebar__label">
-        Description
-        <textarea
-          className="node-sidebar__textarea"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-      </label>
+      <AppTextarea
+        className="node-sidebar__textarea"
+        label={"Description"}
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+      />
     </>
   );
 }

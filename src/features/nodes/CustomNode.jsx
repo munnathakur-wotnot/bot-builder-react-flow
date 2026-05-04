@@ -6,7 +6,7 @@ import { useFlowCallbacks } from "../canvas/FlowCallbacksContext.jsx";
 import NodeTooltips from "./NodeTooltips.jsx";
 
 function CustomNode({ id, data }) {
-  const { openMenu} = useFlowCallbacks();
+  const { openMenu } = useFlowCallbacks();
 
   const isStartNode = data.type === "start";
   const isConnected = data?.connected;
@@ -80,7 +80,8 @@ function CustomNode({ id, data }) {
     [handleOpenMenu, hasOutgoing, isSelfLoop],
   );
 
-  const isSubNode = data.type === "carouselCard" || data.type === "carouselButton";
+  const isSubNode =
+    data.type === "carouselCard" || data.type === "carouselButton";
   const showToolbar = !isStartNode && !isSubNode;
 
   if (!data) return null;
@@ -126,9 +127,7 @@ function CustomNode({ id, data }) {
       )}
 
       {/* Hover toolbar */}
-      {showToolbar && (
-        <NodeTooltips id={id} />
-      )}
+      {showToolbar && <NodeTooltips id={id} />}
 
       {/* Source Handles */}
       {isDoubleOutport ? (

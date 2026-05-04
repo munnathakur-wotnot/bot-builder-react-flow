@@ -4,7 +4,14 @@ import SidebarContent from "./SidebarContent";
 import { CATEGORY_CONFIGS } from "./utils/categoryConfigs";
 
 export default function DynamicRenderer(props) {
-  const { nodeType, nodeData, layerIndex = 0, currentItemId, currentItemType, onNavigate } = props;
+  const {
+    nodeType,
+    nodeData,
+    layerIndex = 0,
+    currentItemId,
+    currentItemType,
+    onNavigate,
+  } = props;
 
   const categoryConfig = CATEGORY_CONFIGS[nodeData?.iCategory] ?? {};
   const rawConfig = categoryConfig?.getComponents
@@ -22,12 +29,14 @@ export default function DynamicRenderer(props) {
   // Filter out entries that declare shouldRender and evaluate to false.
   const renderContext = { nodeData, currentItemType };
   const configs = allConfigs.filter((c) =>
-    typeof c.shouldRender === "function" ? c.shouldRender(renderContext) : true
+    typeof c.shouldRender === "function" ? c.shouldRender(renderContext) : true,
   );
 
   if (configs.length === 0) return null;
 
-  const handlers = categoryConfig?.getHandlers ? categoryConfig.getHandlers(props) : {};
+  const handlers = categoryConfig?.getHandlers
+    ? categoryConfig.getHandlers(props)
+    : {};
 
   return (
     <SidebarContent

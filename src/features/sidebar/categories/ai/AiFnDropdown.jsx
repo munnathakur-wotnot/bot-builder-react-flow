@@ -1,6 +1,7 @@
 ﻿import React from "react";
 import PropTypes from "prop-types";
 import SelectDropdown from "./SelectDropdown";
+import "./AiAnswerSidebar.css";
 
 export default function AiFnDropdown({ nodeData, handlers, onNavigate }) {
   const availableFunctions = nodeData?.availableFunctions ?? [];

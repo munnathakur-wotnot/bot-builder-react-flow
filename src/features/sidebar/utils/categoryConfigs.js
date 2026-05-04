@@ -8,7 +8,9 @@ import NodeSidebar from "../NodeSidebar";
 
 export const CATEGORY_CONFIGS = {
   collect: {
+    //get collect  components based on types
     getComponents: (type) => COLLECT_CONFIGS[type],
+    //get collect handlers
     getHandlers: (props) => getCollectHandlers(props),
     getSidebarComponent: (_type, props) => ({ Component: NodeSidebar, props }),
   },
@@ -17,7 +19,13 @@ export const CATEGORY_CONFIGS = {
     getHandlers: (props) => getLogicHandlers(props),
     getSidebarComponent: (type, props) =>
       type === "delay"
-        ? { Component: DurationSelector, props: { selectedNode: props.selectedNode, updateNode: props.updateNode } }
+        ? {
+            Component: DurationSelector,
+            props: {
+              selectedNode: props.selectedNode,
+              updateNode: props.updateNode,
+            },
+          }
         : { Component: NodeSidebar, props },
   },
   ai: {

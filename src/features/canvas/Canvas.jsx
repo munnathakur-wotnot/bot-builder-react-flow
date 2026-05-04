@@ -44,7 +44,10 @@ export default function CanvasFlow() {
   const nodesRef = useRef(nodes);
   nodesRef.current = nodes;
 
-  const { onGroupNodeDragStart, onGroupNodeDrag } = useGroupDrag(nodesRef, setNodes);
+  const { onGroupNodeDragStart, onGroupNodeDrag } = useGroupDrag(
+    nodesRef,
+    setNodes,
+  );
 
   const {
     handleConnectStart,
@@ -52,14 +55,17 @@ export default function CanvasFlow() {
     handleConnectEnd,
     handleDeleteEdge,
     handleEdgesDelete,
-  } = useFlowConnections({ edges, setEdges, setNodes, nodesRef, flowWrapperRef });
+  } = useFlowConnections({
+    edges,
+    setEdges,
+    setNodes,
+    nodesRef,
+    flowWrapperRef,
+  });
 
-  const openMenu = useCallback(
-    ({ nodeId, x, y, type, isSelfLoop }) => {
-      setMenuState({ nodeId, x, y, type, isSelfLoop });
-    },
-    [],
-  );
+  const openMenu = useCallback(({ nodeId, x, y, type, isSelfLoop }) => {
+    setMenuState({ nodeId, x, y, type, isSelfLoop });
+  }, []);
 
   const handleNodeClick = useCallback((_, node) => {
     setSelectedNodeId(node.id);
@@ -68,14 +74,24 @@ export default function CanvasFlow() {
   const handleSelectionChange = useCallback(({ nodes: selected }) => {
     // Only track root-level selectable nodes (skip carousel sub-nodes)
     const ids = (selected ?? [])
-      .filter((n) => n.data?.type !== "carouselCard" && n.data?.type !== "carouselButton")
+      .filter(
+        (n) =>
+          n.data?.type !== "carouselCard" && n.data?.type !== "carouselButton",
+      )
       .map((n) => n.id);
     setSelectedNodeIds(ids);
   }, []);
 
   const getNextNodeId = useCallback(() => `node_${nextIdRef.current++}`, []);
 
-  const { deleteNode, copyNode, cloneNode, deleteNodes, copyNodes, cloneNodes } = useNodeActions({
+  const {
+    deleteNode,
+    copyNode,
+    cloneNode,
+    deleteNodes,
+    copyNodes,
+    cloneNodes,
+  } = useNodeActions({
     nodesRef,
     edges,
     setNodes,
@@ -85,7 +101,13 @@ export default function CanvasFlow() {
   });
 
   const flowCallbacks = useMemo(
-    () => ({ openMenu, deleteEdge: handleDeleteEdge, deleteNode, copyNode, cloneNode }),
+    () => ({
+      openMenu,
+      deleteEdge: handleDeleteEdge,
+      deleteNode,
+      copyNode,
+      cloneNode,
+    }),
     [openMenu, handleDeleteEdge, deleteNode, copyNode, cloneNode],
   );
 
@@ -142,7 +164,10 @@ export default function CanvasFlow() {
                 selectedIds={selectedNodeIds}
                 onCopy={copyNodes}
                 onClone={cloneNodes}
-                onDelete={(ids) => { deleteNodes(ids); setSelectedNodeIds([]); }}
+                onDelete={(ids) => {
+                  deleteNodes(ids);
+                  setSelectedNodeIds([]);
+                }}
               />
             )}
           </ReactFlow>
@@ -175,4 +200,3 @@ export default function CanvasFlow() {
     </div>
   );
 }
- 
