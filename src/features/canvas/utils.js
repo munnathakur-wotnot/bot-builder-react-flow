@@ -1,3 +1,5 @@
+import { Icons } from "../context-menu/contextMenuConfig";
+
 const NODE_WIDTH = 240;
 const NODE_HEIGHT = 120;
 
@@ -80,6 +82,7 @@ export function buildSingleNodePayload({
   delay = false,
   doubleHandler = false,
   sourceHandle = "",
+  jump = false,
 }) {
   const newNodeId = getNextNodeId();
   const title = getIncrementalTitle({
@@ -123,6 +126,24 @@ export function buildSingleNodePayload({
         doubleHandler: true,
         successOutport: [],
         failureOutport: [],
+      },
+    };
+  } else if (jump) {
+    const newNodeDelay = createFlowNode({
+      id: newNodeId,
+      x: sourceNode.position.x,
+      y: sourceNode.position.y + 220,
+      inPorts: [sourceNodeId],
+      title: "Jump",
+      metaType: "jump",
+      icon: Icons.jump,
+      iCategory: "logic",
+    });
+    newNode = {
+      ...newNodeDelay,
+      data: {
+        ...newNodeDelay.data,
+        jumpNode: { id: "", title: "Select Node" },
       },
     };
   } else {
@@ -327,6 +348,14 @@ export function buildMenuActionMap({
         delay: true,
         sourceHandle,
       }),
+    jump: () =>
+      buildSingleNodePayload({
+        ...context,
+        nodeData: templates.collectInput,
+        getNextNodeId,
+        jump: true,
+        sourceHandle,
+      }),
     answer_ai: () =>
       buildSingleNodePayload({
         ...context,
@@ -526,10 +555,7 @@ export function applyConnectionToNodes(nodes, params) {
           params.target,
         ];
       } else {
-        updatedData.outPorts = [
-          ...(node.data.outPorts || []),
-          params.target,
-        ];
+        updatedData.outPorts = [...(node.data.outPorts || []), params.target];
       }
       return { ...node, data: { ...updatedData, connected: true } };
     }

@@ -5,6 +5,27 @@ import { getAiHandlers } from "../categories/ai/handlers";
 import { AI_CONFIGS } from "./aiConfigs";
 import DurationSelector from "../categories/logic/DurationSelector";
 import NodeSidebar from "../NodeSidebar";
+import SmallSidebar from "../SmallSidebar";
+import JumpSelector from "../categories/logic/JumpSelector";
+
+const SMALL_SIDEBAR_RENDER = {
+  delay: DurationSelector,
+  jump: JumpSelector,
+};
+
+const renderSmallSideBar = (props, type) => {
+  function renderProps() {
+    if (type === "delay") {
+      return props;
+    } else {
+      return props;
+    }
+  }
+  return {
+    RenderCompoent: SMALL_SIDEBAR_RENDER[type],
+    renderProps: renderProps(),
+  };
+};
 
 export const CATEGORY_CONFIGS = {
   collect: {
@@ -18,12 +39,14 @@ export const CATEGORY_CONFIGS = {
     getComponents: () => null,
     getHandlers: (props) => getLogicHandlers(props),
     getSidebarComponent: (type, props) =>
-      type === "delay"
+      type === "delay" || type === "jump"
         ? {
-            Component: DurationSelector,
+            Component: SmallSidebar,
             props: {
               selectedNode: props.selectedNode,
               updateNode: props.updateNode,
+              nodes: props.nodes,
+              renderComponent: (props) => renderSmallSideBar(props, type),
             },
           }
         : { Component: NodeSidebar, props },

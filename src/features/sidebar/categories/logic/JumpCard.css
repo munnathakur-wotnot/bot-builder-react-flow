@@ -1,0 +1,44 @@
+.jump-card {
+    width: 260px;
+    background: #fffdfd;
+    padding: 14px;
+    border-radius: 10px;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+  
+  .jump-card__desc {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 12px;
+    line-height: 1.4;
+  }
+  
+  .jump-card__field {
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .jump-card__field label {
+    font-size: 13px;
+    color: #374151;
+    margin-bottom: 4px;
+  }
+  
+  .jump-card__field input,
+  .jump-card__field select {
+    height: 34px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 0 10px;
+    font-size: 14px;
+    background: #fff;
+    outline: none;
+  }
+  
+  .jump-card__field input:focus,
+  .jump-card__field select:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+  }

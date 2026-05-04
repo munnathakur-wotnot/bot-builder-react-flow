@@ -12,8 +12,6 @@ export default function AppTextarea({
     id,
 }) {
     const handleChange = (e) => {
-        console.log(e, onChange, "Hello onchange");
-
         onChange(e);
     };
 

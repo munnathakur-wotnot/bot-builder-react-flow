@@ -88,8 +88,13 @@ function CustomNode({ id, data }) {
 
   const typeClassName = `custom-node custom-node--${data.type ?? "default"}`;
   const titleClassName =
-    data.type === "delay" ? "custom-node__header-delay" : "custom-node__header";
-  const titleTextClassName = data.type === "delay" ? "" : "custom-node__title";
+    data.type === "delay" || data.type === "jump"
+      ? "custom-node__header-delay"
+      : "custom-node__header";
+  const titleTextClassName =
+    data.type === "delay" || data.type === "jump"
+      ? "small-node-title"
+      : "custom-node__title";
 
   return (
     <div
@@ -116,8 +121,8 @@ function CustomNode({ id, data }) {
       <div className={titleClassName}>
         {!data.icon && <div className="custom-node__icon" />}
         <p className={titleTextClassName}>
-          {data.icon} {data.title}{" "}
-          {data.delayDuration ? `(${data.delayDuration}s)` : ""}
+          <span>{data.icon}</span>
+          {data.title} {data.delayDuration ? `(${data.delayDuration}s)` : ""}
         </p>
       </div>
 
