@@ -6,6 +6,10 @@ const NODE_HEIGHT = 120;
 const HORIZONTAL_GAP = 80;
 const VERTICAL_GAP = 100;
 
+/* =========================================================
+   CORE HELPERS
+========================================================= */
+
 export function createFlowNode({
   id,
   x,
@@ -35,12 +39,13 @@ export function createFlowNode({
       title,
       description,
       type: metaType,
-      iCategory: iCategory,
+      iCategory,
       isValidDragConn,
     },
   };
-  // groupId enables group-drag: dragging any member moves the whole carousel group.
+
   if (groupId) node.data.groupId = groupId;
+
   return node;
 }
 
@@ -59,19 +64,74 @@ export function createEdge(
     target,
     hidden,
     sourceHandle: handle,
-    data: {
-      isNotDeletable,
-    },
     type: "custom",
+    data: { isNotDeletable },
   };
 }
 
 function getIncrementalTitle({ allNodes = [], metaType, baseTitle }) {
-  const typeCount = allNodes.filter(
-    (node) => node.data?.type === metaType,
-  ).length;
-  return typeCount === 0 ? baseTitle : `${baseTitle} ${typeCount + 1}`;
+  const count = allNodes.filter((n) => n.data?.type === metaType).length;
+  return count === 0 ? baseTitle : `${baseTitle} ${count + 1}`;
 }
+
+/* =========================================================
+   NODE CONFIG (🔥 MAIN IMPROVEMENT)
+========================================================= */
+
+function getNodeConfig(type, allNodes) {
+  const configs = {
+    delay: {
+      metaType: "delay",
+      baseTitle: "Delay",
+      icon: "◔",
+      iCategory: "logic",
+      extraData: { delayDuration: 1 },
+    },
+    ai_answer: {
+      metaType: "ai_answer",
+      baseTitle: "Ai Answer",
+      icon: "🤖",
+      iCategory: "ai",
+      description: "Ai Answer",
+      extraData: {
+        doubleHandler: true,
+        successOutport: [],
+        failureOutport: [],
+      },
+    },
+    jump: {
+      metaType: "jump",
+      baseTitle: "Jump",
+      icon: Icons.jump,
+      iCategory: "logic",
+      extraData: {
+        jumpNode: { id: "", title: "Select Node" },
+      },
+    },
+    default: {
+      metaType: "collectInput",
+      baseTitle: "Enter Input",
+      description: "Enter Description",
+      iCategory: "collect",
+      extraData: {},
+    },
+  };
+
+  const config = configs[type] || configs.default;
+
+  return {
+    ...config,
+    title: getIncrementalTitle({
+      allNodes,
+      metaType: config.metaType,
+      baseTitle: config.baseTitle,
+    }),
+  };
+}
+
+/* =========================================================
+   SINGLE NODE BUILDER ( CLEAN)
+========================================================= */
 
 export function buildSingleNodePayload({
   sourceNode,
@@ -79,95 +139,46 @@ export function buildSingleNodePayload({
   nodeData,
   getNextNodeId,
   allNodes,
-  delay = false,
-  doubleHandler = false,
+  type = "default",
   sourceHandle = "",
-  jump = false,
 }) {
   const newNodeId = getNextNodeId();
-  const title = getIncrementalTitle({
-    allNodes,
-    metaType: nodeData?.type ?? "collectInput",
-    baseTitle: "Enter Input",
-  });
-  let newNode = {};
 
-  if (delay) {
-    const newNodeDelay = createFlowNode({
-      id: newNodeId,
-      x: sourceNode.position.x,
-      y: sourceNode.position.y + 220,
-      inPorts: [sourceNodeId],
-      title: "Delay",
-      metaType: "delay",
-      icon: "◔",
-      iCategory: "logic",
-    });
-    newNode = {
-      ...newNodeDelay,
-      data: { ...newNodeDelay.data, delayDuration: 1 },
-    };
-  } else if (doubleHandler) {
-    const newNodeDelay = createFlowNode({
-      id: newNodeId,
-      x: sourceNode.position.x,
-      y: sourceNode.position.y + 220,
-      inPorts: [sourceNodeId],
-      title: "AI Answer",
-      metaType: "ai_answer",
-      description: "Ai Answer",
-      icon: "🤖",
-      iCategory: "ai",
-    });
-    newNode = {
-      ...newNodeDelay,
-      data: {
-        ...newNodeDelay.data,
-        doubleHandler: true,
-        successOutport: [],
-        failureOutport: [],
-      },
-    };
-  } else if (jump) {
-    const newNodeDelay = createFlowNode({
-      id: newNodeId,
-      x: sourceNode.position.x,
-      y: sourceNode.position.y + 220,
-      inPorts: [sourceNodeId],
-      title: "Jump",
-      metaType: "jump",
-      icon: Icons.jump,
-      iCategory: "logic",
-    });
-    newNode = {
-      ...newNodeDelay,
-      data: {
-        ...newNodeDelay.data,
-        jumpNode: { id: "", title: "Select Node" },
-      },
-    };
-  } else {
-    newNode = createFlowNode({
-      id: newNodeId,
-      x: sourceNode.position.x,
-      y: sourceNode.position.y + 220,
-      inPorts: [sourceNodeId],
-      title,
-      description: "Enter Description",
-      metaType: nodeData?.type ?? "collectInput",
-      iCategory: "collect",
-    });
-  }
+  const config = getNodeConfig(type, allNodes);
+
+  const newNode = createFlowNode({
+    id: newNodeId,
+    x: sourceNode.position.x,
+    y: sourceNode.position.y + 220,
+    inPorts: [sourceNodeId],
+    title: config.title,
+    description: config.description,
+    metaType: config.metaType,
+    icon: config.icon,
+    iCategory: config.iCategory,
+  });
+
+  newNode.data = {
+    ...newNode.data,
+    ...config.extraData,
+  };
 
   return {
     nodesToAdd: [newNode],
     edgesToAdd: [createEdge(sourceNodeId, newNodeId, false, sourceHandle)],
     dataPatch: {
-      [newNodeId]: { ...nodeData, inPorts: [sourceNodeId] },
+      [newNodeId]: {
+        ...nodeData,
+        inPorts: [sourceNodeId],
+      },
     },
     selectedNodeId: newNodeId,
   };
 }
+
+/* =========================================================
+   CAROUSEL BUILDER 
+========================================================= */
 
 export function buildCarouselPayload({
   sourceNode,
@@ -177,6 +188,7 @@ export function buildCarouselPayload({
   sourceHandle = "",
 }) {
   const carouselId = getNextNodeId();
+
   const carouselTitle = getIncrementalTitle({
     allNodes,
     metaType: "carousel",
@@ -186,12 +198,11 @@ export function buildCarouselPayload({
   const cardIds = [getNextNodeId(), getNextNodeId()];
   const buttonIds = [getNextNodeId(), getNextNodeId()];
 
-  // Full card objects — include button details so everything is in one place
-  const cards = cardIds.map((id, index) => ({
+  const cards = cardIds.map((id, i) => ({
     id,
-    title: `Card ${index + 1}`,
+    title: `Card ${i + 1}`,
     description: "",
-    buttons: [{ id: buttonIds[index], title: `Button ${index + 1}` }],
+    buttons: [{ id: buttonIds[i], title: `Button ${i + 1}` }],
   }));
 
   const baseX = sourceNode.position.x;
@@ -206,7 +217,6 @@ export function buildCarouselPayload({
 
   const startX = baseX - totalWidth / 2 + NODE_WIDTH / 2;
 
-  //  Carousel Node (absolute position)
   const carouselNode = createFlowNode({
     id: carouselId,
     x: baseX,
@@ -220,66 +230,61 @@ export function buildCarouselPayload({
 
   carouselNode.data.cards = cards;
   carouselNode.data.outPorts = cardIds;
-  carouselNode.data.connected = cards.length > 0;
+  carouselNode.data.connected = true;
 
   const nodes = [carouselNode];
   const edges = [createEdge(sourceNodeId, carouselId, false, sourceHandle)];
 
   cards.forEach((card, index) => {
-    const cardId = card.id;
     const x = startX + index * (NODE_WIDTH + HORIZONTAL_GAP);
     const buttonId = card.buttons[0].id;
 
-    // Card node — stores its own buttons array
-    nodes.push(
-      createFlowNode({
-        id: cardId,
-        x,
-        y: cardY,
-        isValidDragConn: false,
-        inPorts: [carouselId],
-        metaType: "carouselCard",
-        connected: true,
-        outPorts: [buttonId],
-        title: card.title,
-        iCategory: "collect",
-        groupId: carouselId,
-      }),
-    );
-    nodes[nodes.length - 1].data.buttons = card.buttons;
-    nodes[nodes.length - 1].data.description = card.description;
+    const cardNode = createFlowNode({
+      id: card.id,
+      x,
+      y: cardY,
+      inPorts: [carouselId],
+      outPorts: [buttonId],
+      metaType: "carouselCard",
+      title: card.title,
+      groupId: carouselId,
+      isValidDragConn: false,
+      connected: true,
+    });
 
-    // Button node — stores its own details
-    nodes.push(
-      createFlowNode({
-        id: buttonId,
-        x,
-        y: buttonY,
-        isValidDragConn: false,
-        inPorts: [cardId],
-        metaType: "carouselButton",
-        title: card.buttons[0].title,
-        iCategory: "collect",
-        groupId: carouselId,
-      }),
-    );
+    cardNode.data.buttons = card.buttons;
+    cardNode.data.description = card.description;
 
-    edges.push(createEdge(carouselId, cardId, true));
-    edges.push(createEdge(cardId, buttonId, true));
+    const buttonNode = createFlowNode({
+      id: buttonId,
+      x,
+      y: buttonY,
+      inPorts: [card.id],
+      metaType: "carouselButton",
+      title: card.buttons[0].title,
+      groupId: carouselId,
+      isValidDragConn: false,
+    });
+
+    nodes.push(cardNode, buttonNode);
+
+    edges.push(createEdge(carouselId, card.id, true));
+    edges.push(createEdge(card.id, buttonId, true));
   });
 
   return {
     nodesToAdd: nodes,
     edgesToAdd: edges,
     dataPatch: {
-      [carouselId]: {
-        type: "carousel",
-        cards,
-      },
+      [carouselId]: { type: "carousel", cards },
     },
     selectedNodeId: carouselId,
   };
 }
+
+/* =========================================================
+   FORM BUILDER
+========================================================= */
 
 export function buildFormPayload({
   sourceNode,
@@ -290,9 +295,10 @@ export function buildFormPayload({
   sourceHandle = "",
 }) {
   const newNodeId = getNextNodeId();
+
   const title = getIncrementalTitle({
     allNodes,
-    metaType: nodeData?.type ?? "form",
+    metaType: "form",
     baseTitle: nodeData?.title ?? "Form",
   });
 
@@ -307,15 +313,18 @@ export function buildFormPayload({
     iCategory: "collect",
   });
 
-  // Embed fields directly into the node's data
   newNode.data.fields = nodeData.fields ?? [];
 
   return {
     nodesToAdd: [newNode],
-    edgesToAdd: [createEdge(sourceNodeId, newNodeId, sourceHandle)],
+    edgesToAdd: [createEdge(sourceNodeId, newNodeId, false, sourceHandle)],
     selectedNodeId: newNodeId,
   };
 }
+
+/* =========================================================
+   MENU ACTION MAP 
+========================================================= */
 
 export function buildMenuActionMap({
   context,
@@ -326,13 +335,16 @@ export function buildMenuActionMap({
   return {
     carousel: () =>
       buildCarouselPayload({ ...context, getNextNodeId, sourceHandle }),
+
     collectInput: () =>
       buildSingleNodePayload({
         ...context,
         nodeData: templates.collectInput,
         getNextNodeId,
+        type: "default",
         sourceHandle,
       }),
+
     form: () =>
       buildFormPayload({
         ...context,
@@ -340,28 +352,31 @@ export function buildMenuActionMap({
         getNextNodeId,
         sourceHandle,
       }),
+
     delay: () =>
       buildSingleNodePayload({
         ...context,
         nodeData: templates.collectInput,
         getNextNodeId,
-        delay: true,
+        type: "delay",
         sourceHandle,
       }),
+
     jump: () =>
       buildSingleNodePayload({
         ...context,
         nodeData: templates.collectInput,
         getNextNodeId,
-        jump: true,
+        type: "jump",
         sourceHandle,
       }),
+
     answer_ai: () =>
       buildSingleNodePayload({
         ...context,
         nodeData: templates.collectInput,
         getNextNodeId,
-        doubleHandler: true,
+        type: "ai_answer",
         sourceHandle,
       }),
   };
