@@ -1,0 +1,90 @@
+/* ── DraggableRow ─────────────────────────────────────────────── */
+
+.draggable-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Drag handle */
+.draggable-row__handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-disabled);
+  cursor: grab;
+  flex-shrink: 0;
+  padding: 2px 3px;
+  border-radius: var(--radius-xs, 4px);
+  transition: color var(--transition-base);
+}
+
+.draggable-row__handle:active {
+  cursor: grabbing;
+}
+
+.draggable-row:hover .draggable-row__handle {
+  color: var(--color-text-tertiary);
+}
+
+/* Clickable card area */
+.draggable-row__card {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-white);
+  border: 1.5px solid var(--color-border);
+  cursor: pointer;
+  min-height: 42px;
+  min-width: 0;
+  transition: background var(--transition-base), border-color var(--transition-base),
+    box-shadow var(--transition-base);
+}
+
+.draggable-row__card:hover {
+  background: var(--color-bg-hover);
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+/* Content slot (left side) */
+.draggable-row__content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Chevron › (right side of card) */
+.draggable-row__chevron {
+  font-size: 18px;
+  color: var(--color-text-tertiary);
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+/* Remove × button */
+.draggable-row__remove {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-danger-border);
+  background: var(--color-bg-white);
+  color: var(--color-danger);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  line-height: 1;
+  transition: background var(--transition-base);
+}
+
+.draggable-row__remove:hover {
+  background: var(--color-danger-bg);
+}

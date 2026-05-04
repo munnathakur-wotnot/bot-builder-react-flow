@@ -1,0 +1,63 @@
+.ms-toolbar {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  background: #fff;
+  border: 1px solid #e4e7ec;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12);
+  animation: ms-toolbar-in 0.15s ease-out;
+  white-space: nowrap;
+}
+
+@keyframes ms-toolbar-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(-6px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.ms-toolbar__count {
+  font-size: 12px;
+  font-weight: 600;
+  color: #475467;
+  padding: 0 4px;
+}
+
+.ms-toolbar__divider {
+  width: 1px;
+  height: 20px;
+  background: #e4e7ec;
+  margin: 0 4px;
+}
+
+.ms-toolbar__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid #e4e7ec;
+  background: #fff;
+  color: #344054;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+
+.ms-toolbar__btn:hover {
+  background: #f5f8ff;
+  border-color: #93c5fd;
+  color: #2563eb;
+}
+
+.ms-toolbar__btn--danger:hover {
+  background: #fff1f0;
+  border-color: #fca5a5;
+  color: #dc2626;
+}

@@ -1,0 +1,231 @@
+﻿/* ── Panel ───────────────────────────────────────────────────── */
+.node-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--color-border);
+  background: var(--color-bg-white);
+  box-shadow: -4px 0 24px rgba(16, 24, 40, 0.08);
+  z-index: var(--z-sidebar);
+  animation: sidebar-in 180ms ease-out;
+  overflow: hidden;
+}
+
+@keyframes sidebar-in {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Header ──────────────────────────────────────────────────── */
+.node-sidebar__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+  background: var(--color-bg-white);
+}
+
+.node-sidebar__title {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.node-sidebar__close {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-white);
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition-base), border-color var(--transition-base);
+  line-height: 1;
+}
+
+.node-sidebar__close:hover {
+  background: var(--color-danger-bg);
+  border-color: var(--color-danger-border);
+  color: var(--color-danger);
+}
+
+/* ── Back button ─────────────────────────────────────────────── */
+.node-sidebar__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: none;
+  background: none;
+  color: var(--color-accent-collect);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  transition: color var(--transition-base);
+}
+
+.node-sidebar__back:hover {
+  color: #1d4ed8;
+}
+
+/* ── Scrollable body ─────────────────────────────────────────── */
+.node-sidebar__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  scroll-behavior: smooth;
+}
+
+.node-sidebar__body::-webkit-scrollbar { width: 4px; }
+.node-sidebar__body::-webkit-scrollbar-track { background: transparent; }
+.node-sidebar__body::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 4px; }
+
+/* ── Labels & inputs ─────────────────────────────────────────── */
+.node-sidebar__label {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--color-text-secondary);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.node-sidebar__input,
+.node-sidebar__textarea {
+  width: 100%;
+  margin-top: 5px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 8px 10px;
+  font-size: 13.5px;
+  color: var(--color-text-primary);
+  background: var(--color-bg-white);
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+}
+
+.node-sidebar__input:focus,
+.node-sidebar__textarea:focus {
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.node-sidebar__textarea {
+  min-height: 72px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+/* ── Section title ───────────────────────────────────────────── */
+.node-sidebar__section-title {
+  margin: 0 0 8px;
+  color: var(--color-text-tertiary);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── Add card / field buttons ────────────────────────────────── */
+.node-sidebar__add-card-button {
+  width: 100%;
+  border: 1.5px solid var(--color-green-500);
+  border-radius: var(--radius-md);
+  padding: 9px 12px;
+  background: var(--color-green-50);
+  color: var(--color-green-600);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background var(--transition-base), box-shadow var(--transition-base);
+}
+
+.node-sidebar__add-card-button:hover {
+  background: var(--color-green-100);
+  box-shadow: 0 0 0 3px rgba(31, 178, 106, 0.12);
+}
+
+.node-sidebar__add-field-button {
+  width: 100%;
+  margin-top: 6px;
+  border: 1.5px dashed var(--color-border-hover);
+  border-radius: var(--radius-md);
+  padding: 9px 12px;
+  background: var(--color-bg-white);
+  color: var(--color-text-tertiary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color var(--transition-base), color var(--transition-base), background var(--transition-base);
+}
+
+.node-sidebar__add-field-button:hover {
+  border-color: var(--color-green-500);
+  color: var(--color-green-500);
+  background: var(--color-green-50);
+}
+
+/* ── Form fields ─────────────────────────────────────────────── */
+.node-sidebar__form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+/* Label & type badge inside DraggableRow children */
+.field-row__label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.field-row__type-badge {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-tertiary);
+  background: var(--color-bg-hover);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xs, 4px);
+  padding: 1px 6px;
+  flex-shrink: 0;
+  text-transform: capitalize;
+}
+
+/* ── Field-type select (layer 1 detail) ──────────────────────── */
+.node-sidebar__field-type {
+  width: 100%;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 7px 8px;
+  font-size: 13px;
+  color: var(--color-text-primary);
+  background: var(--color-bg-white);
+  cursor: pointer;
+  outline: none;
+  margin-top: 5px;
+  transition: border-color var(--transition-base);
+  box-sizing: border-box;
+}
+
+.node-sidebar__field-type:focus {
+  border-color: var(--color-border-focus);
+}

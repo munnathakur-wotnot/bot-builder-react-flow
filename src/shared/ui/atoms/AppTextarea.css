@@ -1,0 +1,13 @@
+.app-textarea__wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border: #344054;
+    border-radius: 10px;
+  }
+  
+  .app-textarea__label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #344054;
+  }

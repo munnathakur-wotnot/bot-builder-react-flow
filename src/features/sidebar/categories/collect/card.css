@@ -1,0 +1,27 @@
+﻿.card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.card-icon {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eff6ff;
+  color: var(--color-accent-collect);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.card-title {
+  font-weight: 500;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

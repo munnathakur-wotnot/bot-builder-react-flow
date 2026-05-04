@@ -1,0 +1,176 @@
+﻿.context-menu {
+  position: fixed;
+  z-index: 1000;
+  width: 272px;
+  border: 1px solid #e4e7ec;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.13), 0 2px 8px rgba(15,23,42,0.06);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Search ─────────────────────────────── */
+.context-menu__header {
+  position: relative;
+  padding: 12px 12px 10px;
+  border-bottom: 1px solid #f2f4f7;
+  flex-shrink: 0;
+}
+
+.context-menu__search-icon {
+  position: absolute;
+  left: 22px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.context-menu__search {
+  width: 100%;
+  border: 1px solid #e4e7ec;
+  border-radius: 8px;
+  padding: 7px 10px 7px 32px;
+  font-size: 13px;
+  color: #101828;
+  background: #f9fafb;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+}
+
+.context-menu__search:focus {
+  background: #fff;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.context-menu__search::placeholder {
+  color: #98a2b3;
+}
+
+/* ── Category tabs ──────────────────────── */
+.context-menu__tabs {
+  display: flex;
+  gap: 6px;
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid #f2f4f7;
+  flex-shrink: 0;
+}
+
+.context-menu__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1.5px solid #e4e7ec;
+  border-radius: 20px;
+  padding: 5px 12px;
+  background: #fff;
+  color: #475467;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  line-height: 1;
+}
+
+.context-menu__tab:hover {
+  background: #f5f8ff;
+  border-color: #93c5fd;
+  color: #2563eb;
+}
+
+.context-menu__tab--active {
+  background: #eff6ff;
+}
+
+.context-menu__tab-icon {
+  display: flex;
+  align-items: center;
+  line-height: 1;
+}
+
+/* ── Scrollable list ────────────────────── */
+.context-menu__list {
+  overflow-y: auto;
+  flex: 1;
+  padding: 6px 0 8px;
+  scroll-behavior: smooth;
+}
+
+.context-menu__list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.context-menu__list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.context-menu__list::-webkit-scrollbar-thumb {
+  background: #e4e7ec;
+  border-radius: 4px;
+}
+
+/* ── Category label ─────────────────────── */
+.context-menu__category-label {
+  margin: 8px 0 4px;
+  padding: 0 14px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #98a2b3;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+/* ── Option items ───────────────────────── */
+.context-menu__options {
+  padding: 0 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.context-menu__option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: transparent;
+  color: #344054;
+  font-size: 13.5px;
+  font-weight: 450;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  transition: background 0.12s;
+}
+
+.context-menu__option:hover {
+  background: #f5f8ff;
+  color: #1d4ed8;
+}
+
+.context-menu__option-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+/* ── Empty state ────────────────────────── */
+.context-menu__empty {
+  margin: 0;
+  padding: 20px 14px;
+  text-align: center;
+  color: #98a2b3;
+  font-size: 13px;
+}
