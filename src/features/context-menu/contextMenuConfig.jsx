@@ -46,6 +46,12 @@ export const MENU_CATEGORIES = [
     options: [
       { id: "delay", label: "Delay", icon: Icons.delay, color: "#0ea5e9" },
       { id: "jump", label: "Jump", icon: Icons.jump, color: "#0ea5e9" },
+      {
+        id: "condition",
+        label: "Condition",
+        icon: Icons.condition,
+        color: "#0ea5e9",
+      },
     ],
   },
 ];

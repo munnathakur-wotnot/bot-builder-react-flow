@@ -7,6 +7,7 @@ import DurationSelector from "../categories/logic/DurationSelector";
 import NodeSidebar from "../NodeSidebar";
 import SmallSidebar from "../SmallSidebar";
 import JumpSelector from "../categories/logic/JumpSelector";
+import { LOGIC_CONFIG } from "./logicConfigs";
 
 const SMALL_SIDEBAR_RENDER = {
   delay: DurationSelector,
@@ -36,7 +37,7 @@ export const CATEGORY_CONFIGS = {
     getSidebarComponent: (_type, props) => ({ Component: NodeSidebar, props }),
   },
   logic: {
-    getComponents: () => null,
+    getComponents: (type) => LOGIC_CONFIG[type],
     getHandlers: (props) => getLogicHandlers(props),
     getSidebarComponent: (type, props) =>
       type === "delay" || type === "jump"

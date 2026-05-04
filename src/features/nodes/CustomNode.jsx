@@ -6,6 +6,8 @@ import { useFlowCallbacks } from "../canvas/FlowCallbacksContext.jsx";
 import NodeTooltips from "./NodeTooltips.jsx";
 
 function CustomNode({ id, data }) {
+  console.log(data, "Data-Node-Data");
+
   const { openMenu } = useFlowCallbacks();
 
   const isStartNode = data.type === "start";
@@ -80,8 +82,7 @@ function CustomNode({ id, data }) {
     [handleOpenMenu, hasOutgoing, isSelfLoop],
   );
 
-  const isSubNode =
-    data.type === "carouselCard" || data.type === "carouselButton";
+  const isSubNode = data?.isSubNode;
   const showToolbar = !isStartNode && !isSubNode;
 
   if (!data) return null;
@@ -99,6 +100,7 @@ function CustomNode({ id, data }) {
   return (
     <div
       className={typeClassName}
+      style={isSubNode ? { width: "120px" } : {}}
       onClick={
         isStartNode && !isConnected
           ? (e) => handleOpenMenu({ event: e })
@@ -119,7 +121,7 @@ function CustomNode({ id, data }) {
 
       {/* Header */}
       <div className={titleClassName}>
-        {!data.icon && <div className="custom-node__icon" />}
+        {!data.icon && !isSubNode && <div className="custom-node__icon" />}
         <p className={titleTextClassName}>
           <span>{data.icon}</span>
           {data.title} {data.delayDuration ? `(${data.delayDuration}s)` : ""}
