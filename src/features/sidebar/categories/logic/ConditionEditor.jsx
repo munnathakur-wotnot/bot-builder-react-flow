@@ -7,7 +7,7 @@ export default function ConditionEditor({
   onUpdateConditions,
   onUpdateConditionType,
 }) {
-  const branchId      = branchNode?.id;
+  const branchId = branchNode?.id;
   const conditionType = branchNode?.conditionType ?? "ALL";
   const rawConditions = branchNode?.conditions ?? [];
 
@@ -54,7 +54,11 @@ export default function ConditionEditor({
       {/* ANY / ALL toggle */}
       <div className="cond-editor__match-row">
         <span className="cond-editor__match-label">Match</span>
-        <div className="cond-editor__toggle" role="group" aria-label="Match type">
+        <div
+          className="cond-editor__toggle"
+          role="group"
+          aria-label="Match type"
+        >
           <button
             type="button"
             className={`cond-toggle__btn${conditionType === "ALL" ? " cond-toggle__btn--active" : ""}`}

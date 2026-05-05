@@ -1,19 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import "./DurationSelector.css";
 import PropTypes from "prop-types";
 
 const durations = [1, 2, 5, 10];
 
 export default function DurationSelector({ selectedNode, updateNode }) {
-    const [selected, setSelected] = useState(selectedNode?.data?.delayDuration);
-
-    // keep state in sync if node changes
-    useEffect(() => {
-        setSelected(selectedNode?.data?.delayDuration);
-    }, [selectedNode]);
-
     const handleSelect = (value) => {
-        setSelected(value);
         updateNode({
             delayDuration: value,
         });
@@ -27,7 +19,7 @@ export default function DurationSelector({ selectedNode, updateNode }) {
                 {durations.map((item) => (
                     <button
                         key={item}
-                        className={`duration-btn ${selected === item ? "active" : ""}`}
+                        className={`duration-btn ${selectedNode?.data?.delayDuration === item ? "active" : ""}`}
                         onClick={() => handleSelect(item)}
                     >
                         {item + "s"}

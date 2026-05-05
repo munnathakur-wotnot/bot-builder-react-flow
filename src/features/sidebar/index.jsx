@@ -21,9 +21,6 @@ export default function SidebarIndex({
     const nodeType = selectedNode?.data?.type;
     const categoryConfig = CATEGORY_CONFIGS[iCategory];
 
-    // Full prop set available to every category config:
-    //   • spread ...rest   → any prop the parent passed through unchanged
-    //   • explicit entries → props derived / owned by SidebarIndex (override rest if same key)
     const sidebarProps = {
         ...rest,
         selectedNodeId,

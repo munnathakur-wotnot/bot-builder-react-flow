@@ -5,8 +5,6 @@ import DraggableRow from "../../../../shared/ui/molecules/DraggableRow";
 import { CardIcon } from "../../../../shared/ui/atoms/icons";
 
 const Branches = ({ nodeData, removeCard, reorderCards, onNavigate }) => {
-    console.log(nodeData, "NodeData-card");
-
     const cards =
         nodeData?.children?.filter((data) => data.type !== "other") ?? [];
 

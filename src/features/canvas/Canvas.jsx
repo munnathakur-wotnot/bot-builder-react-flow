@@ -163,7 +163,7 @@ export default function CanvasFlow() {
             <StaticBackground />
             <MiniMap />
             <StaticControls />
-            {selectedNodeIds.length >= 2 && (
+            {selectedNodeIds.length >= 1 && (
               <MultiSelectToolbar
                 selectedIds={selectedNodeIds}
                 onCopy={copyNodes}

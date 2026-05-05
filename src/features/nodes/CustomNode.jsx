@@ -6,8 +6,6 @@ import { useFlowCallbacks } from "../canvas/FlowCallbacksContext.jsx";
 import NodeTooltips from "./NodeTooltips.jsx";
 
 function CustomNode({ id, data }) {
-  console.log(data, "Data-Node-Data");
-
   const { openMenu } = useFlowCallbacks();
 
   const isStartNode = data.type === "start";
