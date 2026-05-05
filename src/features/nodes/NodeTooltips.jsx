@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React from "react";
 import { useFlowCallbacks } from "../canvas/FlowCallbacksContext";
 import {
   CloneIcon,
@@ -7,7 +7,7 @@ import {
 } from "../../shared/ui/atoms/icons.jsx";
 import PropTypes from "prop-types";
 
-export  function NodeTooltips({ id }) {
+export default function NodeTooltips({ id }) {
   const { deleteNode, copyNode, cloneNode } = useFlowCallbacks();
 
   return (
@@ -52,6 +52,3 @@ export  function NodeTooltips({ id }) {
 NodeTooltips.propTypes = {
   id: PropTypes.string.isRequired,
 };
-
-export default memo(NodeTooltips);
-// re-export the memoized version as default (overrides the function export above)

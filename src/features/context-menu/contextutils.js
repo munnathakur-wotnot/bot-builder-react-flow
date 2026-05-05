@@ -117,69 +117,86 @@ export function bulkCreateFromSource({
   edges,
   totalToAdd,
   getNextNodeId,
+  batchSize = 25,
   onComplete,
 }) {
   const sourceNodeId = menuState?.nodeId;
   if (!sourceNodeId) return;
 
-  const sourceNode = nodes.find((n) => n.id === sourceNodeId);
-  if (!sourceNode) return;
-
-  // Build the payload factory ONCE against the original snapshot.
-  // The original code rebuilt it on every iteration → O(n²) allNodes.filter()
-  // calls inside getIncrementalTitle alone. Passing allNodes:[] skips the
-  // title-numbering filter; bulk nodes share a base title which is acceptable.
-  const actionByOption = buildMenuActionMap({
-    context: { sourceNode, sourceNodeId, allNodes: [] },
-    templates: MENU_NODE_TEMPLATES,
-    getNextNodeId,
-    sourceHandle: menuState.type,
-  });
-  const buildPayload = actionByOption[optionId];
-  if (!buildPayload) return;
-
-  // Pre-allocate output arrays — no per-iteration array spreading (was O(n²)).
-  const newNodes = [];
-  const newEdges = [];
-  const directTargets = [];
+  let workingNodes = nodes;
+  let workingEdges = edges;
+  let created = 0;
   let finalSelectedNodeId = null;
+  let aborted = false;
 
-  for (let i = 0; i < totalToAdd; i++) {
-    const payload = buildPayload();
-    if (!payload) break;
+  const runBatch = () => {
+    const batchLimit = Math.min(batchSize, totalToAdd - created);
 
-    // Spread Y positions so onlyRenderVisibleElements can cull off-screen
-    // nodes. Without this, all 1000 nodes land at the same coordinate and
-    // React Flow treats every one as "visible" every frame.
-    const spreadNodes = (payload.nodesToAdd || []).map((n) => ({
-      ...n,
-      position: { x: n.position.x, y: n.position.y + i * 220 },
-    }));
+    for (let i = 0; i < batchLimit; i++) {
+      const sourceNode = workingNodes.find((n) => n.id === sourceNodeId);
+      if (!sourceNode) {
+        aborted = true;
+        break;
+      }
 
-    newNodes.push(...spreadNodes);
-    newEdges.push(...(payload.edgesToAdd || []));
+      const actionByOption = buildMenuActionMap({
+        context: { sourceNode, sourceNodeId, allNodes: workingNodes },
+        templates: MENU_NODE_TEMPLATES,
+        getNextNodeId,
+      });
 
-    for (const edge of payload.edgesToAdd || []) {
-      if (edge.source === sourceNodeId) directTargets.push(edge.target);
+      const buildPayload = actionByOption[optionId];
+      if (!buildPayload) {
+        aborted = true;
+        break;
+      }
+
+      const payload = buildPayload();
+      if (!payload) {
+        aborted = true;
+        break;
+      }
+
+      const directTargets = (payload.edgesToAdd || [])
+        .filter((edge) => edge.source === sourceNodeId)
+        .map((edge) => edge.target);
+
+      const nextNodes = workingNodes.map((node) => {
+        if (node.id !== sourceNodeId) return node;
+
+        const existingOutPorts = node.data?.outPorts || [];
+        const mergedOutPorts = Array.from(
+          new Set([...existingOutPorts, ...directTargets]),
+        );
+
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            outPorts: mergedOutPorts,
+            connected: mergedOutPorts.length > 0,
+          },
+        };
+      });
+
+      workingNodes = [...nextNodes, ...(payload.nodesToAdd || [])];
+      workingEdges = [...workingEdges, ...(payload.edgesToAdd || [])];
+      finalSelectedNodeId = payload.selectedNodeId || finalSelectedNodeId;
+
+      created++;
     }
 
-    finalSelectedNodeId = payload.selectedNodeId || finalSelectedNodeId;
-  }
+    if (!aborted && created < totalToAdd) {
+      requestAnimationFrame(runBatch);
+      return;
+    }
 
-  // Update source node's outPorts ONCE at the end — not on every iteration.
-  const updatedNodes = nodes.map((node) => {
-    if (node.id !== sourceNodeId) return node;
-    const existing = node.data?.outPorts || [];
-    const merged = Array.from(new Set([...existing, ...directTargets]));
-    return {
-      ...node,
-      data: { ...node.data, outPorts: merged, connected: merged.length > 0 },
-    };
-  });
+    onComplete({
+      nodes: workingNodes,
+      edges: workingEdges,
+      selectedNodeId: finalSelectedNodeId,
+    });
+  };
 
-  onComplete({
-    nodes: [...updatedNodes, ...newNodes],
-    edges: [...edges, ...newEdges],
-    selectedNodeId: finalSelectedNodeId,
-  });
+  runBatch();
 }

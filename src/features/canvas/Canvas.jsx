@@ -1,4 +1,4 @@
-﻿import React, { useCallback, useDeferredValue, useMemo, useRef, useState } from "react";
+﻿import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
   Background,
   Controls,
@@ -11,7 +11,7 @@ import "@xyflow/react/dist/style.css";
 import "./Canvas.css";
 import CustomNode from "../nodes/CustomNode";
 import { INITIAL_EDGES, INITIAL_NODES } from "./constants";
-import CustomEdge, { MemoCustomEdge } from "../edges/CustomEdge";
+import CustomEdge from "../edges/CustomEdge";
 import { FlowCallbacksProvider } from "./FlowCallbacksContext.jsx";
 import HeaderTooltip from "../../shared/ui/tooltip/HeaderTooltip.jsx";
 import SidebarIndex from "../sidebar/index.jsx";
@@ -22,7 +22,7 @@ import { useNodeActions } from "./hooks/useNodeActions";
 import MultiSelectToolbar from "./MultiSelectToolbar";
 
 const nodeTypes = { custom: CustomNode };
-const edgeTypes = { custom: MemoCustomEdge };
+const edgeTypes = { custom: CustomEdge };
 
 const StaticBackground = React.memo(function StaticBackground() {
   return <Background gap={20} size={1} />;
@@ -43,31 +43,6 @@ export default function CanvasFlow() {
   const flowWrapperRef = useRef(null);
   const nodesRef = useRef(nodes);
   nodesRef.current = nodes;
-  const menuStateRef = useRef(menuState);
-  menuStateRef.current = menuState;
-  const selectedNodeIdRef = useRef(selectedNodeId);
-  selectedNodeIdRef.current = selectedNodeId;
-
-  // Sidebar only needs node data (title, type, fields) — not live positions.
-  // useDeferredValue lets React skip sidebar re-renders on every drag-position
-  // update and schedule them at low priority when the browser is idle.
-  const deferredNodes = useDeferredValue(nodes);
-
-  // KEY PERF FIX: during a drag, ReactFlow fires onNodesChange with
-  // {type:'position', dragging:true} on every mousemove (~60/s). Each call
-  // normally triggers setNodes → full CanvasFlow re-render. But ReactFlow
-  // already drives the visual drag via its internal Zustand store + CSS
-  // transforms — React state doesn't need updating until drag ends.
-  // Filtering these out reduces re-renders from ~60/s to 1 per drag.
-  const filteredOnNodesChange = useCallback(
-    (changes) => {
-      const meaningful = changes.filter(
-        (c) => c.type !== "position" || c.dragging !== true,
-      );
-      if (meaningful.length > 0) onNodesChange(meaningful);
-    },
-    [onNodesChange],
-  );
 
   const { onGroupNodeDragStart, onGroupNodeDrag } = useGroupDrag(
     nodesRef,
@@ -147,23 +122,9 @@ export default function CanvasFlow() {
   }, []);
 
   const onMove = useCallback(() => {
-    // Only update state when something actually needs to change.
-    // Calling setState unconditionally here fires a full Canvas re-render on
-    // every pan/zoom frame, forcing 1000+ memo comparisons per frame.
-    if (menuStateRef.current !== null) setMenuState(null);
-    if (selectedNodeIdRef.current !== null) setSelectedNodeId(null);
+    setMenuState(null);
+    setSelectedNodeId(null);
   }, []);
-
-  // Stable callbacks for JSX — inline arrows create new references every
-  // render, preventing memo from bailing out on SidebarIndex / MultiSelectToolbar.
-  const handleSidebarClose = useCallback(() => setSelectedNodeId(null), []);
-  const handleMultiSelectDelete = useCallback(
-    (ids) => {
-      deleteNodes(ids);
-      setSelectedNodeIds([]);
-    },
-    [deleteNodes],
-  );
 
   return (
     <div className="canvas-layout">
@@ -184,7 +145,7 @@ export default function CanvasFlow() {
             edgeTypes={edgeTypes}
             autoPanOnConnect={false}
             autoPanOnNodeDrag={false}
-            onNodesChange={filteredOnNodesChange}
+            onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onEdgesDelete={handleEdgesDelete}
             onConnect={onConnect}
@@ -194,20 +155,24 @@ export default function CanvasFlow() {
             onNodeDrag={onGroupNodeDrag}
             onNodeClick={handleNodeClick}
             onSelectionChange={handleSelectionChange}
+            snapToGrid={true}
             onPaneClick={handlePaneClick}
             onMove={onMove}
             fitView
             minZoom={0.1}
           >
             <StaticBackground />
-            {nodes.length <= 200 && <MiniMap />}
+            <MiniMap />
             <StaticControls />
             {selectedNodeIds.length >= 1 && (
               <MultiSelectToolbar
                 selectedIds={selectedNodeIds}
                 onCopy={copyNodes}
                 onClone={cloneNodes}
-                onDelete={handleMultiSelectDelete}
+                onDelete={(ids) => {
+                  deleteNodes(ids);
+                  setSelectedNodeIds([]);
+                }}
               />
             )}
           </ReactFlow>
@@ -228,12 +193,12 @@ export default function CanvasFlow() {
 
           <SidebarIndex
             selectedNodeId={selectedNodeId}
-            nodes={deferredNodes}
+            nodes={nodes}
             edges={edges}
             setNodes={setNodes}
             setEdges={setEdges}
             getNextNodeId={getNextNodeId}
-            onClose={handleSidebarClose}
+            onClose={() => setSelectedNodeId(null)}
           />
         </FlowCallbacksProvider>
       </div>

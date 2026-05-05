@@ -1,4 +1,4 @@
-﻿import React, { memo, useCallback, useEffect, useRef, useState } from "react";
+﻿import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   BaseEdge,
   EdgeLabelRenderer,
@@ -163,17 +163,3 @@ CustomEdge.propTypes = {
   sourceHandleId: PropTypes.string,
   data: PropTypes.object,
 };
-
-// Wrap in memo so edges only re-render when their own geometry or data changes.
-// Without this, all 1000 edges re-render on every Canvas state update (e.g.
-// selectedNodeId, menuState) even though the edge didn't change.
-export const MemoCustomEdge = memo(CustomEdge, (prev, next) =>
-  prev.id === next.id &&
-  prev.sourceX === next.sourceX &&
-  prev.sourceY === next.sourceY &&
-  prev.targetX === next.targetX &&
-  prev.targetY === next.targetY &&
-  prev.sourceHandleId === next.sourceHandleId &&
-  prev.data === next.data,
-);
-MemoCustomEdge.displayName = "CustomEdge";

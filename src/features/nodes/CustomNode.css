@@ -9,10 +9,6 @@
   overflow: visible;
   transition: box-shadow var(--transition-base), border-color var(--transition-base);
   cursor: default;
-  /* CSS Containment: tells the browser changes inside this node cannot affect
-     the layout/style of any other node. Dragging 1 node skips recalculation
-     for all 999 others. Do NOT use 'paint' — node-toolbar overflows the boundary. */
-  contain: layout style;
 }
 
 .custom-node:hover {
