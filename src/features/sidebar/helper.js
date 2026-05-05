@@ -62,6 +62,62 @@ export function handleAddForm({ nodeData, updateNode }) {
   });
 }
 
+export function handleRemoveBranch({
+  selectedNode,
+  nodes,
+  edges,
+  branchId,
+  setNodes,
+  setEdges,
+  updateNode,
+}) {
+  if (!selectedNode || !branchId) return;
+
+  const idsToRemove = new Set([branchId]);
+
+  const removedEdges = edges.filter(
+    (edge) => idsToRemove.has(edge.source) || idsToRemove.has(edge.target),
+  );
+
+  const remainingEdges = edges.filter(
+    (edge) => !idsToRemove.has(edge.source) && !idsToRemove.has(edge.target),
+  );
+
+  const remainingNodes = nodes.filter((node) => !idsToRemove.has(node.id));
+  const cleanedNodes = removeNodeConnectionsForEdges(
+    remainingNodes,
+    removedEdges,
+  );
+
+  const nextChildren = (selectedNode.data?.children ?? []).filter((child) => {
+    if (typeof child === "string") return child !== branchId;
+    return child.id !== branchId;
+  });
+
+  const nextNodes = cleanedNodes.map((node) => {
+    if (node.id !== selectedNode.id) return node;
+    return {
+      ...node,
+      data: {
+        ...node.data,
+        children: nextChildren,
+        outPorts: nextChildren
+          .filter((c) => c.type !== "other")
+          .map((c) => (typeof c === "string" ? c : c.id)),
+      },
+    };
+  });
+
+  setNodes(nextNodes);
+  setEdges(remainingEdges);
+  updateNode({
+    children: nextChildren,
+    outPorts: nextChildren
+      .filter((c) => c.type !== "other")
+      .map((c) => (typeof c === "string" ? c : c.id)),
+  });
+}
+
 export function handleRemoveCarouselCard({
   selectedNode,
   nodes,
