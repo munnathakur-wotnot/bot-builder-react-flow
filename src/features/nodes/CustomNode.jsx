@@ -6,7 +6,11 @@ import { useFlowCallbacks } from "../canvas/FlowCallbacksContext.jsx";
 import NodeTooltips from "./NodeTooltips.jsx";
 
 function CustomNode({ id, data }) {
-  const { openMenu } = useFlowCallbacks();
+  const { openMenu, validationErrors, executedIds, activeId } = useFlowCallbacks();
+  const nodeErrors = validationErrors?.[id] ?? [];
+  const hasErrors = nodeErrors.length > 0;
+  const isActive = activeId === id;
+  const isExecuted = !isActive && (executedIds ?? []).includes(id);
 
   const isStartNode = data.type === "start";
   const isConnected = data?.connected;
@@ -85,7 +89,7 @@ function CustomNode({ id, data }) {
 
   if (!data) return null;
 
-  const typeClassName = `custom-node custom-node--${data.type ?? "default"}`;
+  const typeClassName = `custom-node custom-node--${data.type ?? "default"}${data.isSearchHighlight ? " custom-node--search-highlight" : ""}${hasErrors ? " custom-node--has-errors" : ""}${isActive ? " custom-node--executing" : ""}${isExecuted ? " custom-node--executed" : ""}`;
   const titleClassName =
     data.type === "delay" || data.type === "jump"
       ? "custom-node__header-delay"
@@ -108,6 +112,16 @@ function CustomNode({ id, data }) {
       role={isStartNode && !isConnected ? "button" : undefined}
       tabIndex={isStartNode && !isConnected ? 0 : undefined}
     >
+      {/* Error badge */}
+      {hasErrors && !isSubNode && (
+        <div className="custom-node__error-badge" title={nodeErrors.join("\n")}>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+          </svg>
+          {nodeErrors.length}
+        </div>
+      )}
+
       {/* Target Handle */}
       {!isStartNode && (
         <Handle

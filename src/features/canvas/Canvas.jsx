@@ -6,6 +6,7 @@ import {
   ReactFlow,
   useEdgesState,
   useNodesState,
+  useReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import "./Canvas.css";
@@ -20,6 +21,9 @@ import { useGroupDrag } from "./hooks/useGroupDrag";
 import { useFlowConnections } from "./hooks/useFlowConnections";
 import { useNodeActions } from "./hooks/useNodeActions";
 import MultiSelectToolbar from "./MultiSelectToolbar";
+import NodeSearchModal from "./NodeSearchModal";
+import { validateAllNodes } from "./validateNodes";
+import { useFlowSimulation } from "./hooks/useFlowSimulation";
 
 const nodeTypes = { custom: CustomNode };
 const edgeTypes = { custom: CustomEdge };
@@ -39,10 +43,18 @@ export default function CanvasFlow() {
   const [selectedNodeIds, setSelectedNodeIds] = useState([]);
   const [nuberOfNodes, setNumberOfNodes] = useState(0);
   const [menuState, setMenuState] = useState(null);
+  const [searchOpen, setSearchOpen] = useState(false);
   const nextIdRef = useRef(2);
   const flowWrapperRef = useRef(null);
   const nodesRef = useRef(nodes);
   nodesRef.current = nodes;
+
+  const { fitView } = useReactFlow();
+
+  const validationErrors = useMemo(() => validateAllNodes(nodes), [nodes]);
+
+  const { isSimulating, executedIds, activeId, startSimulation, stopSimulation } =
+    useFlowSimulation();
 
   const { onGroupNodeDragStart, onGroupNodeDrag } = useGroupDrag(
     nodesRef,
@@ -111,8 +123,11 @@ export default function CanvasFlow() {
       deleteNode,
       copyNode,
       cloneNode,
+      validationErrors,
+      executedIds,
+      activeId,
     }),
-    [openMenu, handleDeleteEdge, deleteNode, copyNode, cloneNode],
+    [openMenu, handleDeleteEdge, deleteNode, copyNode, cloneNode, validationErrors, executedIds, activeId],
   );
 
   const handlePaneClick = useCallback(() => {
@@ -126,6 +141,43 @@ export default function CanvasFlow() {
     setSelectedNodeId(null);
   }, []);
 
+  const handleNodeFound = useCallback(
+    (node) => {
+      setSearchOpen(false);
+      setSelectedNodeId(node.id);
+
+      // Temporarily highlight the node
+      setNodes((nds) =>
+        nds.map((n) =>
+          n.id === node.id
+            ? { ...n, data: { ...n.data, isSearchHighlight: true } }
+            : { ...n, data: { ...n.data, isSearchHighlight: false } },
+        ),
+      );
+
+      // Center on the node
+      requestAnimationFrame(() => {
+        fitView({
+          nodes: [{ id: node.id }],
+          duration: 600,
+          padding: 0.5,
+        });
+      });
+
+      // Remove highlight after 2.5s
+      setTimeout(() => {
+        setNodes((nds) =>
+          nds.map((n) =>
+            n.data?.isSearchHighlight
+              ? { ...n, data: { ...n.data, isSearchHighlight: false } }
+              : n,
+          ),
+        );
+      }, 2500);
+    },
+    [fitView, setNodes],
+  );
+
   return (
     <div className="canvas-layout">
       <div className="flow-canvas" ref={flowWrapperRef}>
@@ -135,6 +187,13 @@ export default function CanvasFlow() {
           totalNodes={nodes.length}
           nuberOfNodes={nuberOfNodes}
           setNumberOfNodes={setNumberOfNodes}
+          onOpenSearch={() => setSearchOpen(true)}
+          validationErrors={validationErrors}
+          nodes={nodes}
+          onSelectErrorNode={handleNodeFound}
+          isSimulating={isSimulating}
+          onTest={() => startSimulation(nodes, edges)}
+          onStopTest={stopSimulation}
         />
         <FlowCallbacksProvider value={flowCallbacks}>
           <ReactFlow
@@ -200,6 +259,14 @@ export default function CanvasFlow() {
             getNextNodeId={getNextNodeId}
             onClose={() => setSelectedNodeId(null)}
           />
+
+          {searchOpen && (
+            <NodeSearchModal
+              nodes={nodes}
+              onSelect={handleNodeFound}
+              onClose={() => setSearchOpen(false)}
+            />
+          )}
         </FlowCallbacksProvider>
       </div>
     </div>
