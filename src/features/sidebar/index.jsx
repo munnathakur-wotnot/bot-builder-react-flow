@@ -1,10 +1,10 @@
 ﻿import PropTypes from "prop-types";
-import React from "react";
+import React, { memo } from "react";
 import { CATEGORY_CONFIGS } from "./utils/categoryConfigs";
 import NodeSidebar from "./NodeSidebar";
 import useNodeUpdater from "../../shared/hooks/useNodeUpdater";
 
-export default function SidebarIndex({
+function SidebarIndex({
     selectedNodeId,
     nodes,
     setNodes,
@@ -49,3 +49,8 @@ SidebarIndex.propTypes = {
     getNextNodeId: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
 };
+
+// Memo: all props passed from Canvas are stable references (setters, stable
+// callbacks, deferred nodes). Bails out during drag/pan so nodes.find() and
+// child component re-renders don't run 60x/s.
+export default memo(SidebarIndex);

@@ -16,6 +16,13 @@
   background-color: var(--color-bg-canvas) !important;
 }
 
+/* Promote the actively dragged node to its own GPU compositor layer.
+   Transform changes are handled entirely by the GPU — zero CPU layout work.
+   ReactFlow adds the 'dragging' class on the wrapper during drag. */
+.react-flow__node.dragging {
+  will-change: transform;
+}
+
 /* Edges - clean neutral stroke */
 .react-flow__edge-path {
   stroke: #b0b8c8;

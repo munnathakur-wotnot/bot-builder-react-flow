@@ -30,6 +30,12 @@ export function createFlowNode({
     id,
     type,
     position: { x, y },
+    // width/height must be set so ReactFlow's onlyRenderVisibleElements can
+    // calculate viewport intersection BEFORE mounting. Without these ReactFlow
+    // mounts all 1000 nodes first, measures via ResizeObserver, then culls —
+    // meaning all 1000 are always in the DOM.
+    width: 220,
+    height: 120,
     data: {
       id,
       inPorts,
@@ -75,7 +81,7 @@ function getIncrementalTitle({ allNodes = [], metaType, baseTitle }) {
 }
 
 /* =========================================================
-   NODE CONFIG (🔥 MAIN IMPROVEMENT)
+   NODE CONFIG ( MAIN IMPROVEMENT)
 ========================================================= */
 
 function getNodeConfig(type, allNodes) {

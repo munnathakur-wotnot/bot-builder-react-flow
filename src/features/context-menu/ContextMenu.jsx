@@ -1,4 +1,4 @@
-﻿import React, { useCallback, useRef, useState } from "react";
+﻿import React, { useCallback, useRef, useState, startTransition } from "react";
 import PropTypes from "prop-types";
 import "./ContextMenu.css";
 import AppInput from "../../shared/ui/atoms/AppInput";
@@ -42,8 +42,12 @@ export default function ContextMenu({
         return;
       }
 
-      setNodes(result.nodes);
-      setEdges([...edges, ...result.edges]);
+      // startTransition: adding nodes is non-urgent work.
+      // React Fiber can interrupt this render to keep pan/zoom responsive.
+      startTransition(() => {
+        setNodes(result.nodes);
+        setEdges([...edges, ...result.edges]);
+      });
       setSelectedNodeId(result.selectedNodeId);
       setMenuState(null);
     },
@@ -76,8 +80,10 @@ export default function ContextMenu({
         totalToAdd,
         getNextNodeId,
         onComplete: ({ nodes, edges, selectedNodeId }) => {
-          setNodes(nodes);
-          setEdges(edges);
+          startTransition(() => {
+            setNodes(nodes);
+            setEdges(edges);
+          });
           if (selectedNodeId) setSelectedNodeId(selectedNodeId);
           setMenuState(null);
         },

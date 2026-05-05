@@ -5,6 +5,8 @@ export const INITIAL_NODES = [
     id: INITIAL_NODE_ID,
     type: "custom",
     position: { x: 120, y: 120 },
+    width: 220,
+    height: 120,
     data: {
       id: INITIAL_NODE_ID,
       inPorts: [],
