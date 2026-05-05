@@ -132,6 +132,7 @@ export default function CanvasFlow() {
         <HeaderTooltip
           setNodes={setNodes}
           edges={edges}
+          totalNodes={nodes.length}
           nuberOfNodes={nuberOfNodes}
           setNumberOfNodes={setNumberOfNodes}
         />

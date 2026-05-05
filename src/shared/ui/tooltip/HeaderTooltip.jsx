@@ -1,12 +1,10 @@
 ﻿import React, { memo, useCallback } from "react";
 import { layoutNodesDagre } from "../../../features/canvas/layout";
-import { useNodes, useReactFlow } from "@xyflow/react";
+import { useReactFlow } from "@xyflow/react";
 import PropTypes from "prop-types";
 import AppInput from "../atoms/AppInput";
 function HeaderTooltip(props) {
-    const { edges, setNodes, nuberOfNodes, setNumberOfNodes } = props;
-    const nodes = useNodes();
-    const totalNodes = nodes.length;
+    const { edges, setNodes, nuberOfNodes, setNumberOfNodes, totalNodes } = props;
 
     const { fitView } = useReactFlow();
     const onAutoLayout = useCallback(() => {
@@ -37,13 +35,16 @@ function HeaderTooltip(props) {
                 value={nuberOfNodes}
             />
             <div className="layout-toolbar__divider" />
-            <span className="layout-toolbar__count">
-                {totalNodes} on canvas
-            </span>
+            <span className="layout-toolbar__count">{totalNodes} on canvas</span>
         </div>
     );
 }
-const HeaderTooltipMemo = memo(HeaderTooltip);
+const HeaderTooltipMemo = memo(HeaderTooltip, (prev, next) => {
+    return (
+        prev.nuberOfNodes === next.nuberOfNodes &&
+        prev.totalNodes === next.totalNodes
+    );
+});
 export default HeaderTooltipMemo;
 HeaderTooltip.propTypes = {
     edges: PropTypes.object,
@@ -51,4 +52,5 @@ HeaderTooltip.propTypes = {
     nuberOfNodes: PropTypes.number,
     setNumberOfNodes: PropTypes.func,
     isProcessing: PropTypes.bool,
+    totalNodes: PropTypes.string,
 };
