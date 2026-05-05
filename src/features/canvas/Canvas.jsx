@@ -68,7 +68,11 @@ export default function CanvasFlow() {
   }, []);
 
   const handleNodeClick = useCallback((_, node) => {
-    setSelectedNodeId(node.id);
+    if (!node.data.isSubNode) {
+      setSelectedNodeId(node.id);
+    } else {
+      setSelectedNodeId(null);
+    }
   }, []);
 
   const handleSelectionChange = useCallback(({ nodes: selected }) => {

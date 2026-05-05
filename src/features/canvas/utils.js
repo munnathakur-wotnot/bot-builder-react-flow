@@ -254,6 +254,7 @@ export function buildCarouselPayload({
 
     cardNode.data.buttons = card.buttons;
     cardNode.data.description = card.description;
+    cardNode.data.isSubNode = true;
 
     const buttonNode = createFlowNode({
       id: buttonId,
@@ -265,7 +266,7 @@ export function buildCarouselPayload({
       groupId: carouselId,
       isValidDragConn: false,
     });
-
+    buttonNode.data.isSubNode = true;
     nodes.push(cardNode, buttonNode);
 
     edges.push(createEdge(carouselId, card.id, true));
@@ -335,6 +336,13 @@ export function buildMenuActionMap({
   return {
     carousel: () =>
       buildCarouselPayload({ ...context, getNextNodeId, sourceHandle }),
+
+    condition: () =>
+      buildConditionPayload({
+        ...context,
+        getNextNodeId,
+        sourceHandle,
+      }),
 
     collectInput: () =>
       buildSingleNodePayload({
@@ -444,22 +452,23 @@ export function buildAddCarouselCardPayload({
   });
   cardNode.data.buttons = newCard.buttons;
   cardNode.data.description = newCard.description;
+  cardNode.data.isSubNode = true;
   nodesToAdd.push(cardNode);
 
   // New button node
-  nodesToAdd.push(
-    createFlowNode({
-      id: newButtonId,
-      x: newCardX,
-      isValidDragConn: false,
-      y: buttonY,
-      inPorts: [newCardId],
-      metaType: "carouselButton",
-      title: newCard.buttons[0].title,
-      iCategory: "collect",
-      groupId: selectedNodeId,
-    }),
-  );
+  const newButton = createFlowNode({
+    id: newButtonId,
+    x: newCardX,
+    isValidDragConn: false,
+    y: buttonY,
+    inPorts: [newCardId],
+    metaType: "carouselButton",
+    title: newCard.buttons[0].title,
+    iCategory: "collect",
+    groupId: selectedNodeId,
+  });
+  newButton.data.isSubNode = true;
+  nodesToAdd.push(newButton);
 
   edgesToAdd.push(createEdge(selectedNodeId, newCardId, true));
   edgesToAdd.push(createEdge(newCardId, newButtonId, true));
@@ -596,4 +605,189 @@ export function isConnectionAllowed(edges, source, sourceHandle) {
   return !edges.some(
     (e) => e.source === source && e.sourceHandle === sourceHandle,
   );
+}
+
+//condition Node
+
+export function buildConditionPayload({
+  sourceNode,
+  sourceNodeId,
+  getNextNodeId,
+  allNodes,
+  sourceHandle = "",
+}) {
+  const conditionRootId = getNextNodeId();
+
+  const conditionTitle = getIncrementalTitle({
+    allNodes,
+    metaType: "conditionRoot",
+    baseTitle: "Condition",
+  });
+
+  // Create children (1 default + 1 condition)
+  const childIds = [getNextNodeId(), getNextNodeId(), getNextNodeId()];
+
+  const children = [
+    {
+      id: childIds[1],
+      title: "Branch 1",
+      type: "condition",
+    },
+    {
+      id: childIds[2],
+      title: "Branch 2",
+      type: "condition",
+    },
+    {
+      id: childIds[0],
+      title: "Default",
+      type: "other", // default child
+    },
+  ];
+
+  const baseX = sourceNode.position.x;
+  const baseY = sourceNode.position.y;
+
+  const rootY = baseY + NODE_HEIGHT + VERTICAL_GAP;
+  const childY = rootY + NODE_HEIGHT + VERTICAL_GAP;
+
+  const totalWidth =
+    childIds.length * NODE_WIDTH + (childIds.length - 1) * HORIZONTAL_GAP;
+
+  const startX = baseX - totalWidth / 2 + NODE_WIDTH / 2;
+
+  // Root Node
+  const rootNode = createFlowNode({
+    id: conditionRootId,
+    x: baseX,
+    y: rootY,
+    inPorts: [sourceNodeId],
+    outPorts: childIds,
+    title: conditionTitle,
+    description: "Condition Node",
+    metaType: "conditionRoot",
+    iCategory: "logic",
+    connected: true,
+  });
+
+  rootNode.data.children = children;
+
+  const nodes = [rootNode];
+  const edges = [
+    createEdge(sourceNodeId, conditionRootId, false, sourceHandle),
+  ];
+
+  // Create only ONE LEVEL children
+  children.forEach((child, index) => {
+    const x = startX + index * (NODE_WIDTH + HORIZONTAL_GAP);
+
+    const childNode = createFlowNode({
+      id: child.id,
+      x,
+      y: childY,
+      inPorts: [conditionRootId],
+      metaType: child.type === "other" ? "defaultCondition" : "condition",
+      title: child.title,
+      groupId: conditionRootId,
+      isValidDragConn: false,
+      connected: true,
+    });
+    childNode.data.conditionType = "ALL";
+    childNode.data.conditions = [];
+    childNode.data.isSubNode = true;
+    childIds;
+
+    nodes.push(childNode);
+
+    edges.push(createEdge(conditionRootId, child.id, true));
+  });
+
+  return {
+    nodesToAdd: nodes,
+    edgesToAdd: edges,
+    dataPatch: {
+      [conditionRootId]: {
+        type: "conditionRoot",
+        children,
+      },
+    },
+    selectedNodeId: conditionRootId,
+  };
+}
+
+export function buildSingleBranch({
+  selectedNodeId,
+  conditionNode,
+  allNodes = [],
+  getNextNodeId,
+}) {
+  if (!conditionNode) return;
+
+  const existingChildren = conditionNode.data?.children ?? [];
+
+  const newChildId = getNextNodeId();
+
+  const newChild = {
+    id: newChildId,
+    title: `Branch ${existingChildren.length}`,
+    type: "condition",
+  };
+
+  const allChildren = [...existingChildren, newChild];
+
+  const baseX = conditionNode.position.x;
+  const rootY = conditionNode.position.y;
+
+  const childY = rootY + NODE_HEIGHT + VERTICAL_GAP;
+
+  // find last child node for positioning
+  const existingChildNodes = existingChildren
+    .map((c) => allNodes.find((n) => n.id === c.id))
+    .filter(Boolean);
+
+  const lastX =
+    existingChildNodes.length > 0
+      ? existingChildNodes[existingChildNodes.length - 1].position.x
+      : baseX;
+
+  const newX =
+    existingChildNodes.length > 0 ? lastX + NODE_WIDTH + HORIZONTAL_GAP : baseX;
+
+  /* =========================
+     CREATE CHILD NODE
+  ========================= */
+
+  const childNode = createFlowNode({
+    id: newChildId,
+    x: newX,
+    y: childY,
+    inPorts: [selectedNodeId],
+    metaType: "condition",
+    title: newChild.title,
+    groupId: selectedNodeId,
+    isValidDragConn: false,
+    connected: true,
+  });
+
+  childNode.data.conditionType = "ALL";
+  childNode.data.conditions = [];
+  childNode.data.isSubNode = true;
+
+  /* =========================
+     EDGE
+  ========================= */
+
+  const edge = createEdge(selectedNodeId, newChildId, true);
+
+  return {
+    nodesToAdd: [childNode],
+    edgesToAdd: [edge],
+
+    dataPatch: {
+      [selectedNodeId]: {
+        children: allChildren,
+        outPorts: allChildren.map((c) => c.id),
+      },
+    },
+  };
 }

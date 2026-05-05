@@ -9,7 +9,10 @@ export function useGroupDrag(nodesRef, setNodes) {
   const dragStartRef = useRef({});
 
   const getGroupId = useCallback(
-    (node) => (node.data?.type === "carousel" ? node.id : null),
+    (node) =>
+      node.data?.type === "carousel" || node.data?.type === "conditionRoot"
+        ? node.id
+        : null,
     [],
   );
 

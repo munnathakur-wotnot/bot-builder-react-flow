@@ -14,7 +14,7 @@ export default function SmallSidebar(props) {
             offset={10}
         >
             <div
-                className="duration-tooltip"
+                className="duration-tooltip nodrag nopan nowheel"
                 onMouseDown={(e) => e.stopPropagation()}
             >
                 <RenderCompoent {...renderProps} />
