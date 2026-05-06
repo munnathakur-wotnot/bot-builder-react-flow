@@ -1,4 +1,4 @@
-﻿import React, { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+﻿import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   BaseEdge,
   EdgeLabelRenderer,
@@ -8,6 +8,7 @@ import {
 import "./CustomEdge.css";
 import { useFlowCallbacks } from "../canvas/FlowCallbacksContext.jsx";
 import PropTypes from "prop-types";
+import { useSimulationStatus } from "../../shared/hooks/useSimulationStatus";
 
 export default function CustomEdge(props) {
   const {
@@ -25,15 +26,7 @@ export default function CustomEdge(props) {
   const { deleteEdge, simulationStore } = useFlowCallbacks();
 
   // Per-edge subscription — only this edge re-renders when its source status changes
-  const edgeSimStatus = useSyncExternalStore(
-    simulationStore.subscribe,
-    () => {
-      const { executedIdsSet, activeId } = simulationStore.getState();
-      if (activeId === source) return "active";
-      if (executedIdsSet.has(source)) return "executed";
-      return "none";
-    },
-  );
+  const edgeSimStatus = useSimulationStatus(simulationStore, source);
   const isEdgeActive = edgeSimStatus === "active";
   const isEdgeExecuted = edgeSimStatus === "executed";
   //Used to delay hiding the delete button (smooth UX).

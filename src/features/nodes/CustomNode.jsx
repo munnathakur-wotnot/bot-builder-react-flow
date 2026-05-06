@@ -1,9 +1,10 @@
-﻿import React, { memo, useCallback, useSyncExternalStore } from "react";
+﻿import React, { memo, useCallback } from "react";
 import PropTypes from "prop-types";
 import { Handle, Position } from "@xyflow/react";
 import "./CustomNode.css";
 import { useFlowCallbacks } from "../canvas/FlowCallbacksContext.jsx";
 import NodeTooltips from "./NodeTooltips.jsx";
+import { useSimulationStatus } from "../../shared/hooks/useSimulationStatus";
 
 function CustomNode({ id, data }) {
   const {
@@ -13,17 +14,8 @@ function CustomNode({ id, data }) {
     isHandleClickRef,
   } = useFlowCallbacks();
 
-  // useSyncExternalStore with a per-node selector:
   // only this node re-renders when ITS simulation status changes
-  const simulationStatus = useSyncExternalStore(
-    simulationStore.subscribe,
-    () => {
-      const { executedIdsSet, activeId } = simulationStore.getState();
-      if (activeId === id) return "active";
-      if (executedIdsSet.has(id)) return "executed";
-      return "none";
-    },
-  );
+  const simulationStatus = useSimulationStatus(simulationStore, id);
   const isActive = simulationStatus === "active";
   const isExecuted = simulationStatus === "executed";
 
