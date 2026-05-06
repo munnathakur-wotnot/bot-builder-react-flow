@@ -1,4 +1,4 @@
-﻿import React, { memo, useCallback } from "react";
+﻿import React, { memo, useCallback, useSyncExternalStore } from "react";
 import PropTypes from "prop-types";
 import { Handle, Position } from "@xyflow/react";
 import "./CustomNode.css";
@@ -9,15 +9,26 @@ function CustomNode({ id, data }) {
   const {
     openMenu,
     validationErrors,
-    executedIds,
-    activeId,
+    simulationStore,
     isHandleClickRef,
   } = useFlowCallbacks();
 
+  // useSyncExternalStore with a per-node selector:
+  // only this node re-renders when ITS simulation status changes
+  const simulationStatus = useSyncExternalStore(
+    simulationStore.subscribe,
+    () => {
+      const { executedIdsSet, activeId } = simulationStore.getState();
+      if (activeId === id) return "active";
+      if (executedIdsSet.has(id)) return "executed";
+      return "none";
+    },
+  );
+  const isActive = simulationStatus === "active";
+  const isExecuted = simulationStatus === "executed";
+
   const nodeErrors = validationErrors?.current?.[id] ?? [];
   const hasErrors = nodeErrors.length > 0;
-  const isActive = activeId === id;
-  const isExecuted = !isActive && (executedIds ?? []).includes(id);
 
   const isStartNode = data.type === "start";
   const isConnected = data?.connected;
@@ -245,7 +256,9 @@ export default memo(CustomNode, (prev, next) => {
     prevData?.successOutport === nextData?.successOutport &&
     prevData?.failureOutport === nextData?.failureOutport &&
     prevData?.cards === nextData?.cards &&
-    prevData?.fields === nextData?.fields
+    prevData?.fields === nextData?.fields &&
+    prevData?.knowledgeBaseId === nextData?.knowledgeBaseId &&
+    prevData?.functionIds === nextData?.functionIds
   );
 });
 

@@ -47,6 +47,7 @@ export default function CanvasFlow() {
   const [searchOpen, setSearchOpen] = useState(false);
   const nextIdRef = useRef(2);
   const flowWrapperRef = useRef(null);
+  const importFileRef = useRef(null);
   const nodesRef = useRef(nodes);
   nodesRef.current = nodes;
   const isHandleClickRef = useRef(false);
@@ -61,8 +62,7 @@ export default function CanvasFlow() {
 
   const {
     isSimulating,
-    executedIds,
-    activeId,
+    simulationStore,
     startSimulation,
     stopSimulation,
   } = useFlowSimulation();
@@ -141,8 +141,7 @@ export default function CanvasFlow() {
       copyNode,
       cloneNode,
       validationErrors,
-      executedIds,
-      activeId,
+      simulationStore, // stable ref — never changes, won't invalidate memo
       isHandleClickRef,
     }),
     [
@@ -152,8 +151,7 @@ export default function CanvasFlow() {
       copyNode,
       cloneNode,
       validationErrors,
-      executedIds,
-      activeId,
+      simulationStore,
     ],
   );
 
@@ -205,8 +203,53 @@ export default function CanvasFlow() {
     [fitView, setNodes],
   );
 
+  const handleExport = useCallback(() => {
+    const json = JSON.stringify({ nodes, edges }, null, 2);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "flow.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [nodes, edges]);
+
+  const handleImportFile = useCallback(
+    (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        try {
+          const parsed = JSON.parse(evt.target.result);
+          if (!Array.isArray(parsed.nodes) || !Array.isArray(parsed.edges)) {
+            alert("Invalid flow JSON: must have \"nodes\" and \"edges\" arrays.");
+            return;
+          }
+          setNodes(parsed.nodes);
+          setEdges(parsed.edges);
+          requestAnimationFrame(() => fitView({ padding: 0.2, duration: 400 }));
+        } catch {
+          alert("Failed to parse JSON file.");
+        }
+      };
+      reader.readAsText(file);
+      // reset so the same file can be re-imported
+      e.target.value = "";
+    },
+    [setNodes, setEdges, fitView],
+  );
+
   return (
     <div className="canvas-layout">
+      {/* Hidden file input for JSON import */}
+      <input
+        ref={importFileRef}
+        type="file"
+        accept=".json,application/json"
+        style={{ display: "none" }}
+        onChange={handleImportFile}
+      />
       <div className="flow-canvas" ref={flowWrapperRef}>
         <HeaderTooltip
           setNodes={setNodes}
@@ -221,6 +264,8 @@ export default function CanvasFlow() {
           isSimulating={isSimulating}
           onTest={() => startSimulation(nodes, edges)}
           onStopTest={stopSimulation}
+          onImport={() => importFileRef.current?.click()}
+          onExport={handleExport}
         />
         <FlowCallbacksProvider value={flowCallbacks}>
           <ReactFlow

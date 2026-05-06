@@ -1,7 +1,8 @@
 ﻿import FormFields from "../categories/collect/FormFields";
 import AddButton from "../categories/collect/AddButton";
 import Card from "../categories/collect/Card";
-import CardSecondLayer from "../categories/collect/CardSecondLayer";
+import CarouselCard from "../categories/collect/CarouselCard";
+import CarouselButton from "../categories/collect/CarouselButton";
 import FieldSecondLayer from "../categories/collect/FieldSecondLayer";
 
 export const COLLECT_CONFIGS = {
@@ -29,7 +30,7 @@ export const COLLECT_CONFIGS = {
       // layer 1 – card detail
       [
         {
-          component: CardSecondLayer,
+          component: CarouselCard,
           componentPropsBuilder: ({ nodes, currentItemId, handlers }) => {
             const cardNode = nodes?.find((n) => n.id === currentItemId);
             const card = cardNode
@@ -38,6 +39,18 @@ export const COLLECT_CONFIGS = {
             return {
               card,
               onTitleChange: handlers.carousel.updateCardTitle,
+            };
+          },
+        },
+        {
+          component: CarouselButton,
+          componentPropsBuilder: ({ nodes, currentItemId, handlers }) => {
+            const cardNode = nodes?.find((n) => n.id === currentItemId);
+            const card = cardNode
+              ? { id: cardNode.id, ...cardNode.data }
+              : null;
+            return {
+              card,
               onButtonTitleChange: handlers.carousel.updateButtonTitle,
             };
           },
@@ -47,7 +60,7 @@ export const COLLECT_CONFIGS = {
   },
   form: {
     layers: [
-      // layer 0 â€” field list
+      // layer 0  field list
       [
         {
           component: FormFields,

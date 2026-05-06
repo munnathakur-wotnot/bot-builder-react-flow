@@ -13,6 +13,8 @@ import {
     ArrowRightIcon,
     PlayIcon,
     StopIcon,
+    ImportIcon,
+    ExportIcon,
 } from "./headerTooltipIcon";
 
 function HeaderTooltip(props) {
@@ -29,6 +31,8 @@ function HeaderTooltip(props) {
         isSimulating,
         onTest,
         onStopTest,
+        onImport,
+        onExport,
     } = props;
 
     const { fitView } = useReactFlow();
@@ -136,6 +140,18 @@ function HeaderTooltip(props) {
                     Search nodes
                 </button>
 
+                <div className="layout-toolbar__divider" />
+
+                <button className="layout-toolbar__btn" onClick={onImport}>
+                    <ImportIcon />
+                    Import
+                </button>
+
+                <button className="layout-toolbar__btn" onClick={onExport}>
+                    <ExportIcon />
+                    Export
+                </button>
+
                 {/* Test / Stop */}
                 {errorCount === 0 &&
                     (isSimulating ? (
@@ -177,5 +193,7 @@ HeaderTooltip.propTypes = {
     isSimulating: PropTypes.bool,
     onTest: PropTypes.func,
     onStopTest: PropTypes.func,
+    onImport: PropTypes.func,
+    onExport: PropTypes.func,
 };
 export default HeaderTooltipMemo;

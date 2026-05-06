@@ -8,10 +8,16 @@ MENU_CATEGORIES.forEach((cat) => {
   CATEGORY_MAP[cat.id] = { color: cat.color, label: cat.label };
 });
 
+const ITEM_HEIGHT = 46; // px — must match CSS (padding 9px*2 + icon 28px)
+const LIST_MAX_HEIGHT = 380; // px — matches CSS max-height
+const OVERSCAN = 3;
+
 export default function NodeSearchModal({ nodes, onSelect, onClose }) {
   const [search, setSearch] = useState("");
   const [highlightIndex, setHighlightIndex] = useState(0);
+  const [scrollTop, setScrollTop] = useState(0);
   const inputRef = useRef(null);
+  const listRef = useRef(null);
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -33,6 +39,19 @@ export default function NodeSearchModal({ nodes, onSelect, onClose }) {
     setHighlightIndex(0);
   }, [search]);
 
+  // Auto-scroll list to keep highlighted item visible
+  useEffect(() => {
+    const el = listRef.current;
+    if (!el) return;
+    const itemTop = highlightIndex * ITEM_HEIGHT;
+    const itemBottom = itemTop + ITEM_HEIGHT;
+    if (itemTop < el.scrollTop) {
+      el.scrollTop = itemTop;
+    } else if (itemBottom > el.scrollTop + el.clientHeight) {
+      el.scrollTop = itemBottom - el.clientHeight;
+    }
+  }, [highlightIndex]);
+
   const handleKeyDown = useCallback(
     (e) => {
       if (e.key === "Escape") {
@@ -50,6 +69,16 @@ export default function NodeSearchModal({ nodes, onSelect, onClose }) {
     },
     [filtered, highlightIndex, onClose, onSelect],
   );
+
+  // Virtual list: only render items in the visible window + overscan
+  const totalHeight = filtered.length * ITEM_HEIGHT;
+  const containerHeight = Math.min(totalHeight, LIST_MAX_HEIGHT);
+  const startIndex = Math.max(0, Math.floor(scrollTop / ITEM_HEIGHT) - OVERSCAN);
+  const endIndex = Math.min(
+    filtered.length - 1,
+    Math.ceil((scrollTop + LIST_MAX_HEIGHT) / ITEM_HEIGHT) + OVERSCAN,
+  );
+  const visibleItems = filtered.slice(startIndex, endIndex + 1);
 
   return (
     <div className="node-search-overlay" onMouseDown={onClose}>
@@ -87,17 +116,33 @@ export default function NodeSearchModal({ nodes, onSelect, onClose }) {
           </span>
         </div>
 
-        {/* List */}
-        <div className="node-search-modal__list">
-          {filtered.map((node, index) => {
-            const cat = CATEGORY_MAP[node.data.iCategory];
-            return (
-              <button
-                key={node.id}
-                type="button"
-                className={`node-search-modal__item${index === highlightIndex ? " node-search-modal__item--active" : ""}`}
-                onClick={() => onSelect(node)}
-                onMouseEnter={() => setHighlightIndex(index)}
+        {/* Virtualized list — only rendered when there are results */}
+        {filtered.length === 0 ? (
+          <div className="node-search-modal__empty">No nodes found</div>
+        ) : (
+          <div
+            ref={listRef}
+            className="node-search-modal__list"
+            style={{ height: containerHeight }}
+            onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)}
+          >
+            <div style={{ height: totalHeight, position: "relative" }}>
+              {visibleItems.map((node, idx) => {
+                const index = startIndex + idx;
+                const cat = CATEGORY_MAP[node.data.iCategory];
+                return (
+                  <button
+                    key={node.id}
+                    type="button"
+                    className={`node-search-modal__item${index === highlightIndex ? " node-search-modal__item--active" : ""}`}
+                    style={{
+                      position: "absolute",
+                      top: index * ITEM_HEIGHT,
+                      left: 0,
+                      right: 0,
+                    }}
+                    onClick={() => onSelect(node)}
+                    onMouseEnter={() => setHighlightIndex(index)}
               >
                 <span
                   className="node-search-modal__item-icon"
@@ -119,13 +164,12 @@ export default function NodeSearchModal({ nodes, onSelect, onClose }) {
                     {cat.label}
                   </span>
                 )}
-              </button>
-            );
-          })}
-          {filtered.length === 0 && (
-            <div className="node-search-modal__empty">No nodes found</div>
-          )}
-        </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
