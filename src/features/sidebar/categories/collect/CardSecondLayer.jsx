@@ -18,18 +18,31 @@ function ButtonRow({ button, cardId, onButtonTitleChange }) {
         onChange={handleChange}
         placeholder="Button title"
       />
-      {hasError && <span className="node-sidebar__field-error">Button title is required</span>}
+      {hasError && (
+        <span className="node-sidebar__field-error">
+          Button title is required
+        </span>
+      )}
     </label>
   );
 }
 
 ButtonRow.propTypes = {
-  button: PropTypes.shape({ id: PropTypes.string.isRequired, title: PropTypes.string }).isRequired,
+  button: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    title: PropTypes.string,
+  }).isRequired,
   cardId: PropTypes.string.isRequired,
   onButtonTitleChange: PropTypes.func.isRequired,
 };
 
-export default function CardSecondLayer({ card, onTitleChange, onButtonTitleChange }) {
+export default function CardSecondLayer({
+  card,
+  onTitleChange,
+  onButtonTitleChange,
+}) {
+  console.log(card, "Cards");
+
   const handleTitleChange = useCallback(
     (e) => onTitleChange(card.id, e.target.value),
     [card?.id, onTitleChange],
@@ -52,7 +65,11 @@ export default function CardSecondLayer({ card, onTitleChange, onButtonTitleChan
           onChange={handleTitleChange}
           placeholder="Card title"
         />
-        {titleHasError && <span className="node-sidebar__field-error">Card title is required</span>}
+        {titleHasError && (
+          <span className="node-sidebar__field-error">
+            Card title is required
+          </span>
+        )}
       </label>
 
       {buttons.length > 0 && (
@@ -78,11 +95,14 @@ CardSecondLayer.propTypes = {
   card: PropTypes.shape({
     id: PropTypes.string.isRequired,
     title: PropTypes.string,
+    groupId: PropTypes.string,
     buttons: PropTypes.arrayOf(
-      PropTypes.shape({ id: PropTypes.string.isRequired, title: PropTypes.string }),
+      PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        title: PropTypes.string,
+      }),
     ),
   }),
   onTitleChange: PropTypes.func.isRequired,
   onButtonTitleChange: PropTypes.func.isRequired,
 };
-

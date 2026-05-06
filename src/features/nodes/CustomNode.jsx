@@ -243,7 +243,8 @@ export default memo(CustomNode, (prev, next) => {
     prevData.inPorts === nextData.inPorts &&
     prevData.delayDuration === nextData.delayDuration &&
     prevData?.successOutport === nextData?.successOutport &&
-    prevData?.failureOutport === nextData?.failureOutport
+    prevData?.failureOutport === nextData?.failureOutport &&
+    prevData?.cards === nextData?.cards
   );
 });
 

@@ -32,7 +32,9 @@ export const COLLECT_CONFIGS = {
           component: CardSecondLayer,
           componentPropsBuilder: ({ nodes, currentItemId, handlers }) => {
             const cardNode = nodes?.find((n) => n.id === currentItemId);
-            const card = cardNode ? { id: cardNode.id, ...cardNode.data } : null;
+            const card = cardNode
+              ? { id: cardNode.id, ...cardNode.data }
+              : null;
             return {
               card,
               onTitleChange: handlers.carousel.updateCardTitle,
@@ -68,7 +70,8 @@ export const COLLECT_CONFIGS = {
         {
           component: FieldSecondLayer,
           componentPropsBuilder: ({ nodeData, currentItemId, handlers }) => {
-            const field = nodeData?.fields?.find((f) => f.id === currentItemId) ?? null;
+            const field =
+              nodeData?.fields?.find((f) => f.id === currentItemId) ?? null;
             return {
               field,
               onLabelChange: handlers.form.updateFieldLabel,
