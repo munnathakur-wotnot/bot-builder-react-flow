@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useRef } from "react";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import {
     SortableContext,
@@ -10,7 +10,6 @@ import { CSS } from "@dnd-kit/utilities";
 import PropTypes from "prop-types";
 import {
     restrictToVerticalAxis,
-    restrictToParentElement,
 } from "@dnd-kit/modifiers";
 import { validateAllNodesKeys } from "../../../features/canvas/validateNodes";
 import { getIdForKnowError } from "./moleculeshelper";
@@ -40,12 +39,12 @@ const SortableItem = React.memo(({ id, renderItem, type, nodeData }) => {
             borderRadius: "8px",
             willChange: "transform",
         }),
-        [transform, transition, isDragging],
+        [transform, transition, isDragging, isError],
     );
 
     return (
-        <div>
-            <div ref={setNodeRef} style={style}>
+        <div ref={setNodeRef} style={style}>
+            <div>
                 {renderItem({
                     dragHandleProps: attributes,
                     dragListeners: listeners,
@@ -82,8 +81,25 @@ export default function DragDropList({
     getId = (item) => item.id,
     renderItem,
 }) {
+    const containerRef = useRef(null);
+
     //  stable ids
     const itemIds = useMemo(() => items.list.map(getId), [items.list, getId]);
+
+    // Custom modifier: restrict drag movement to the list container bounds
+    const restrictToContainer = useCallback(({ transform, draggingNodeRect }) => {
+        if (!containerRef.current || !draggingNodeRect) return transform;
+
+        const containerRect = containerRef.current.getBoundingClientRect();
+        const minY = containerRect.top - draggingNodeRect.top;
+        const maxY = containerRect.bottom - draggingNodeRect.bottom;
+
+        return {
+            ...transform,
+            x: 0,
+            y: Math.min(Math.max(transform.y, minY), maxY),
+        };
+    }, []);
 
     //  drag handler
     const handleDragEnd = useCallback(
@@ -103,10 +119,11 @@ export default function DragDropList({
     );
 
     return (
+        <div ref={containerRef}>
         <DndContext
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
-            modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+            modifiers={[restrictToVerticalAxis, restrictToContainer]}
         >
             <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
                 {items?.list.map((item) => {
@@ -123,6 +140,7 @@ export default function DragDropList({
                 })}
             </SortableContext>
         </DndContext>
+        </div>
     );
 }
 

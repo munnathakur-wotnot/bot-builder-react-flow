@@ -4,20 +4,23 @@ import { Handle, Position } from "@xyflow/react";
 import "./CustomNode.css";
 import { useFlowCallbacks } from "../canvas/FlowCallbacksContext.jsx";
 import NodeTooltips from "./NodeTooltips.jsx";
+import { useSimulationStatus } from "../../shared/hooks/useSimulationStatus";
 
 function CustomNode({ id, data }) {
   const {
     openMenu,
     validationErrors,
-    executedIds,
-    activeId,
+    simulationStore,
     isHandleClickRef,
   } = useFlowCallbacks();
 
+  // only this node re-renders when ITS simulation status changes
+  const simulationStatus = useSimulationStatus(simulationStore, id);
+  const isActive = simulationStatus === "active";
+  const isExecuted = simulationStatus === "executed";
+
   const nodeErrors = validationErrors?.current?.[id] ?? [];
   const hasErrors = nodeErrors.length > 0;
-  const isActive = activeId === id;
-  const isExecuted = !isActive && (executedIds ?? []).includes(id);
 
   const isStartNode = data.type === "start";
   const isConnected = data?.connected;
@@ -245,7 +248,9 @@ export default memo(CustomNode, (prev, next) => {
     prevData?.successOutport === nextData?.successOutport &&
     prevData?.failureOutport === nextData?.failureOutport &&
     prevData?.cards === nextData?.cards &&
-    prevData?.fields === nextData?.fields
+    prevData?.fields === nextData?.fields &&
+    prevData?.knowledgeBaseId === nextData?.knowledgeBaseId &&
+    prevData?.functionIds === nextData?.functionIds
   );
 });
 

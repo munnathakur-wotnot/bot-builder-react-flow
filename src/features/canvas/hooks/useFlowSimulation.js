@@ -40,10 +40,50 @@ function buildExecutionPath(nodes, edges) {
   return path;
 }
 
+/**
+ * External store for simulation state.
+ * Consumers subscribe via useSyncExternalStore and receive per-node snapshots,
+ * so only the affected node re-renders when simulation advances — not all nodes.
+ */
+function createSimulationStore() {
+  let executedIdsSet = new Set();
+  let activeId = null;
+  const listeners = new Set();
+
+  function notify() {
+    listeners.forEach((fn) => fn());
+  }
+
+  return {
+    getState: () => ({ executedIdsSet, activeId }),
+    addExecutedId: (id) => {
+      executedIdsSet = new Set(executedIdsSet);
+      executedIdsSet.add(id);
+      notify();
+    },
+    setActiveId: (id) => {
+      activeId = id;
+      notify();
+    },
+    reset: () => {
+      executedIdsSet = new Set();
+      activeId = null;
+      notify();
+    },
+    subscribe: (listener) => {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
+  };
+}
+
 export function useFlowSimulation() {
   const [isSimulating, setIsSimulating] = useState(false);
-  const [executedIds, setExecutedIds] = useState([]); // nodes already "done"
-  const [activeId, setActiveId] = useState(null);     // currently executing
+  // Store is created once and never replaced — stable reference for context
+  const storeRef = useRef(null);
+  if (!storeRef.current) storeRef.current = createSimulationStore();
+  const store = storeRef.current;
+
   const timeoutsRef = useRef([]);
 
   const clearAll = useCallback(() => {
@@ -54,9 +94,8 @@ export function useFlowSimulation() {
   const stopSimulation = useCallback(() => {
     clearAll();
     setIsSimulating(false);
-    setActiveId(null);
-    setExecutedIds([]);
-  }, [clearAll]);
+    store.reset();
+  }, [clearAll, store]);
 
   const startSimulation = useCallback(
     (nodes, edges) => {
@@ -66,14 +105,12 @@ export function useFlowSimulation() {
       if (path.length === 0) return;
 
       setIsSimulating(true);
-      setExecutedIds([]);
-      setActiveId(null);
+      store.reset();
 
       path.forEach((nodeId, index) => {
-        // activate this node
         const activateId = setTimeout(() => {
-          setActiveId(nodeId);
-          setExecutedIds((prev) => [...prev, nodeId]);
+          store.setActiveId(nodeId);
+          store.addExecutedId(nodeId);
         }, index * STEP_DELAY);
 
         timeoutsRef.current.push(activateId);
@@ -81,14 +118,14 @@ export function useFlowSimulation() {
 
       // finish
       const finishId = setTimeout(() => {
-        setActiveId(null);
+        store.setActiveId(null);
         setIsSimulating(false);
       }, path.length * STEP_DELAY);
 
       timeoutsRef.current.push(finishId);
     },
-    [isSimulating],
+    [isSimulating, store],
   );
 
-  return { isSimulating, executedIds, activeId, startSimulation, stopSimulation };
+  return { isSimulating, simulationStore: store, startSimulation, stopSimulation };
 }

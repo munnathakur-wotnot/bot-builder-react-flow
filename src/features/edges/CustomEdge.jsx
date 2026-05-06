@@ -8,6 +8,7 @@ import {
 import "./CustomEdge.css";
 import { useFlowCallbacks } from "../canvas/FlowCallbacksContext.jsx";
 import PropTypes from "prop-types";
+import { useSimulationStatus } from "../../shared/hooks/useSimulationStatus";
 
 export default function CustomEdge(props) {
   const {
@@ -22,12 +23,12 @@ export default function CustomEdge(props) {
     sourceHandleId,
   } = props;
 
-  const { deleteEdge, executedIds, activeId } = useFlowCallbacks();
+  const { deleteEdge, simulationStore } = useFlowCallbacks();
 
-  // An edge is "executed" when its source has been visited in simulation
-  const isEdgeExecuted = (executedIds ?? []).includes(source);
-  // An edge is "active" (animated) when its source is the current active node
-  const isEdgeActive = activeId === source;
+  // Per-edge subscription — only this edge re-renders when its source status changes
+  const edgeSimStatus = useSimulationStatus(simulationStore, source);
+  const isEdgeActive = edgeSimStatus === "active";
+  const isEdgeExecuted = edgeSimStatus === "executed";
   //Used to delay hiding the delete button (smooth UX).
   const hideTimeoutRef = useRef(null);
   const [hoverState, setHoverState] = useState({
