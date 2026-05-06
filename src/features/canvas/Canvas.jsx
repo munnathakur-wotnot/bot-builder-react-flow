@@ -49,10 +49,14 @@ export default function CanvasFlow() {
   const nodesRef = useRef(nodes);
   nodesRef.current = nodes;
   const isHandleClickRef = useRef(false);
+  const validationErrors = useRef(null);
 
   const { fitView } = useReactFlow();
 
-  const validationErrors = useMemo(() => validateAllNodesKeys(nodes), [nodes]);
+  validationErrors.current = useMemo(
+    () => validateAllNodesKeys(nodes),
+    [nodes],
+  );
 
   const {
     isSimulating,
@@ -210,7 +214,7 @@ export default function CanvasFlow() {
           nuberOfNodes={nuberOfNodes}
           setNumberOfNodes={setNumberOfNodes}
           onOpenSearch={() => setSearchOpen(true)}
-          validationErrors={validationErrors}
+          validationErrors={validationErrors.current}
           nodes={nodes}
           onSelectErrorNode={handleNodeFound}
           isSimulating={isSimulating}

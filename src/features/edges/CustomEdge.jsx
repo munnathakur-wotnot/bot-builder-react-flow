@@ -117,10 +117,15 @@ export default function CustomEdge(props) {
         path={edgePath}
         style={
           isEdgeActive
-            ? { stroke: "#22c55e", strokeWidth: 2.5, strokeDasharray: "6 4", animation: "edge-dash 0.4s linear infinite" }
+            ? {
+              stroke: "#22c55e",
+              strokeWidth: 2.5,
+              strokeDasharray: "6 4",
+              animation: "edge-dash 0.4s linear infinite",
+            }
             : isEdgeExecuted
-            ? { stroke: "#86efac", strokeWidth: 2 }
-            : undefined
+              ? { stroke: "#86efac", strokeWidth: 2 }
+              : undefined
         }
       />
       {!isDeletableEdges && (

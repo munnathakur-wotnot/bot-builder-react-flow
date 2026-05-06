@@ -13,7 +13,8 @@ function CustomNode({ id, data }) {
     activeId,
     isHandleClickRef,
   } = useFlowCallbacks();
-  const nodeErrors = validationErrors?.[id] ?? [];
+
+  const nodeErrors = validationErrors?.current?.[id] ?? [];
   const hasErrors = nodeErrors.length > 0;
   const isActive = activeId === id;
   const isExecuted = !isActive && (executedIds ?? []).includes(id);
