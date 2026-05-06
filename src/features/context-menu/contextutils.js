@@ -179,7 +179,14 @@ export function bulkCreateFromSource({
         };
       });
 
-      workingNodes = [...nextNodes, ...(payload.nodesToAdd || [])];
+      const NODE_STRIDE = 320; // NODE_WIDTH (240) + HORIZONTAL_GAP (80)
+      const xOffset = created * NODE_STRIDE;
+      const shiftedNodes = (payload.nodesToAdd || []).map((n) => ({
+        ...n,
+        position: { x: n.position.x + xOffset, y: n.position.y },
+      }));
+
+      workingNodes = [...nextNodes, ...shiftedNodes];
       workingEdges = [...workingEdges, ...(payload.edgesToAdd || [])];
       finalSelectedNodeId = payload.selectedNodeId || finalSelectedNodeId;
 

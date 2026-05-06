@@ -6,7 +6,7 @@ import DraggableRow from "../../../../shared/ui/molecules/DraggableRow";
 import { CardIcon } from "../../../../shared/ui/atoms/icons";
 
 const Card = ({ nodeData, removeCard, reorderCards, onNavigate }) => {
-  const cards = nodeData?.cards ?? [];
+  const cards = { list: nodeData?.cards ?? [], type: "node", nodeData };
 
   return (
     <div className="card-list">
@@ -24,9 +24,13 @@ const Card = ({ nodeData, removeCard, reorderCards, onNavigate }) => {
               dragHandleProps={dragHandleProps}
               dragListeners={dragListeners}
               onNavigate={() => onNavigate?.({ id: cardId, title: cardTitle })}
-              onRemove={cards?.length > 1 ? () => removeCard(cardId) : undefined}
+              onRemove={
+                cards?.list?.length > 1 ? () => removeCard(cardId) : undefined
+              }
             >
-              <div className="card-icon"><CardIcon /></div>
+              <div className="card-icon">
+                <CardIcon />
+              </div>
               <span className="card-title">{cardTitle}</span>
             </DraggableRow>
           );

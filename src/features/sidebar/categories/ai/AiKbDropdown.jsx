@@ -21,6 +21,7 @@ export default function AiKbDropdown({ nodeData, handlers, onNavigate }) {
       onCreate={handleCreate}
       onEdit={(kb) => onNavigate?.({ id: kb.id, _type: "kb" })}
       createLabel="Create Knowledge Base"
+      error={!knowledgeBaseId ? "Knowledge base selection is required" : ""}
     />
   );
 }

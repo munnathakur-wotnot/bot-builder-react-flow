@@ -53,22 +53,21 @@ export function getCollectHandlers({
           updateNode,
         }),
       updateCardTitle: (cardId, title) => {
+        // 1. ReactFlow node update
         setNodes((nds) =>
           nds.map((n) =>
             n.id === cardId ? { ...n, data: { ...n.data, title } } : n,
           ),
         );
         const cards = nodeData?.cards ?? [];
-        updater(
-          cards.map((card) => {
-            const id = typeof card === "string" ? card : card?.id;
-            if (id !== cardId) return card;
-            return typeof card === "string"
-              ? { id: card, title }
-              : { ...card, title };
-          }),
-          "cards",
-        );
+        const newCards = cards.map((card) => {
+          const id = typeof card === "string" ? card : card?.id;
+          if (id !== cardId) return card;
+          return typeof card === "string"
+            ? { id: card, title }
+            : { ...card, title };
+        });
+        updater(newCards, "cards");
       },
       updateButtonTitle: (cardId, buttonId, title) => {
         setNodes((nds) =>
@@ -103,12 +102,11 @@ export function getCollectHandlers({
       reorderFields: (fields) => updater(fields, "fields"),
       updateFieldLabel: (fieldId, label) => {
         const fields = nodeData?.fields ?? [];
-        updater(
-          fields.map((field) =>
-            field.id === fieldId ? { ...field, label } : field,
-          ),
-          "fields",
+        const newfields = fields.map((field) =>
+          field.id === fieldId ? { ...field, label } : field,
         );
+
+        updater(newfields, "fields");
       },
       updateFieldType: (fieldId, type) => {
         const fields = nodeData?.fields ?? [];

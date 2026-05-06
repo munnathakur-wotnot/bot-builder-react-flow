@@ -10,6 +10,7 @@ export default function AppTextarea({
     placeholder,
     className = "",
     id,
+    error,
 }) {
     const handleChange = (e) => {
         onChange(e);
@@ -25,12 +26,13 @@ export default function AppTextarea({
 
             <textarea
                 id={id}
-                className={`app-textarea ${className}`}
+                className={`app-textarea${error ? " app-textarea--error" : ""} ${className}`}
                 value={value}
                 style={{ minHeight: "100px" }}
                 onChange={handleChange}
                 placeholder={placeholder}
             />
+            {error && <span className="app-textarea__error">{error}</span>}
         </div>
     );
 }
@@ -42,6 +44,7 @@ AppTextarea.propTypes = {
     placeholder: PropTypes.string,
     className: PropTypes.string,
     id: PropTypes.string,
+    error: PropTypes.string,
 };
 
 AppTextarea.defaultProps = {

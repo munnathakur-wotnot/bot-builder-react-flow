@@ -14,7 +14,13 @@ import {
  *   - handleDeleteEdge  delete a single edge by id
  *   - handleEdgesDelete called by ReactFlow's built-in edge deletion
  */
-export function useFlowConnections({ edges, setEdges, setNodes, nodesRef, flowWrapperRef }) {
+export function useFlowConnections({
+  edges,
+  setEdges,
+  setNodes,
+  nodesRef,
+  flowWrapperRef,
+}) {
   // Stable ref so callbacks don't need edges in their dep arrays
   const edgesRef = useRef(edges);
   edgesRef.current = edges;
@@ -25,8 +31,18 @@ export function useFlowConnections({ edges, setEdges, setNodes, nodesRef, flowWr
 
   const onConnect = useCallback(
     (params) => {
-      if (!isConnectionAllowed(edgesRef.current, params.source, params.sourceHandle)) return;
+      if (
+        !isConnectionAllowed(
+          edgesRef.current,
+          params.source,
+          params.sourceHandle,
+        )
+      )
+        return;
 
+      if (params.source === params.target) {
+        params.hidden = true;
+      }
       setEdges((eds) => addEdge({ ...params, type: "custom" }, eds));
       setNodes((nds) => applyConnectionToNodes(nds, params));
     },
@@ -68,7 +84,12 @@ export function useFlowConnections({ edges, setEdges, setNodes, nodesRef, flowWr
       setEdges((eds) => eds.filter((e) => e.id !== edgeId));
       setNodes((nds) =>
         removeNodeConnectionsForEdges(nds, [
-          { id: edgeId, source: sourceId, target: targetId, sourceHandle: sourceHandleId },
+          {
+            id: edgeId,
+            source: sourceId,
+            target: targetId,
+            sourceHandle: sourceHandleId,
+          },
         ]),
       );
     },

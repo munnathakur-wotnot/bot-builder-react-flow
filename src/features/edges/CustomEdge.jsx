@@ -22,7 +22,12 @@ export default function CustomEdge(props) {
     sourceHandleId,
   } = props;
 
-  const { deleteEdge } = useFlowCallbacks();
+  const { deleteEdge, executedIds, activeId } = useFlowCallbacks();
+
+  // An edge is "executed" when its source has been visited in simulation
+  const isEdgeExecuted = (executedIds ?? []).includes(source);
+  // An edge is "active" (animated) when its source is the current active node
+  const isEdgeActive = activeId === source;
   //Used to delay hiding the delete button (smooth UX).
   const hideTimeoutRef = useRef(null);
   const [hoverState, setHoverState] = useState({
@@ -108,7 +113,21 @@ export default function CustomEdge(props) {
 
   return (
     <>
-      <BaseEdge path={edgePath} />
+      <BaseEdge
+        path={edgePath}
+        style={
+          isEdgeActive
+            ? {
+              stroke: "#22c55e",
+              strokeWidth: 2.5,
+              strokeDasharray: "6 4",
+              animation: "edge-dash 0.4s linear infinite",
+            }
+            : isEdgeExecuted
+              ? { stroke: "#86efac", strokeWidth: 2 }
+              : undefined
+        }
+      />
       {!isDeletableEdges && (
         <path
           d={edgePath}

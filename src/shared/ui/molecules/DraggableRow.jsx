@@ -39,10 +39,16 @@ export default function DraggableRow({
         onClick={onNavigate}
         role={onNavigate ? "button" : undefined}
         tabIndex={onNavigate ? 0 : undefined}
-        onKeyDown={onNavigate ? (e) => e.key === "Enter" && onNavigate() : undefined}
+        onKeyDown={
+          onNavigate ? (e) => e.key === "Enter" && onNavigate() : undefined
+        }
       >
         <div className="draggable-row__content">{children}</div>
-        {onNavigate && <span className="draggable-row__chevron" aria-hidden="true">›</span>}
+        {onNavigate && (
+          <span className="draggable-row__chevron" aria-hidden="true">
+            ›
+          </span>
+        )}
       </div>
 
       {/* Remove button */}

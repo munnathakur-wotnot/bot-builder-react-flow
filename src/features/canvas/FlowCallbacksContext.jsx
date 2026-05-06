@@ -18,6 +18,9 @@ FlowCallbacksProvider.propTypes = {
     deleteNode: PropTypes.func.isRequired,
     copyNode: PropTypes.func.isRequired,
     cloneNode: PropTypes.func.isRequired,
+    validationErrors: PropTypes.object,
+    executedIds: PropTypes.array,
+    activeId: PropTypes.string,
   }).isRequired,
   children: PropTypes.node.isRequired,
 };

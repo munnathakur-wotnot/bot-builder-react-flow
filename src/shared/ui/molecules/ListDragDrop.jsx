@@ -12,8 +12,10 @@ import {
     restrictToVerticalAxis,
     restrictToParentElement,
 } from "@dnd-kit/modifiers";
+import { validateAllNodesKeys } from "../../../features/canvas/validateNodes";
+import { getIdForKnowError } from "./moleculeshelper";
 
-const SortableItem = React.memo(({ id, renderItem }) => {
+const SortableItem = React.memo(({ id, renderItem, type, nodeData }) => {
     const {
         attributes,
         listeners,
@@ -23,6 +25,10 @@ const SortableItem = React.memo(({ id, renderItem }) => {
         isDragging,
     } = useSortable({ id });
 
+    const validateData = validateAllNodesKeys(nodeData, "sidebar");
+
+    const isError = getIdForKnowError({ type, validateData, id, nodeData });
+
     const style = useMemo(
         () => ({
             transform: CSS.Transform.toString(transform),
@@ -30,7 +36,7 @@ const SortableItem = React.memo(({ id, renderItem }) => {
             padding: "12px",
             margin: "8px 0",
             background: isDragging ? "#e0f7fa" : "#fff",
-            border: "1px solid #ddd",
+            border: isError ? "1px solid red" : "1px solid #ddd",
             borderRadius: "8px",
             willChange: "transform",
         }),
@@ -38,11 +44,25 @@ const SortableItem = React.memo(({ id, renderItem }) => {
     );
 
     return (
-        <div ref={setNodeRef} style={style}>
-            {renderItem({
-                dragHandleProps: attributes,
-                dragListeners: listeners,
-            })}
+        <div>
+            <div ref={setNodeRef} style={style}>
+                {renderItem({
+                    dragHandleProps: attributes,
+                    dragListeners: listeners,
+                })}
+            </div>
+            {isError && (
+                <p
+                    style={{
+                        color: "red",
+                        padding: 0,
+                        height: "5px",
+                        marginTop: "0px",
+                    }}
+                >
+                    Someting worng
+                </p>
+            )}
         </div>
     );
 });
@@ -52,6 +72,8 @@ SortableItem.displayName = "SortableItem";
 SortableItem.propTypes = {
     id: PropTypes.string,
     renderItem: PropTypes.array,
+    type: PropTypes.string,
+    nodeData: PropTypes.object,
 };
 
 export default function DragDropList({
@@ -61,7 +83,7 @@ export default function DragDropList({
     renderItem,
 }) {
     //  stable ids
-    const itemIds = useMemo(() => items.map(getId), [items, getId]);
+    const itemIds = useMemo(() => items.list.map(getId), [items.list, getId]);
 
     //  drag handler
     const handleDragEnd = useCallback(
@@ -70,14 +92,14 @@ export default function DragDropList({
 
             if (!over || active.id === over.id) return;
 
-            const oldIndex = items.findIndex((i) => getId(i) === active.id);
-            const newIndex = items.findIndex((i) => getId(i) === over.id);
+            const oldIndex = items?.list.findIndex((i) => getId(i) === active.id);
+            const newIndex = items?.list.findIndex((i) => getId(i) === over.id);
 
-            const newArray = arrayMove(items, oldIndex, newIndex);
+            const newArray = arrayMove(items.list, oldIndex, newIndex);
 
             setItems(newArray);
         },
-        [items, setItems, getId],
+        [items?.list, setItems, getId],
     );
 
     return (
@@ -87,12 +109,14 @@ export default function DragDropList({
             modifiers={[restrictToVerticalAxis, restrictToParentElement]}
         >
             <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
-                {items.map((item) => {
+                {items?.list.map((item) => {
                     const id = getId(item);
                     return (
                         <SortableItem
                             key={id}
                             id={id}
+                            type={items.type}
+                            nodeData={items.nodeData}
                             renderItem={(dragProps) => renderItem(item, dragProps)}
                         />
                     );
@@ -107,4 +131,6 @@ DragDropList.propTypes = {
     items: PropTypes.array,
     setItems: PropTypes.setItems,
     getId: PropTypes.func,
+    type: PropTypes.string,
+    nodeData: PropTypes.object,
 };

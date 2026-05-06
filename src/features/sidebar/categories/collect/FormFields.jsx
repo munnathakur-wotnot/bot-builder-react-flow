@@ -4,7 +4,7 @@ import DragDropList from "../../../../shared/ui/molecules/ListDragDrop";
 import FieldRow from "./FormField";
 
 export default function FormFields({ nodeData, formHandlers, onNavigate }) {
-  const fields = nodeData.fields ?? [];
+  const fields = { list: nodeData.fields ?? [], nodeData, type: "field" };
 
   return (
     <div className="node-sidebar__form-fields">

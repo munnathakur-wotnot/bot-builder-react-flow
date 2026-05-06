@@ -4,6 +4,7 @@ import "./NodeSidebar.css";
 import TitleDescriptionFields from "./TitleDescriptionFields";
 import DynamicRenderer from "./DynamicRenderer";
 import SidebarHeader from "./SidebarHeader";
+import { useResizable } from "../../shared/hooks/useResizable";
 
 export default function NodeSidebar({
   selectedNodeId,
@@ -16,6 +17,11 @@ export default function NodeSidebar({
   updateNode,
   onClose,
 }) {
+  const { width, isResizing, startResizing } = useResizable({
+    initialWidth: 360,
+    minWidth: 280,
+    maxWidth: 600,
+  });
   /**
    * layerStack is an array of { itemId } entries.
    *   length === 0  →  layer 0 (first layer, the list view)
@@ -49,7 +55,14 @@ export default function NodeSidebar({
   if (!selectedNode) return null;
 
   return (
-    <aside className="node-sidebar">
+    <aside
+      className={`node-sidebar ${isResizing ? "resizing" : ""}`}
+      style={{ width }}
+    >
+      <div
+        className="node-sidebar__resizer"
+        onMouseDown={() => startResizing(true)}
+      />
       <SidebarHeader
         onClose={onClose}
         layerIndex={layerIndex}

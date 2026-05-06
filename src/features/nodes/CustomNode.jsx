@@ -6,7 +6,18 @@ import { useFlowCallbacks } from "../canvas/FlowCallbacksContext.jsx";
 import NodeTooltips from "./NodeTooltips.jsx";
 
 function CustomNode({ id, data }) {
-  const { openMenu } = useFlowCallbacks();
+  const {
+    openMenu,
+    validationErrors,
+    executedIds,
+    activeId,
+    isHandleClickRef,
+  } = useFlowCallbacks();
+
+  const nodeErrors = validationErrors?.current?.[id] ?? [];
+  const hasErrors = nodeErrors.length > 0;
+  const isActive = activeId === id;
+  const isExecuted = !isActive && (executedIds ?? []).includes(id);
 
   const isStartNode = data.type === "start";
   const isConnected = data?.connected;
@@ -20,11 +31,9 @@ function CustomNode({ id, data }) {
     ? hasSuccessOutport && hasFailureOutport
     : data.outPorts?.length > 0;
 
-  const showDescription = Boolean(data?.description);
-
   // Safe menu open
   const handleOpenMenu = useCallback(
-    ({ event, type, isSelfLoop }) => {
+    ({ event, type, isSelfLoop, isMenuOpen }) => {
       event?.stopPropagation();
 
       openMenu({
@@ -33,6 +42,7 @@ function CustomNode({ id, data }) {
         y: event?.clientY + 10,
         type,
         isSelfLoop,
+        isMenuOpen,
       });
     },
     [id, openMenu],
@@ -69,8 +79,18 @@ function CustomNode({ id, data }) {
 
         // treat as click if small movement
         if (dx < 5 && dy < 5 && !hasOutgoing) {
-          handleOpenMenu({ event: upEvent, type: type, isSelfLoop });
+          isHandleClickRef.current = true;
+          handleOpenMenu({
+            event: upEvent,
+            type: type,
+            isSelfLoop,
+            isMenuOpen: true,
+          });
         }
+
+        requestAnimationFrame(() => {
+          isHandleClickRef.current = false;
+        });
 
         document.removeEventListener("mouseup", handleMouseUp);
       };
@@ -85,7 +105,7 @@ function CustomNode({ id, data }) {
 
   if (!data) return null;
 
-  const typeClassName = `custom-node custom-node--${data.type ?? "default"}`;
+  const typeClassName = `custom-node custom-node--${data.type ?? "default"}${data.isSearchHighlight ? " custom-node--search-highlight" : ""}${hasErrors ? " custom-node--has-errors" : ""}${isActive ? " custom-node--executing" : ""}${isExecuted ? " custom-node--executed" : ""}`;
   const titleClassName =
     data.type === "delay" || data.type === "jump"
       ? "custom-node__header-delay"
@@ -108,6 +128,21 @@ function CustomNode({ id, data }) {
       role={isStartNode && !isConnected ? "button" : undefined}
       tabIndex={isStartNode && !isConnected ? 0 : undefined}
     >
+      {/* Error badge */}
+      {hasErrors && !isSubNode && (
+        <div className="custom-node__error-badge" title={nodeErrors.join("\n")}>
+          <svg
+            width="10"
+            height="10"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+          </svg>
+          {nodeErrors.length}
+        </div>
+      )}
       {/* Target Handle */}
       {!isStartNode && (
         <Handle
@@ -116,7 +151,6 @@ function CustomNode({ id, data }) {
           className="custom-node__handle custom-node__handle--target"
         />
       )}
-
       {/* Header */}
       <div className={titleClassName}>
         {!data.icon && !isSubNode && <div className="custom-node__icon" />}
@@ -125,15 +159,12 @@ function CustomNode({ id, data }) {
           {data.title} {data.delayDuration ? `(${data.delayDuration}s)` : ""}
         </p>
       </div>
-
       {/* Description */}
-      {showDescription && (
-        <p className="custom-node__description">{data.description}</p>
+      {!(data.type === "delay" || data.type === "jump" || isSubNode) && (
+        <p className="custom-node__description">{data.description || ""}</p>
       )}
-
       {/* Hover toolbar */}
       {showToolbar && <NodeTooltips id={id} />}
-
       {/* Source Handles */}
       {isDoubleOutport ? (
         <>
@@ -212,7 +243,9 @@ export default memo(CustomNode, (prev, next) => {
     prevData.inPorts === nextData.inPorts &&
     prevData.delayDuration === nextData.delayDuration &&
     prevData?.successOutport === nextData?.successOutport &&
-    prevData?.failureOutport === nextData?.failureOutport
+    prevData?.failureOutport === nextData?.failureOutport &&
+    prevData?.cards === nextData?.cards &&
+    prevData?.fields === nextData?.fields
   );
 });
 
