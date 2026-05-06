@@ -3,18 +3,25 @@ import PropTypes from "prop-types";
 import "./MultiSelectToolbar.css";
 import { CloneIcon, CopyIcon, DeleteIcon } from "../../shared/ui/atoms/icons";
 
-
-
 /**
  * Floating toolbar shown when 2+ nodes are selected.
  * Positioned at the top-center of the canvas viewport.
  */
-export default function MultiSelectToolbar({ selectedIds, onCopy, onClone, onDelete }) {
+export default function MultiSelectToolbar({
+  selectedIds,
+  onCopy,
+  onClone,
+  onDelete,
+}) {
   const count = selectedIds.length;
   if (count < 2) return null;
 
   return (
-    <div className="ms-toolbar" role="toolbar" aria-label="Multi-select actions">
+    <div
+      className="ms-toolbar"
+      role="toolbar"
+      aria-label="Multi-select actions no-select"
+    >
       <span className="ms-toolbar__count">{count} selected</span>
 
       <div className="ms-toolbar__divider" />

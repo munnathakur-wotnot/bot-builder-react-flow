@@ -45,11 +45,12 @@ export default function FieldSecondLayer({ field, onLabelChange, onTypeChange })
       <label className="node-sidebar__label">
         Label
         <AppInput
-          className="node-sidebar__input"
+          className={`node-sidebar__input${!label.trim() ? " node-sidebar__input--error" : ""}`}
           value={label}
           onChange={handleLabelChange}
           placeholder="Field label"
         />
+        {!label.trim() && <span className="node-sidebar__field-error">Label is required</span>}
       </label>
       <label className="node-sidebar__label">
         Type

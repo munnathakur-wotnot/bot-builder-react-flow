@@ -46,16 +46,20 @@ export default function TitleDescriptionFields({ nodeData, updateNode }) {
       <label className="node-sidebar__label">
         Title
         <AppInput
-          className="node-sidebar__input"
+          className={`node-sidebar__input${!title.trim() ? " node-sidebar__input--error" : ""}`}
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
+        {!title.trim() && (
+          <span className="node-sidebar__field-error">Title is required</span>
+        )}
       </label>
       <AppTextarea
-        className="node-sidebar__textarea"
+        className={`node-sidebar__textarea${!description.trim() ? " node-sidebar__textarea--error" : ""}`}
         label={"Description"}
         value={description}
         onChange={(e) => setDescription(e.target.value)}
+        error={!description.trim() ? "Description is required" : ""}
       />
     </>
   );

@@ -24,6 +24,7 @@ export default function AiFnDropdown({ nodeData, handlers, onNavigate }) {
       onCreate={handleCreate}
       onEdit={(fn) => onNavigate?.({ id: fn.id, _type: "fn" })}
       createLabel="Create Function"
+      error={!functionIds?.length ? "At least one function must be selected" : ""}
     />
   );
 }

@@ -8,15 +8,17 @@ function ButtonRow({ button, cardId, onButtonTitleChange }) {
     (e) => onButtonTitleChange(cardId, button.id, e.target.value),
     [cardId, button.id, onButtonTitleChange],
   );
+  const hasError = !button.title?.trim();
   return (
     <label className="node-sidebar__label">
       Button title
       <AppInput
-        className="node-sidebar__input"
+        className={`node-sidebar__input${hasError ? " node-sidebar__input--error" : ""}`}
         value={button.title ?? ""}
         onChange={handleChange}
         placeholder="Button title"
       />
+      {hasError && <span className="node-sidebar__field-error">Button title is required</span>}
     </label>
   );
 }
@@ -37,17 +39,20 @@ export default function CardSecondLayer({ card, onTitleChange, onButtonTitleChan
 
   const buttons = card.buttons ?? [];
 
+  const titleHasError = !card.title?.trim();
+
   return (
     <div className="node-sidebar__second-layer-content">
       <p className="node-sidebar__section-title">Card Settings</p>
       <label className="node-sidebar__label">
         Title
         <AppInput
-          className="node-sidebar__input"
+          className={`node-sidebar__input${titleHasError ? " node-sidebar__input--error" : ""}`}
           value={card.title ?? ""}
           onChange={handleTitleChange}
           placeholder="Card title"
         />
+        {titleHasError && <span className="node-sidebar__field-error">Card title is required</span>}
       </label>
 
       {buttons.length > 0 && (

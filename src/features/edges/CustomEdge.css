@@ -1,4 +1,10 @@
-﻿.edge-icon-wrapper {
+﻿/* ── Simulation edge animation ───────────────────────────────── */
+@keyframes edge-dash {
+  from { stroke-dashoffset: 20; }
+  to   { stroke-dashoffset: 0; }
+}
+
+.edge-icon-wrapper {
   position: absolute;
   z-index: 20;
   pointer-events: all;
