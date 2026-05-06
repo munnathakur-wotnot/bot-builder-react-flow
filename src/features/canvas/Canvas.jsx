@@ -4,6 +4,7 @@ import {
   Controls,
   MiniMap,
   ReactFlow,
+  SelectionMode,
   useEdgesState,
   useNodesState,
   useReactFlow,
@@ -226,6 +227,7 @@ export default function CanvasFlow() {
             nodes={nodes}
             edges={edges}
             nodeTypes={nodeTypes}
+            selectionMode={SelectionMode.Partial}
             onlyRenderVisibleElements={true}
             edgeTypes={edgeTypes}
             autoPanOnConnect={false}
