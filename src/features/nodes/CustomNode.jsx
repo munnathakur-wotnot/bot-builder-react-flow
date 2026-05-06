@@ -244,7 +244,8 @@ export default memo(CustomNode, (prev, next) => {
     prevData.delayDuration === nextData.delayDuration &&
     prevData?.successOutport === nextData?.successOutport &&
     prevData?.failureOutport === nextData?.failureOutport &&
-    prevData?.cards === nextData?.cards
+    prevData?.cards === nextData?.cards &&
+    prevData?.fields === nextData?.fields
   );
 });
 

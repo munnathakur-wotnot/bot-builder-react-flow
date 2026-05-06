@@ -102,12 +102,11 @@ export function getCollectHandlers({
       reorderFields: (fields) => updater(fields, "fields"),
       updateFieldLabel: (fieldId, label) => {
         const fields = nodeData?.fields ?? [];
-        updater(
-          fields.map((field) =>
-            field.id === fieldId ? { ...field, label } : field,
-          ),
-          "fields",
+        const newfields = fields.map((field) =>
+          field.id === fieldId ? { ...field, label } : field,
         );
+
+        updater(newfields, "fields");
       },
       updateFieldType: (fieldId, type) => {
         const fields = nodeData?.fields ?? [];
