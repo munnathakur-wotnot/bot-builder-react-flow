@@ -23,16 +23,14 @@ export default function NodeSearchModal({ nodes, onSelect, onClose }) {
     inputRef.current?.focus();
   }, []);
 
-  const searchableNodes = nodes.filter(
-    (n) => !n.data?.isSubNode && n.data?.title,
-  );
+  const searchableNodes = nodes.filter((n) => n.data?.title);
 
   const filtered = search.trim()
     ? searchableNodes.filter(
-        (n) =>
-          n.data.title.toLowerCase().includes(search.toLowerCase()) ||
-          n.data.iCategory?.toLowerCase().includes(search.toLowerCase()),
-      )
+      (n) =>
+        n.data.title.toLowerCase().includes(search.toLowerCase()) ||
+        n.data.iCategory?.toLowerCase().includes(search.toLowerCase()),
+    )
     : searchableNodes;
 
   useEffect(() => {
@@ -73,7 +71,10 @@ export default function NodeSearchModal({ nodes, onSelect, onClose }) {
   // Virtual list: only render items in the visible window + overscan
   const totalHeight = filtered.length * ITEM_HEIGHT;
   const containerHeight = Math.min(totalHeight, LIST_MAX_HEIGHT);
-  const startIndex = Math.max(0, Math.floor(scrollTop / ITEM_HEIGHT) - OVERSCAN);
+  const startIndex = Math.max(
+    0,
+    Math.floor(scrollTop / ITEM_HEIGHT) - OVERSCAN,
+  );
   const endIndex = Math.min(
     filtered.length - 1,
     Math.ceil((scrollTop + LIST_MAX_HEIGHT) / ITEM_HEIGHT) + OVERSCAN,
@@ -143,27 +144,27 @@ export default function NodeSearchModal({ nodes, onSelect, onClose }) {
                     }}
                     onClick={() => onSelect(node)}
                     onMouseEnter={() => setHighlightIndex(index)}
-              >
-                <span
-                  className="node-search-modal__item-icon"
-                  style={{ background: cat?.color ?? "#6b7280" }}
-                >
-                  {node.data.icon}
-                </span>
-                <span className="node-search-modal__item-title">
-                  {node.data.title}
-                </span>
-                {cat && (
-                  <span
-                    className="node-search-modal__item-badge"
-                    style={{
-                      color: cat.color,
-                      background: cat.color + "20",
-                    }}
                   >
-                    {cat.label}
-                  </span>
-                )}
+                    <span
+                      className="node-search-modal__item-icon"
+                      style={{ background: cat?.color ?? "#6b7280" }}
+                    >
+                      {node.data.icon}
+                    </span>
+                    <span className="node-search-modal__item-title">
+                      {node.data.title}
+                    </span>
+                    {cat && (
+                      <span
+                        className="node-search-modal__item-badge"
+                        style={{
+                          color: cat.color,
+                          background: cat.color + "20",
+                        }}
+                      >
+                        {cat.label}
+                      </span>
+                    )}
                   </button>
                 );
               })}
