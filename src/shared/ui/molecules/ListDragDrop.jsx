@@ -8,9 +8,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import PropTypes from "prop-types";
-import {
-    restrictToVerticalAxis,
-} from "@dnd-kit/modifiers";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { validateAllNodesKeys } from "../../../features/canvas/validateNodes";
 import { getIdForKnowError } from "./moleculeshelper";
 
@@ -120,26 +118,26 @@ export default function DragDropList({
 
     return (
         <div ref={containerRef}>
-        <DndContext
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-            modifiers={[restrictToVerticalAxis, restrictToContainer]}
-        >
-            <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
-                {items?.list.map((item) => {
-                    const id = getId(item);
-                    return (
-                        <SortableItem
-                            key={id}
-                            id={id}
-                            type={items.type}
-                            nodeData={items.nodeData}
-                            renderItem={(dragProps) => renderItem(item, dragProps)}
-                        />
-                    );
-                })}
-            </SortableContext>
-        </DndContext>
+            <DndContext
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+                modifiers={[restrictToVerticalAxis, restrictToContainer]}
+            >
+                <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
+                    {items?.list.map((item) => {
+                        const id = getId(item);
+                        return (
+                            <SortableItem
+                                key={id}
+                                id={id}
+                                type={items.type}
+                                nodeData={items.nodeData}
+                                renderItem={(dragProps) => renderItem(item, dragProps)}
+                            />
+                        );
+                    })}
+                </SortableContext>
+            </DndContext>
         </div>
     );
 }
