@@ -18,7 +18,7 @@ function CustomNode({ id, data }) {
   const nodeErrors = validationErrors?.current?.[id] ?? [];
   const hasErrors = data.isErrorShow && nodeErrors.length > 0;
 
-  const isStartNode = data.type === "start";
+  const isStartNode = data.type === "start" || data.type === "flowStart";
   const isConnected = data?.connected;
   const isDoubleOutport = data?.doubleHandler ?? false;
   const isSelfLoop = data?.successOutport?.[0] === id;
@@ -105,14 +105,9 @@ function CustomNode({ id, data }) {
   if (!data) return null;
 
   const typeClassName = `custom-node custom-node--${data.type ?? "default"}${data.isSearchHighlight ? " custom-node--search-highlight" : ""}${hasErrors ? " custom-node--has-errors" : ""}${isActive ? " custom-node--executing" : ""}${isExecuted ? " custom-node--executed" : ""}`;
-  const titleClassName =
-    data.type === "delay" || data.type === "jump"
-      ? "custom-node__header-delay"
-      : "custom-node__header";
-  const titleTextClassName =
-    data.type === "delay" || data.type === "jump"
-      ? "small-node-title"
-      : "custom-node__title";
+  const isSmallPill = data.type === "delay" || data.type === "jump" || data.type === "flow" || data.type === "flowStart";
+  const titleClassName = isSmallPill ? "custom-node__header-delay" : "custom-node__header";
+  const titleTextClassName = isSmallPill ? "small-node-title" : "custom-node__title";
 
   return (
     <div
@@ -159,7 +154,7 @@ function CustomNode({ id, data }) {
         </p>
       </div>
       {/* Description */}
-      {!(data.type === "delay" || data.type === "jump" || isSubNode) && (
+      {!isSmallPill && !isSubNode && (
         <p className="custom-node__description">{data.description || ""}</p>
       )}
       {/* Hover toolbar */}

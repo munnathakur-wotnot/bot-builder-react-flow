@@ -283,6 +283,14 @@ export const Icons = {
       ></path>
     </svg>
   ),
+  flow: (
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+      <rect x="1" y="5" width="6" height="4" rx="1.2" stroke="white" strokeWidth="1.3" />
+      <rect x="9" y="2" width="6" height="4" rx="1.2" stroke="white" strokeWidth="1.3" />
+      <rect x="9" y="10" width="6" height="4" rx="1.2" stroke="white" strokeWidth="1.3" />
+      <path d="M7 7h1.5M8.5 4h-2a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h2" stroke="white" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  ),
 };
 
 // ── Toolbar icons ────────────────────────────────────────────────

@@ -42,6 +42,7 @@ export function getMenuSelectionPayload({
   menuState,
   nodes,
   getNextNodeId,
+  activeFlowId = null,
 }) {
   if (!menuState?.nodeId) return null;
 
@@ -57,6 +58,7 @@ export function getMenuSelectionPayload({
     templates: MENU_NODE_TEMPLATES,
     getNextNodeId,
     sourceHandle: menuState.type,
+    activeFlowId,
   });
 
   const buildPayload = actionByOption[optionId];
@@ -119,6 +121,7 @@ export function bulkCreateFromSource({
   getNextNodeId,
   batchSize = 25,
   onComplete,
+  activeFlowId = null,
 }) {
   const sourceNodeId = menuState?.nodeId;
   if (!sourceNodeId) return;
@@ -143,6 +146,7 @@ export function bulkCreateFromSource({
         context: { sourceNode, sourceNodeId, allNodes: workingNodes },
         templates: MENU_NODE_TEMPLATES,
         getNextNodeId,
+        activeFlowId,
       });
 
       const buildPayload = actionByOption[optionId];

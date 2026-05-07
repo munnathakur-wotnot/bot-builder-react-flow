@@ -1,8 +1,9 @@
-﻿import React, { useCallback, useMemo, useRef, useState } from "react";
+﻿import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Background,
   Controls,
   MiniMap,
+  Panel,
   ReactFlow,
   SelectionMode,
   useEdgesState,
@@ -47,6 +48,7 @@ export default function CanvasFlow() {
   const [nuberOfNodes, setNumberOfNodes] = useState(0);
   const [menuState, setMenuState] = useState(null);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [activeFlowId, setActiveFlowId] = useState(null);
   const nextIdRef = useRef(2);
   const flowWrapperRef = useRef(null);
   const importFileRef = useRef(null);
@@ -63,6 +65,37 @@ export default function CanvasFlow() {
     () => validateAllNodesKeys(nodes),
     [nodes],
   );
+
+  // Flow scoping — all nodes/edges share one array; filter by top-level flowId
+  const visibleNodes = useMemo(
+    () => nodes.filter((n) => (n.flowId ?? null) === activeFlowId),
+    [nodes, activeFlowId],
+  );
+
+  const visibleEdges = useMemo(
+    () => edges.filter((e) => (e.flowId ?? null) === activeFlowId),
+    [edges, activeFlowId],
+  );
+
+  // Collect flow options from "flow" type nodes for the breadcrumb dropdown
+  const flowOptions = useMemo(() => {
+    return nodes
+      .filter((n) => n.data.type === "flow" && n.data.targetFlowId)
+      .map((n) => ({ id: n.data.targetFlowId, label: n.data.title || "Unnamed Flow" }));
+  }, [nodes]);
+
+  // Label of the currently active flow
+  const activeFlowLabel = useMemo(() => {
+    if (!activeFlowId) return null;
+    return flowOptions.find((f) => f.id === activeFlowId)?.label ?? "Flow";
+  }, [activeFlowId, flowOptions]);
+
+  // fitView whenever the active flow changes
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      fitView({ padding: 0.2, duration: 400 });
+    });
+  }, [activeFlowId, fitView]);
 
   const { isSimulating, simulationStore, startSimulation, stopSimulation } =
     useFlowSimulation();
@@ -169,6 +202,15 @@ export default function CanvasFlow() {
       _setSelectedNodeId(id);
     },
     [updateSingleNode],
+  );
+
+  const handleEnterFlow = useCallback(
+    (targetFlowId) => {
+      if (!targetFlowId) return;
+      setSelectedNodeIdUpdate();
+      setActiveFlowId(targetFlowId);
+    },
+    [setSelectedNodeIdUpdate],
   );
 
   const {
@@ -323,8 +365,8 @@ export default function CanvasFlow() {
         />
         <FlowCallbacksProvider value={flowCallbacks}>
           <ReactFlow
-            nodes={nodes}
-            edges={edges}
+            nodes={visibleNodes}
+            edges={visibleEdges}
             onMouseMove={onMouseMove}
             nodeTypes={nodeTypes}
             selectionMode={SelectionMode.Partial}
@@ -351,6 +393,66 @@ export default function CanvasFlow() {
             <StaticBackground />
             <MiniMap />
             <StaticControls />
+
+            {/* Flow breadcrumb panel */}
+            <Panel position="top-left" className="flow-scope-panel">
+              <div className="flow-scope-panel__breadcrumb">
+                {/* Home button */}
+                <button
+                  className={`flow-scope-panel__home${activeFlowId === null ? " flow-scope-panel__home--active" : ""}`}
+                  onClick={() => {
+                    setSelectedNodeIdUpdate();
+                    setActiveFlowId(null);
+                  }}
+                  title="Main Flow"
+                >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z" />
+                    <path d="M9 21V12h6v9" />
+                  </svg>
+                </button>
+
+                {/* Slash + current flow name — shown only when inside a sub-flow */}
+                {activeFlowId !== null && (
+                  <>
+                    <span className="flow-scope-panel__sep">/</span>
+                    <span className="flow-scope-panel__current">{activeFlowLabel}</span>
+                  </>
+                )}
+
+                {/* Dropdown chevron */}
+                {flowOptions.length > 0 && (
+                  <div className="flow-scope-panel__dropdown-wrap">
+                    <button className="flow-scope-panel__chevron" aria-label="Select flow">
+                      <svg width="10" height="10" viewBox="0 0 10 6" fill="none">
+                        <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </button>
+                    <select
+                      className="flow-scope-panel__hidden-select"
+                      value={activeFlowId ?? ""}
+                      onChange={(e) => {
+                        setSelectedNodeIdUpdate();
+                        setActiveFlowId(e.target.value || null);
+                      }}
+                    >
+                      <option value="">Main Flow</option>
+                      {flowOptions.map((flow) => (
+                        <option key={flow.id} value={flow.id}>
+                          {flow.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+              </div>
+
+              {/* Blocks counter */}
+              <div className="flow-scope-panel__blocks">
+                Blocks: {visibleNodes.filter((n) => !n.data.isSubNode).length}
+              </div>
+            </Panel>
+
             {selectedNodeIds.length >= 1 && (
               <MultiSelectToolbar
                 selectedIds={selectedNodeIds}
@@ -373,8 +475,8 @@ export default function CanvasFlow() {
               nuberOfNodes={nuberOfNodes}
               setNodes={setNodes}
               setEdges={setEdges}
-              // setSelectedNodeId={setSelectedNodeId}
               getNextNodeId={getNextNodeId}
+              activeFlowId={activeFlowId}
             />
           )}
 
@@ -387,12 +489,13 @@ export default function CanvasFlow() {
               setEdges={setEdges}
               getNextNodeId={getNextNodeId}
               onClose={setSelectedNodeIdUpdate}
+              onEnterFlow={handleEnterFlow}
             />
           )}
 
           <NodeSearchModal
             open={searchOpen}
-            nodes={nodes}
+            nodes={visibleNodes}
             onSelect={handleNodeFound}
             onClose={() => setSearchOpen(false)}
           />
