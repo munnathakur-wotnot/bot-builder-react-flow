@@ -25,6 +25,7 @@ import MultiSelectToolbar from "./MultiSelectToolbar";
 import NodeSearchModal from "./NodeSearchModal";
 import { validateAllNodesKeys } from "./validateNodes";
 import { useFlowSimulation } from "./hooks/useFlowSimulation";
+import useUpdateNode from "../../shared/hooks/useUpdateNode.js";
 
 const nodeTypes = { custom: CustomNode };
 const edgeTypes = { custom: CustomEdge };
@@ -40,7 +41,7 @@ const StaticControls = React.memo(function StaticControls() {
 export default function CanvasFlow() {
   const [nodes, setNodes, onNodesChange] = useNodesState(INITIAL_NODES);
   const [edges, setEdges, onEdgesChange] = useEdgesState(INITIAL_EDGES);
-  const [selectedNodeId, setSelectedNodeId] = useState(null);
+  const [selectedNodeId, _setSelectedNodeId] = useState(null);
   const [selectedNodeIds, setSelectedNodeIds] = useState([]);
   const [nuberOfNodes, setNumberOfNodes] = useState(0);
   const [menuState, setMenuState] = useState(null);
@@ -52,20 +53,18 @@ export default function CanvasFlow() {
   nodesRef.current = nodes;
   const isHandleClickRef = useRef(false);
   const validationErrors = useRef(null);
+  const { updateSingleNode } = useUpdateNode(setNodes);
 
   const { fitView } = useReactFlow();
+  const selectedNodeIdRef = useRef(null);
 
   validationErrors.current = useMemo(
     () => validateAllNodesKeys(nodes),
     [nodes],
   );
 
-  const {
-    isSimulating,
-    simulationStore,
-    startSimulation,
-    stopSimulation,
-  } = useFlowSimulation();
+  const { isSimulating, simulationStore, startSimulation, stopSimulation } =
+    useFlowSimulation();
 
   const { onGroupNodeDragStart, onGroupNodeDrag } = useGroupDrag(
     nodesRef,
@@ -93,13 +92,18 @@ export default function CanvasFlow() {
     [],
   );
 
+  const setSelectedNodeId = useCallback((id) => {
+    selectedNodeIdRef.current = id;
+    _setSelectedNodeId(id);
+  }, []);
+
   const handleNodeClick = useCallback((e, node) => {
     if (isHandleClickRef.current) return;
 
     if (!node.data.isSubNode) {
       setSelectedNodeId(node.id);
     } else {
-      setSelectedNodeId(null);
+      setSelectedNodeIdUpdate();
     }
     setMenuState(null);
   }, []);
@@ -117,6 +121,27 @@ export default function CanvasFlow() {
 
   const getNextNodeId = useCallback(() => `node_${nextIdRef.current++}`, []);
 
+  const setSelectedNodeIdUpdate = useCallback(
+    (id = null) => {
+      const prevSelectedId = selectedNodeIdRef.current;
+
+      // cleanup previous selected node
+      if (prevSelectedId) {
+        updateSingleNode(prevSelectedId, (node) => ({
+          ...node,
+          data: {
+            ...node.data,
+            isErrorShow: true,
+          },
+        }));
+      }
+
+      selectedNodeIdRef.current = id;
+      _setSelectedNodeId(id);
+    },
+    [updateSingleNode],
+  );
+
   const {
     deleteNode,
     copyNode,
@@ -129,7 +154,7 @@ export default function CanvasFlow() {
     edges,
     setNodes,
     setEdges,
-    setSelectedNodeId,
+    setSelectedNodeIdUpdate,
     getNextNodeId,
   });
 
@@ -157,13 +182,13 @@ export default function CanvasFlow() {
 
   const handlePaneClick = useCallback(() => {
     setMenuState(null);
-    setSelectedNodeId(null);
+    setSelectedNodeIdUpdate();
     setSelectedNodeIds([]);
   }, []);
 
   const onMove = useCallback(() => {
     setMenuState(null);
-    setSelectedNodeId(null);
+    setSelectedNodeIdUpdate();
   }, []);
 
   const handleNodeFound = useCallback(
@@ -223,7 +248,7 @@ export default function CanvasFlow() {
         try {
           const parsed = JSON.parse(evt.target.result);
           if (!Array.isArray(parsed.nodes) || !Array.isArray(parsed.edges)) {
-            alert("Invalid flow JSON: must have \"nodes\" and \"edges\" arrays.");
+            alert('Invalid flow JSON: must have "nodes" and "edges" arrays.');
             return;
           }
           setNodes(parsed.nodes);
@@ -318,7 +343,7 @@ export default function CanvasFlow() {
               nuberOfNodes={nuberOfNodes}
               setNodes={setNodes}
               setEdges={setEdges}
-              setSelectedNodeId={setSelectedNodeId}
+              // setSelectedNodeId={setSelectedNodeId}
               getNextNodeId={getNextNodeId}
             />
           )}
@@ -331,17 +356,16 @@ export default function CanvasFlow() {
               setNodes={setNodes}
               setEdges={setEdges}
               getNextNodeId={getNextNodeId}
-              onClose={() => setSelectedNodeId(null)}
+              onClose={setSelectedNodeIdUpdate}
             />
           )}
 
-          {searchOpen && (
-            <NodeSearchModal
-              nodes={nodes}
-              onSelect={handleNodeFound}
-              onClose={() => setSearchOpen(false)}
-            />
-          )}
+          <NodeSearchModal
+            open={searchOpen}
+            nodes={nodes}
+            onSelect={handleNodeFound}
+            onClose={() => setSearchOpen(false)}
+          />
         </FlowCallbacksProvider>
       </div>
     </div>

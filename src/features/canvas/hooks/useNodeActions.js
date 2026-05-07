@@ -13,7 +13,7 @@ export function useNodeActions({
   edges,
   setNodes,
   setEdges,
-  setSelectedNodeId,
+  // setSelectedNodeIdUpdate: setSelectedNodeId,
   getNextNodeId,
 }) {
   // Keep edges readable inside callbacks without adding it to deps.
@@ -49,9 +49,9 @@ export function useNodeActions({
         return remainingEdges;
       });
 
-      setSelectedNodeId((prev) => (idsToRemove.has(prev) ? null : prev));
+      // setSelectedNodeId((prev) => (idsToRemove.has(prev) ? null : prev));
     },
-    [nodesRef, setEdges, setNodes, setSelectedNodeId],
+    [nodesRef, setEdges, setNodes],
   );
 
   // ── Copy (to clipboard) ───────────────────────────────────────
@@ -59,7 +59,11 @@ export function useNodeActions({
     (nodeId) => {
       const node = nodesRef.current.find((n) => n.id === nodeId);
       if (!node) return;
-      const text = JSON.stringify({ type: node.data.type, data: node.data }, null, 2);
+      const text = JSON.stringify(
+        { type: node.data.type, data: node.data },
+        null,
+        2,
+      );
       navigator.clipboard?.writeText(text).catch(() => {});
     },
     [nodesRef],
@@ -82,7 +86,10 @@ export function useNodeActions({
           {
             id: newId,
             type: node.type,
-            position: { x: node.position.x + OFFSET_X, y: node.position.y + OFFSET_Y },
+            position: {
+              x: node.position.x + OFFSET_X,
+              y: node.position.y + OFFSET_Y,
+            },
             selected: false,
             dragging: false,
             data: {
@@ -97,7 +104,7 @@ export function useNodeActions({
             },
           },
         ]);
-        setSelectedNodeId(newId);
+        // setSelectedNodeId(newId);
         return;
       }
 
@@ -112,7 +119,10 @@ export function useNodeActions({
       const clonedRoot = {
         id: newCarouselId,
         type: node.type,
-        position: { x: node.position.x + OFFSET_X, y: node.position.y + OFFSET_Y },
+        position: {
+          x: node.position.x + OFFSET_X,
+          y: node.position.y + OFFSET_Y,
+        },
         selected: false,
         dragging: false,
         data: {
@@ -127,7 +137,10 @@ export function useNodeActions({
           cards: (node.data.cards ?? []).map((c) => ({
             ...c,
             id: idMap.get(c.id) ?? c.id,
-            buttons: (c.buttons ?? []).map((b) => ({ ...b, id: idMap.get(b.id) ?? b.id })),
+            buttons: (c.buttons ?? []).map((b) => ({
+              ...b,
+              id: idMap.get(b.id) ?? b.id,
+            })),
           })),
         },
       };
@@ -146,7 +159,12 @@ export function useNodeActions({
           outPorts: (m.data.outPorts ?? []).map((id) => idMap.get(id) ?? id),
           connected: m.data.connected ?? false,
           ...(m.data.buttons
-            ? { buttons: m.data.buttons.map((b) => ({ ...b, id: idMap.get(b.id) ?? b.id })) }
+            ? {
+                buttons: m.data.buttons.map((b) => ({
+                  ...b,
+                  id: idMap.get(b.id) ?? b.id,
+                })),
+              }
             : {}),
         },
       }));
@@ -163,14 +181,16 @@ export function useNodeActions({
 
       setNodes((nds) => [...nds, clonedRoot, ...clonedMembers]);
       setEdges((eds) => [...eds, ...clonedEdges]);
-      setSelectedNodeId(newCarouselId);
+      // setSelectedNodeId(newCarouselId);
     },
-    [nodesRef, getNextNodeId, setNodes, setEdges, setSelectedNodeId],
+    [nodesRef, getNextNodeId, setNodes, setEdges],
   );
 
   // ── Multi-select: delete all selected root nodes (+ their groups) ──
   const deleteNodes = useCallback(
-    (nodeIds) => { nodeIds.forEach((id) => deleteNode(id)); },
+    (nodeIds) => {
+      nodeIds.forEach((id) => deleteNode(id));
+    },
     [deleteNode],
   );
 
@@ -182,7 +202,9 @@ export function useNodeActions({
         .map((id) => allNodes.find((n) => n.id === id))
         .filter(Boolean)
         .map((n) => ({ type: n.data.type, data: n.data }));
-      navigator.clipboard?.writeText(JSON.stringify(items, null, 2)).catch(() => {});
+      navigator.clipboard
+        ?.writeText(JSON.stringify(items, null, 2))
+        .catch(() => {});
     },
     [nodesRef],
   );
@@ -219,12 +241,17 @@ export function useNodeActions({
 
         // For group members, the new groupId is the remapped carousel root id
         const originalGroupId = node.data?.groupId;
-        const newGroupId = originalGroupId ? idMap.get(originalGroupId) : undefined;
+        const newGroupId = originalGroupId
+          ? idMap.get(originalGroupId)
+          : undefined;
 
         clonedNodes.push({
           id: newId,
           type: node.type,
-          position: { x: node.position.x + OFFSET_X, y: node.position.y + OFFSET_Y },
+          position: {
+            x: node.position.x + OFFSET_X,
+            y: node.position.y + OFFSET_Y,
+          },
           selected: false,
           dragging: false,
           data: {
@@ -291,5 +318,12 @@ export function useNodeActions({
     [nodesRef, getNextNodeId, setNodes, setEdges],
   );
 
-  return { deleteNode, copyNode, cloneNode, deleteNodes, copyNodes, cloneNodes };
+  return {
+    deleteNode,
+    copyNode,
+    cloneNode,
+    deleteNodes,
+    copyNodes,
+    cloneNodes,
+  };
 }

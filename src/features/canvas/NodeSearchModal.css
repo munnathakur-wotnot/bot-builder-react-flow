@@ -1,147 +1,130 @@
-/* ── Overlay ─────────────────────────────────────────────────── */
 .node-search-overlay {
   position: fixed;
   inset: 0;
-  z-index: 2000;
-  background: rgba(15, 23, 42, 0.22);
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.35);
+
   display: flex;
   align-items: flex-start;
   justify-content: center;
+
   padding-top: 80px;
 }
 
-/* ── Modal panel ─────────────────────────────────────────────── */
 .node-search-modal {
-  width: 520px;
-  max-width: 90vw;
-  background: #fff;
+  width: 560px;
+  max-width: calc(100vw - 32px);
+
+  background: #111827;
+  border: 1px solid #374151;
   border-radius: 14px;
-  border: 1px solid #e4e7ec;
-  box-shadow: 0 12px 48px rgba(15, 23, 42, 0.18),
-    0 2px 8px rgba(15, 23, 42, 0.06);
+
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.45);
 }
 
-/* ── Search header ───────────────────────────────────────────── */
-.node-search-modal__header {
+.node-search-command {
+  width: 100%;
+}
+
+.node-search-header {
   display: flex;
   align-items: center;
   gap: 10px;
+
   padding: 14px 16px;
-  border-bottom: 1px solid #f2f4f7;
+
+  border-bottom: 1px solid #1f2937;
 }
 
-.node-search-modal__search-icon {
-  color: #98a2b3;
-  display: flex;
-  align-items: center;
+.node-search-icon {
+  color: #9ca3af;
   flex-shrink: 0;
 }
 
-.node-search-modal__input {
+.node-search-input {
   flex: 1;
+
+  background: transparent;
   border: none;
   outline: none;
-  font-size: 14.5px;
-  color: #101828;
-  background: transparent;
+
+  color: white;
+  font-size: 14px;
 }
 
-.node-search-modal__input::placeholder {
-  color: #98a2b3;
+.node-search-input::placeholder {
+  color: #6b7280;
 }
 
-.node-search-modal__esc {
+.node-search-esc {
+  border: 1px solid #374151;
+  background: #1f2937;
+
+  color: #9ca3af;
+
+  border-radius: 6px;
+  padding: 4px 8px;
+
   font-size: 11px;
-  font-weight: 500;
-  color: #98a2b3;
-  background: #f2f4f7;
-  border-radius: 5px;
-  padding: 3px 8px;
-  cursor: pointer;
-  user-select: none;
-  flex-shrink: 0;
-  transition: background 0.15s, color 0.15s;
 }
 
-.node-search-modal__esc:hover {
-  background: #e4e7ec;
-  color: #667085;
-}
-
-/* ── Scrollable list ─────────────────────────────────────────── */
-.node-search-modal__list {
+.node-search-list {
   max-height: 380px;
   overflow-y: auto;
-  padding: 6px 0 8px;
-  box-sizing: content-box;
+
+  padding: 8px;
 }
 
-.node-search-modal__list::-webkit-scrollbar {
-  width: 4px;
+.node-search-empty {
+  padding: 20px;
+  text-align: center;
+  color: #9ca3af;
 }
 
-.node-search-modal__list::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.node-search-modal__list::-webkit-scrollbar-thumb {
-  background: #e4e7ec;
-  border-radius: 4px;
-}
-
-/* ── Row item ────────────────────────────────────────────────── */
-.node-search-modal__item {
+.node-search-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+
   width: 100%;
-  border: none;
-  background: transparent;
-  padding: 9px 16px;
+
+  padding: 10px 12px;
+  border-radius: 10px;
+
   cursor: pointer;
-  text-align: left;
-  transition: background 0.1s;
+
+  color: white;
 }
 
-.node-search-modal__item--active,
-.node-search-modal__item:hover {
-  background: #f5f8ff;
+.node-search-item[data-selected="true"] {
+  background: #1f2937;
 }
 
-.node-search-modal__item-icon {
+.node-search-item-icon {
   width: 28px;
   height: 28px;
-  border-radius: 7px;
+
+  border-radius: 8px;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+
+  color: white;
   flex-shrink: 0;
-  font-size: 13px;
 }
 
-.node-search-modal__item-title {
+.node-search-item-title {
   flex: 1;
-  font-size: 13.5px;
-  color: #344054;
-  font-weight: 450;
+  font-size: 14px;
 }
 
-.node-search-modal__item-badge {
+.node-search-item-badge {
+  padding: 3px 8px;
+  border-radius: 999px;
+
   font-size: 11px;
-  font-weight: 600;
-  padding: 2px 9px;
-  border-radius: 20px;
-  flex-shrink: 0;
-}
-
-/* ── Empty state ─────────────────────────────────────────────── */
-.node-search-modal__empty {
-  padding: 24px 16px;
-  text-align: center;
-  color: #98a2b3;
-  font-size: 13px;
+  font-weight: 500;
 }

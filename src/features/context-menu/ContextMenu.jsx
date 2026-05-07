@@ -17,7 +17,6 @@ export default function ContextMenu({
   edges,
   setNodes,
   setEdges,
-  setSelectedNodeId,
   getNextNodeId,
   nuberOfNodes,
 }) {
@@ -44,19 +43,9 @@ export default function ContextMenu({
 
       setNodes(result.nodes);
       setEdges([...edges, ...result.edges]);
-      setSelectedNodeId(result.selectedNodeId);
       setMenuState(null);
     },
-    [
-      menuState,
-      nodes,
-      edges,
-      setNodes,
-      setEdges,
-      setSelectedNodeId,
-      getNextNodeId,
-      setMenuState,
-    ],
+    [menuState, nodes, edges, setNodes, setEdges, getNextNodeId, setMenuState],
   );
 
   const bulkAddFromSource = useCallback(
@@ -75,10 +64,9 @@ export default function ContextMenu({
         edges,
         totalToAdd,
         getNextNodeId,
-        onComplete: ({ nodes, edges, selectedNodeId }) => {
+        onComplete: ({ nodes, edges }) => {
           setNodes(nodes);
           setEdges(edges);
-          if (selectedNodeId) setSelectedNodeId(selectedNodeId);
           setMenuState(null);
         },
       });
@@ -92,7 +80,6 @@ export default function ContextMenu({
       handleSelect,
       setNodes,
       setEdges,
-      setSelectedNodeId,
       setMenuState,
     ],
   );
@@ -210,7 +197,6 @@ ContextMenu.propTypes = {
   edges: PropTypes.array.isRequired,
   setNodes: PropTypes.func.isRequired,
   setEdges: PropTypes.func.isRequired,
-  setSelectedNodeId: PropTypes.func.isRequired,
   getNextNodeId: PropTypes.func.isRequired,
   nuberOfNodes: PropTypes.number,
 };
