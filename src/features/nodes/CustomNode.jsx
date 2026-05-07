@@ -7,12 +7,8 @@ import NodeTooltips from "./NodeTooltips.jsx";
 import { useSimulationStatus } from "../../shared/hooks/useSimulationStatus";
 
 function CustomNode({ id, data }) {
-  const {
-    openMenu,
-    validationErrors,
-    simulationStore,
-    isHandleClickRef,
-  } = useFlowCallbacks();
+  const { openMenu, validationErrors, simulationStore, isHandleClickRef } =
+    useFlowCallbacks();
 
   // only this node re-renders when ITS simulation status changes
   const simulationStatus = useSimulationStatus(simulationStore, id);
@@ -20,7 +16,7 @@ function CustomNode({ id, data }) {
   const isExecuted = simulationStatus === "executed";
 
   const nodeErrors = validationErrors?.current?.[id] ?? [];
-  const hasErrors = nodeErrors.length > 0;
+  const hasErrors = data.isErrorShow && nodeErrors.length > 0;
 
   const isStartNode = data.type === "start";
   const isConnected = data?.connected;
@@ -100,7 +96,7 @@ function CustomNode({ id, data }) {
 
       document.addEventListener("mouseup", handleMouseUp);
     },
-    [handleOpenMenu, hasOutgoing, isSelfLoop],
+    [handleOpenMenu, hasOutgoing, isSelfLoop, isHandleClickRef],
   );
 
   const isSubNode = data?.isSubNode;
@@ -250,7 +246,9 @@ export default memo(CustomNode, (prev, next) => {
     prevData?.cards === nextData?.cards &&
     prevData?.fields === nextData?.fields &&
     prevData?.knowledgeBaseId === nextData?.knowledgeBaseId &&
-    prevData?.functionIds === nextData?.functionIds
+    prevData?.functionIds === nextData?.functionIds &&
+    prevData?.isErrorShow === nextData.isErrorShow &&
+    prevData?.isSearchHighlight === nextData?.isSearchHighlight
   );
 });
 

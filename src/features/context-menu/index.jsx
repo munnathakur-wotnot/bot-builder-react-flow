@@ -24,7 +24,6 @@ ConextMenuIndex.propTypes = {
     edges: PropTypes.array.isRequired,
     setNodes: PropTypes.func.isRequired,
     setEdges: PropTypes.func.isRequired,
-    setSelectedNodeId: PropTypes.func.isRequired,
     getNextNodeId: PropTypes.func.isRequired,
     nuberOfNodes: PropTypes.number,
 };

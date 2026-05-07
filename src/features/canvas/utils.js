@@ -41,6 +41,8 @@ export function createFlowNode({
       type: metaType,
       iCategory,
       isValidDragConn,
+      isErrorShow: false,
+      isSearchHighlight: false,
     },
   };
 
@@ -75,7 +77,7 @@ function getIncrementalTitle({ allNodes = [], metaType, baseTitle }) {
 }
 
 /* =========================================================
-   NODE CONFIG (🔥 MAIN IMPROVEMENT)
+   NODE CONFIG ( MAIN IMPROVEMENT)
 ========================================================= */
 
 function getNodeConfig(type, allNodes) {
