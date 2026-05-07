@@ -29,10 +29,20 @@ export default function FlowSelector({ selectedNode, updateNode, onEnterFlow }) 
         disabled={!targetFlowId}
       >
         Enter flow
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 8h10M9 4l4 4-4 4" />
+        </svg>
       </button>
     </div>
   );
 }
+
+FlowSelector.propTypes = {
+  selectedNode: PropTypes.object,
+  updateNode: PropTypes.func,
+  onEnterFlow: PropTypes.func,
+};
+
 
 FlowSelector.propTypes = {
   selectedNode: PropTypes.object,

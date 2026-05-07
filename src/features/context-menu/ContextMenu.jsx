@@ -110,7 +110,7 @@ export default function ContextMenu({
   return (
     <div
       className="context-menu"
-      style={{ top: menuState.y, left: menuState.x, maxHeight: menuHeight }}
+      style={{ top: menuState.y, left: menuState.x, maxHeight: menuHeight, transform: "translateX(-50%)" }}
       role="menu"
     >
       <div className="context-menu__header">

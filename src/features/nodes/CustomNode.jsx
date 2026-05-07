@@ -30,15 +30,20 @@ function CustomNode({ id, data }) {
     ? hasSuccessOutport && hasFailureOutport
     : data.outPorts?.length > 0;
 
-  // Safe menu open
+  // Safe menu open — centers on node X
   const handleOpenMenu = useCallback(
     ({ event, type, isSelfLoop, isMenuOpen }) => {
       event?.stopPropagation();
 
+      // event.currentTarget is null in mouseup callbacks — use event.target only
+      const nodeEl = event?.target?.closest?.(".react-flow__node");
+      const rect = nodeEl?.getBoundingClientRect();
+      const centerX = rect ? rect.left + rect.width / 2 : event?.clientX;
+
       openMenu({
         nodeId: id,
-        x: event?.clientX,
-        y: event?.clientY + 10,
+        x: centerX,
+        y: rect ? rect.bottom + 8 : (event?.clientY ?? 0) + 20,
         type,
         isSelfLoop,
         isMenuOpen,
@@ -56,8 +61,8 @@ function CustomNode({ id, data }) {
 
         openMenu({
           nodeId: id,
-          x: rect.left + 80,
-          y: rect.bottom + 10,
+          x: rect.left + rect.width / 2,
+          y: rect.bottom + 8,
         });
       }
     },

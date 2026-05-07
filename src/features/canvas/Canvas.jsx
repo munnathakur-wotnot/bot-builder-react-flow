@@ -1,9 +1,8 @@
-﻿import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+﻿import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
   Background,
   Controls,
   MiniMap,
-  Panel,
   ReactFlow,
   SelectionMode,
   useEdgesState,
@@ -28,6 +27,10 @@ import { validateAllNodesKeys } from "./validateNodes";
 import { useFlowSimulation } from "./hooks/useFlowSimulation";
 import useUpdateNode from "../../shared/hooks/useUpdateNode.js";
 import { useFlowPaste } from "./hooks/useFlowPaste.js";
+import { useFlowScope } from "./hooks/useFlowScope.js";
+import { useCanvasIO } from "./hooks/useCanvasIO.js";
+import FlowBreadcrumb from "./FlowBreadcrumb.jsx";
+import { useToast } from "../../shared/ui/feedback/Toast.jsx";
 
 const nodeTypes = { custom: CustomNode };
 const edgeTypes = { custom: CustomEdge };
@@ -41,6 +44,7 @@ const StaticControls = React.memo(function StaticControls() {
 });
 
 export default function CanvasFlow() {
+  // ── State ────────────────────────────────────────────────────
   const [nodes, setNodes, onNodesChange] = useNodesState(INITIAL_NODES);
   const [edges, setEdges, onEdgesChange] = useEdgesState(INITIAL_EDGES);
   const [selectedNodeId, _setSelectedNodeId] = useState(null);
@@ -48,54 +52,78 @@ export default function CanvasFlow() {
   const [nuberOfNodes, setNumberOfNodes] = useState(0);
   const [menuState, setMenuState] = useState(null);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [activeFlowId, setActiveFlowId] = useState(null);
+  const { ToastContainer } = useToast();
+
+  // ── Refs ─────────────────────────────────────────────────────
   const nextIdRef = useRef(2);
   const flowWrapperRef = useRef(null);
-  const importFileRef = useRef(null);
   const nodesRef = useRef(nodes);
   nodesRef.current = nodes;
   const isHandleClickRef = useRef(false);
   const validationErrors = useRef(null);
-  const { updateSingleNode } = useUpdateNode(setNodes);
-
-  const { fitView, screenToFlowPosition } = useReactFlow();
   const selectedNodeIdRef = useRef(null);
+  const pointerRef = useRef({ x: 100, y: 100 });
+
+  // ── React Flow ───────────────────────────────────────────────
+  const { fitView, screenToFlowPosition } = useReactFlow();
+  const { updateSingleNode } = useUpdateNode(setNodes);
 
   validationErrors.current = useMemo(
     () => validateAllNodesKeys(nodes),
     [nodes],
   );
 
-  // Flow scoping — all nodes/edges share one array; filter by top-level flowId
-  const visibleNodes = useMemo(
-    () => nodes.filter((n) => (n.flowId ?? null) === activeFlowId),
-    [nodes, activeFlowId],
+  // ── Helpers ──────────────────────────────────────────────────
+  const getNextNodeId = useCallback(() => `node_${nextIdRef.current++}`, []);
+
+  const setSelectedNodeId = useCallback((id) => {
+    selectedNodeIdRef.current = id;
+    _setSelectedNodeId(id);
+  }, []);
+
+  // Defined early so useFlowScope / useCanvasIO can receive it
+  const setSelectedNodeIdUpdate = useCallback(
+    (id = null) => {
+      const prevSelectedId = selectedNodeIdRef.current;
+      if (prevSelectedId) {
+        updateSingleNode(prevSelectedId, (node) => ({
+          ...node,
+          data: { ...node.data, isErrorShow: true },
+        }));
+      }
+      selectedNodeIdRef.current = id;
+      _setSelectedNodeId(id);
+    },
+    [updateSingleNode],
   );
 
-  const visibleEdges = useMemo(
-    () => edges.filter((e) => (e.flowId ?? null) === activeFlowId),
-    [edges, activeFlowId],
-  );
+  // ── Feature hooks ────────────────────────────────────────────
+  const {
+    activeFlowId,
+    visibleNodes,
+    visibleEdges,
+    flowOptions,
+    activeFlowLabel,
+    handleEnterFlow,
+    handleGoHome,
+    handleSelectFlow,
+  } = useFlowScope({ nodes, edges, setSelectedNodeIdUpdate });
 
-  // Collect flow options from "flow" type nodes for the breadcrumb dropdown
-  const flowOptions = useMemo(() => {
-    return nodes
-      .filter((n) => n.data.type === "flow" && n.data.targetFlowId)
-      .map((n) => ({ id: n.data.targetFlowId, label: n.data.title || "Unnamed Flow" }));
-  }, [nodes]);
+  const { importFileRef, handleImportChange, triggerImport, handleExport } =
+    useCanvasIO({ nodes, edges, setNodes, setEdges });
 
-  // Label of the currently active flow
-  const activeFlowLabel = useMemo(() => {
-    if (!activeFlowId) return null;
-    return flowOptions.find((f) => f.id === activeFlowId)?.label ?? "Flow";
-  }, [activeFlowId, flowOptions]);
+  const getCursorFlowPosition = () =>
+    screenToFlowPosition({ x: pointerRef.current.x, y: pointerRef.current.y });
 
-  // fitView whenever the active flow changes
-  useEffect(() => {
-    requestAnimationFrame(() => {
-      fitView({ padding: 0.2, duration: 400 });
-    });
-  }, [activeFlowId, fitView]);
+  useFlowPaste({
+    setNodes,
+    setEdges,
+    getNextNodeId,
+    fitView,
+    screenToFlowPosition,
+    getCursorFlowPosition,
+    activeFlowId,
+  });
 
   const { isSimulating, simulationStore, startSimulation, stopSimulation } =
     useFlowSimulation();
@@ -119,100 +147,6 @@ export default function CanvasFlow() {
     flowWrapperRef,
   });
 
-  const openMenu = useCallback(
-    ({ nodeId, x, y, type, isSelfLoop, isMenuOpen }) => {
-      setMenuState({ nodeId, x, y, type, isSelfLoop, isMenuOpen });
-    },
-    [],
-  );
-
-  const setSelectedNodeId = useCallback((id) => {
-    selectedNodeIdRef.current = id;
-    _setSelectedNodeId(id);
-  }, []);
-
-  const handleNodeClick = useCallback((e, node) => {
-    if (isHandleClickRef.current) return;
-
-    if (!node.data.isSubNode) {
-      setSelectedNodeId(node.id);
-    } else {
-      setSelectedNodeIdUpdate();
-    }
-    setMenuState(null);
-  }, []);
-
-  const handleSelectionChange = useCallback(({ nodes: selected }) => {
-    // Only track root-level selectable nodes (skip carousel sub-nodes)
-    const ids = (selected ?? [])
-      .filter(
-        (n) =>
-          n.data?.type !== "carouselCard" && n.data?.type !== "carouselButton",
-      )
-      .map((n) => n.id);
-    setSelectedNodeIds(ids);
-  }, []);
-
-  const getNextNodeId = useCallback(() => `node_${nextIdRef.current++}`, []);
-
-  const pointerRef = useRef({ x: 100, y: 100 });
-
-  const onMouseMove = useCallback((event) => {
-    const bounds = flowWrapperRef.current?.getBoundingClientRect();
-
-    if (!bounds) return;
-
-    pointerRef.current = {
-      x: event.clientX - bounds.left,
-      y: event.clientY - bounds.top,
-    };
-  }, []);
-  const getCursorFlowPosition = () => {
-    return screenToFlowPosition({
-      x: pointerRef.current.x,
-      y: pointerRef.current.y,
-    });
-  };
-
-  useFlowPaste({
-    setNodes,
-    setEdges,
-    getNextNodeId,
-    fitView,
-    screenToFlowPosition,
-    getCursorFlowPosition,
-  });
-
-  const setSelectedNodeIdUpdate = useCallback(
-    (id = null) => {
-      const prevSelectedId = selectedNodeIdRef.current;
-
-      // cleanup previous selected node
-      if (prevSelectedId) {
-        updateSingleNode(prevSelectedId, (node) => ({
-          ...node,
-          data: {
-            ...node.data,
-            isErrorShow: true,
-          },
-        }));
-      }
-
-      selectedNodeIdRef.current = id;
-      _setSelectedNodeId(id);
-    },
-    [updateSingleNode],
-  );
-
-  const handleEnterFlow = useCallback(
-    (targetFlowId) => {
-      if (!targetFlowId) return;
-      setSelectedNodeIdUpdate();
-      setActiveFlowId(targetFlowId);
-    },
-    [setSelectedNodeIdUpdate],
-  );
-
   const {
     deleteNode,
     copyNode,
@@ -229,6 +163,81 @@ export default function CanvasFlow() {
     getNextNodeId,
   });
 
+  // ── Event handlers ───────────────────────────────────────────
+  const openMenu = useCallback(
+    ({ nodeId, x, y, type, isSelfLoop, isMenuOpen }) => {
+      setMenuState({ nodeId, x, y, type, isSelfLoop, isMenuOpen });
+    },
+    [],
+  );
+
+  const handleNodeClick = useCallback(
+    (e, node) => {
+      if (isHandleClickRef.current) return;
+      if (!node.data.isSubNode) setSelectedNodeId(node.id);
+      else setSelectedNodeIdUpdate();
+      setMenuState(null);
+    },
+    [setSelectedNodeId, setSelectedNodeIdUpdate],
+  );
+
+  const handleSelectionChange = useCallback(({ nodes: selected }) => {
+    const ids = (selected ?? [])
+      .filter(
+        (n) =>
+          n.data?.type !== "carouselCard" && n.data?.type !== "carouselButton",
+      )
+      .map((n) => n.id);
+    setSelectedNodeIds(ids);
+  }, []);
+
+  const onMouseMove = useCallback((event) => {
+    const bounds = flowWrapperRef.current?.getBoundingClientRect();
+    if (!bounds) return;
+    pointerRef.current = {
+      x: event.clientX - bounds.left,
+      y: event.clientY - bounds.top,
+    };
+  }, []);
+
+  const handlePaneClick = useCallback(() => {
+    setMenuState(null);
+    setSelectedNodeIdUpdate();
+    setSelectedNodeIds([]);
+  }, [setSelectedNodeIdUpdate]);
+
+  const onMove = useCallback(() => {
+    setMenuState(null);
+    setSelectedNodeIdUpdate();
+  }, [setSelectedNodeIdUpdate]);
+
+  const handleNodeFound = useCallback(
+    (node) => {
+      setSearchOpen(false);
+      setSelectedNodeId(node.id);
+      setNodes((nds) =>
+        nds.map((n) =>
+          n.id === node.id
+            ? { ...n, data: { ...n.data, isSearchHighlight: true } }
+            : { ...n, data: { ...n.data, isSearchHighlight: false } },
+        ),
+      );
+      requestAnimationFrame(() =>
+        fitView({ nodes: [{ id: node.id }], duration: 600, padding: 0.5 }),
+      );
+      setTimeout(() => {
+        setNodes((nds) =>
+          nds.map((n) =>
+            n.data?.isSearchHighlight
+              ? { ...n, data: { ...n.data, isSearchHighlight: false } }
+              : n,
+          ),
+        );
+      }, 2500);
+    },
+    [fitView, setNodes, setSelectedNodeId],
+  );
+
   const flowCallbacks = useMemo(
     () => ({
       openMenu,
@@ -237,7 +246,7 @@ export default function CanvasFlow() {
       copyNode,
       cloneNode,
       validationErrors,
-      simulationStore, // stable ref — never changes, won't invalidate memo
+      simulationStore,
       isHandleClickRef,
     }),
     [
@@ -251,101 +260,17 @@ export default function CanvasFlow() {
     ],
   );
 
-  const handlePaneClick = useCallback(() => {
-    setMenuState(null);
-    setSelectedNodeIdUpdate();
-    setSelectedNodeIds([]);
-  }, []);
-
-  const onMove = useCallback(() => {
-    setMenuState(null);
-    setSelectedNodeIdUpdate();
-  }, []);
-
-  const handleNodeFound = useCallback(
-    (node) => {
-      setSearchOpen(false);
-      setSelectedNodeId(node.id);
-
-      // Temporarily highlight the node
-      setNodes((nds) =>
-        nds.map((n) =>
-          n.id === node.id
-            ? { ...n, data: { ...n.data, isSearchHighlight: true } }
-            : { ...n, data: { ...n.data, isSearchHighlight: false } },
-        ),
-      );
-
-      // Center on the node
-      requestAnimationFrame(() => {
-        fitView({
-          nodes: [{ id: node.id }],
-          duration: 600,
-          padding: 0.5,
-        });
-      });
-
-      // Remove highlight after 2.5s
-      setTimeout(() => {
-        setNodes((nds) =>
-          nds.map((n) =>
-            n.data?.isSearchHighlight
-              ? { ...n, data: { ...n.data, isSearchHighlight: false } }
-              : n,
-          ),
-        );
-      }, 2500);
-    },
-    [fitView, setNodes],
-  );
-
-  const handleExport = useCallback(() => {
-    const json = JSON.stringify({ nodes, edges }, null, 2);
-    const blob = new Blob([json], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "flow.json";
-    a.click();
-    URL.revokeObjectURL(url);
-  }, [nodes, edges]);
-
-  const handleImportFile = useCallback(
-    (e) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (evt) => {
-        try {
-          const parsed = JSON.parse(evt.target.result);
-          if (!Array.isArray(parsed.nodes) || !Array.isArray(parsed.edges)) {
-            alert('Invalid flow JSON: must have "nodes" and "edges" arrays.');
-            return;
-          }
-          setNodes(parsed.nodes);
-          setEdges(parsed.edges);
-          requestAnimationFrame(() => fitView({ padding: 0.2, duration: 400 }));
-        } catch {
-          alert("Failed to parse JSON file.");
-        }
-      };
-      reader.readAsText(file);
-      // reset so the same file can be re-imported
-      e.target.value = "";
-    },
-    [setNodes, setEdges, fitView],
-  );
-
+  // ── Render ───────────────────────────────────────────────────
   return (
     <div className="canvas-layout">
-      {/* Hidden file input for JSON import */}
       <input
         ref={importFileRef}
         type="file"
         accept=".json,application/json"
         style={{ display: "none" }}
-        onChange={handleImportFile}
+        onChange={handleImportChange}
       />
+
       <div className="flow-canvas" ref={flowWrapperRef}>
         <HeaderTooltip
           setNodes={setNodes}
@@ -360,9 +285,10 @@ export default function CanvasFlow() {
           isSimulating={isSimulating}
           onTest={() => startSimulation(nodes, edges)}
           onStopTest={stopSimulation}
-          onImport={() => importFileRef.current?.click()}
+          onImport={triggerImport}
           onExport={handleExport}
         />
+
         <FlowCallbacksProvider value={flowCallbacks}>
           <ReactFlow
             nodes={visibleNodes}
@@ -394,64 +320,14 @@ export default function CanvasFlow() {
             <MiniMap />
             <StaticControls />
 
-            {/* Flow breadcrumb panel */}
-            <Panel position="top-left" className="flow-scope-panel">
-              <div className="flow-scope-panel__breadcrumb">
-                {/* Home button */}
-                <button
-                  className={`flow-scope-panel__home${activeFlowId === null ? " flow-scope-panel__home--active" : ""}`}
-                  onClick={() => {
-                    setSelectedNodeIdUpdate();
-                    setActiveFlowId(null);
-                  }}
-                  title="Main Flow"
-                >
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z" />
-                    <path d="M9 21V12h6v9" />
-                  </svg>
-                </button>
-
-                {/* Slash + current flow name — shown only when inside a sub-flow */}
-                {activeFlowId !== null && (
-                  <>
-                    <span className="flow-scope-panel__sep">/</span>
-                    <span className="flow-scope-panel__current">{activeFlowLabel}</span>
-                  </>
-                )}
-
-                {/* Dropdown chevron */}
-                {flowOptions.length > 0 && (
-                  <div className="flow-scope-panel__dropdown-wrap">
-                    <button className="flow-scope-panel__chevron" aria-label="Select flow">
-                      <svg width="10" height="10" viewBox="0 0 10 6" fill="none">
-                        <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </button>
-                    <select
-                      className="flow-scope-panel__hidden-select"
-                      value={activeFlowId ?? ""}
-                      onChange={(e) => {
-                        setSelectedNodeIdUpdate();
-                        setActiveFlowId(e.target.value || null);
-                      }}
-                    >
-                      <option value="">Main Flow</option>
-                      {flowOptions.map((flow) => (
-                        <option key={flow.id} value={flow.id}>
-                          {flow.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-              </div>
-
-              {/* Blocks counter */}
-              <div className="flow-scope-panel__blocks">
-                Blocks: {visibleNodes.filter((n) => !n.data.isSubNode).length}
-              </div>
-            </Panel>
+            <FlowBreadcrumb
+              activeFlowId={activeFlowId}
+              activeFlowLabel={activeFlowLabel}
+              flowOptions={flowOptions}
+              visibleNodes={visibleNodes}
+              onGoHome={handleGoHome}
+              onSelectFlow={handleSelectFlow}
+            />
 
             {selectedNodeIds.length >= 1 && (
               <MultiSelectToolbar
@@ -501,6 +377,8 @@ export default function CanvasFlow() {
           />
         </FlowCallbacksProvider>
       </div>
+
+      <ToastContainer />
     </div>
   );
 }

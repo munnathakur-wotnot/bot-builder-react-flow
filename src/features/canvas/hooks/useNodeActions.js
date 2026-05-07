@@ -1,5 +1,6 @@
 import { useCallback, useRef } from "react";
 import { removeNodeConnectionsForEdges } from "../utils";
+import { pushToastGlobal } from "../../../shared/ui/feedback/Toast.jsx";
 
 /**
  * Encapsulates delete / copy / clone logic for canvas nodes.
@@ -87,7 +88,14 @@ export function useNodeActions({
 
       navigator.clipboard
         ?.writeText(JSON.stringify(payload, null, 2))
-        .catch(() => {});
+        .then(() => {
+          const label = node.data?.title ?? "Node";
+          const extra = nodesToCopy.length > 1 ? ` (+${nodesToCopy.length - 1} sub-nodes)` : "";
+          pushToastGlobal(`"${label}"${extra} copied.`, "info");
+        })
+        .catch(() => {
+          pushToastGlobal("Copy failed — clipboard access denied.", "error");
+        });
     },
     [nodesRef],
   );
@@ -252,7 +260,12 @@ export function useNodeActions({
 
       navigator.clipboard
         ?.writeText(JSON.stringify(payload, null, 2))
-        .catch(() => {});
+        .then(() => {
+          pushToastGlobal(`${nodeIds.length} node${nodeIds.length !== 1 ? "s" : ""} copied.`, "info");
+        })
+        .catch(() => {
+          pushToastGlobal("Copy failed — clipboard access denied.", "error");
+        });
     },
     [nodesRef],
   );
