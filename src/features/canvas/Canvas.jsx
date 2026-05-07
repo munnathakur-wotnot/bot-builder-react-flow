@@ -26,6 +26,7 @@ import NodeSearchModal from "./NodeSearchModal";
 import { validateAllNodesKeys } from "./validateNodes";
 import { useFlowSimulation } from "./hooks/useFlowSimulation";
 import useUpdateNode from "../../shared/hooks/useUpdateNode.js";
+import { useFlowPaste } from "./hooks/useFlowPaste.js";
 
 const nodeTypes = { custom: CustomNode };
 const edgeTypes = { custom: CustomEdge };
@@ -55,7 +56,7 @@ export default function CanvasFlow() {
   const validationErrors = useRef(null);
   const { updateSingleNode } = useUpdateNode(setNodes);
 
-  const { fitView } = useReactFlow();
+  const { fitView, screenToFlowPosition } = useReactFlow();
   const selectedNodeIdRef = useRef(null);
 
   validationErrors.current = useMemo(
@@ -120,6 +121,34 @@ export default function CanvasFlow() {
   }, []);
 
   const getNextNodeId = useCallback(() => `node_${nextIdRef.current++}`, []);
+
+  const pointerRef = useRef({ x: 100, y: 100 });
+
+  const onMouseMove = useCallback((event) => {
+    const bounds = flowWrapperRef.current?.getBoundingClientRect();
+
+    if (!bounds) return;
+
+    pointerRef.current = {
+      x: event.clientX - bounds.left,
+      y: event.clientY - bounds.top,
+    };
+  }, []);
+  const getCursorFlowPosition = () => {
+    return screenToFlowPosition({
+      x: pointerRef.current.x,
+      y: pointerRef.current.y,
+    });
+  };
+
+  useFlowPaste({
+    setNodes,
+    setEdges,
+    getNextNodeId,
+    fitView,
+    screenToFlowPosition,
+    getCursorFlowPosition,
+  });
 
   const setSelectedNodeIdUpdate = useCallback(
     (id = null) => {
@@ -296,6 +325,7 @@ export default function CanvasFlow() {
           <ReactFlow
             nodes={nodes}
             edges={edges}
+            onMouseMove={onMouseMove}
             nodeTypes={nodeTypes}
             selectionMode={SelectionMode.Partial}
             onlyRenderVisibleElements={true}
