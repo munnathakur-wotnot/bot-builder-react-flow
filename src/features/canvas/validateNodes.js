@@ -21,7 +21,7 @@ export function validateNodeKeys(node, allNodes, callFrom = "") {
   if (!d.title?.trim()) errorKeys.push("title");
 
   // ── Common: description ────────────
-  const noDescTypes = ["delay", "jump", "conditionRoot", "carousel"];
+  const noDescTypes = ["delay", "jump", "conditionRoot"];
   if (!noDescTypes.includes(type) && !d.description?.trim()) {
     errorKeys.push("description");
   }

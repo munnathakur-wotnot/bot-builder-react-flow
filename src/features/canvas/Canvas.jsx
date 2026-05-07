@@ -60,12 +60,8 @@ export default function CanvasFlow() {
     [nodes],
   );
 
-  const {
-    isSimulating,
-    simulationStore,
-    startSimulation,
-    stopSimulation,
-  } = useFlowSimulation();
+  const { isSimulating, simulationStore, startSimulation, stopSimulation } =
+    useFlowSimulation();
 
   const { onGroupNodeDragStart, onGroupNodeDrag } = useGroupDrag(
     nodesRef,
@@ -223,7 +219,7 @@ export default function CanvasFlow() {
         try {
           const parsed = JSON.parse(evt.target.result);
           if (!Array.isArray(parsed.nodes) || !Array.isArray(parsed.edges)) {
-            alert("Invalid flow JSON: must have \"nodes\" and \"edges\" arrays.");
+            alert('Invalid flow JSON: must have "nodes" and "edges" arrays.');
             return;
           }
           setNodes(parsed.nodes);
@@ -335,13 +331,12 @@ export default function CanvasFlow() {
             />
           )}
 
-          {searchOpen && (
-            <NodeSearchModal
-              nodes={nodes}
-              onSelect={handleNodeFound}
-              onClose={() => setSearchOpen(false)}
-            />
-          )}
+          <NodeSearchModal
+            open={searchOpen}
+            nodes={nodes}
+            onSelect={handleNodeFound}
+            onClose={() => setSearchOpen(false)}
+          />
         </FlowCallbacksProvider>
       </div>
     </div>
