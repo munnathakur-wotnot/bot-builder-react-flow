@@ -110,7 +110,12 @@ export default function ContextMenu({
   return (
     <div
       className="context-menu"
-      style={{ top: menuState.y, left: menuState.x, maxHeight: menuHeight, transform: "translateX(-50%)" }}
+      style={{
+        top: menuState.y,
+        left: menuState.x,
+        maxHeight: menuHeight,
+        transform: "translateX(-50%)",
+      }}
       role="menu"
     >
       <div className="context-menu__header">
@@ -202,6 +207,7 @@ ContextMenu.propTypes = {
   setEdges: PropTypes.func.isRequired,
   getNextNodeId: PropTypes.func.isRequired,
   nuberOfNodes: PropTypes.number,
+  activeFlowId: PropTypes.string,
 };
 
 ContextMenu.defaultProps = {

@@ -90,7 +90,10 @@ export function useNodeActions({
         ?.writeText(JSON.stringify(payload, null, 2))
         .then(() => {
           const label = node.data?.title ?? "Node";
-          const extra = nodesToCopy.length > 1 ? ` (+${nodesToCopy.length - 1} sub-nodes)` : "";
+          const extra =
+            nodesToCopy.length > 1
+              ? ` (+${nodesToCopy.length - 1} sub-nodes)`
+              : "";
           pushToastGlobal(`"${label}"${extra} copied.`, "info");
         })
         .catch(() => {
@@ -261,7 +264,10 @@ export function useNodeActions({
       navigator.clipboard
         ?.writeText(JSON.stringify(payload, null, 2))
         .then(() => {
-          pushToastGlobal(`${nodeIds.length} node${nodeIds.length !== 1 ? "s" : ""} copied.`, "info");
+          pushToastGlobal(
+            `${nodeIds.length} node${nodeIds.length !== 1 ? "s" : ""} copied.`,
+            "info",
+          );
         })
         .catch(() => {
           pushToastGlobal("Copy failed — clipboard access denied.", "error");
