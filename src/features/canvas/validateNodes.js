@@ -34,7 +34,7 @@ export function validateNodeKeys(node, allNodes, callFrom = "") {
     } else if (fields.some((f) => !f.label?.trim())) {
       const errors = {};
       fields.forEach((items) => {
-        if (!items.label.trim()) {
+        if (!items?.label?.trim()) {
           errors[items.id] = true;
         }
       });

@@ -24,3 +24,5 @@ docs
 *.sln
 *.sw?
 .tempfile/*
+
+.env

@@ -1,0 +1,1331 @@
+{
+    "id": "f6f00211-9a12-4e06-9f16-36dd9846cee8",
+    "zoom": 100,
+    "links": [
+        {
+            "id": "6594f781-c154-4d8d-8488-ff3386510bfe",
+            "type": "advanced",
+            "color": "rgba(255,255,255,0.5)",
+            "width": 3,
+            "extras": {},
+            "flowId": "7ac7b86f-1a99-490b-b868-398b421ddc35",
+            "labels": [],
+            "points": [
+                {
+                    "x": 402.640625,
+                    "y": 149,
+                    "id": "f56bcc01-8be4-4c42-8201-a3dfc1aef524",
+                    "selected": false
+                },
+                {
+                    "x": 420,
+                    "y": 229,
+                    "id": "a28c677d-b1e4-46b4-9599-ac6864086349",
+                    "selected": false
+                }
+            ],
+            "source": "7ac7b86f-1a99-490b-b868-398b421ddc35",
+            "target": "9310a28a-faf2-487e-a00e-0af4fe95a427",
+            "selected": false,
+            "curvyness": 50,
+            "sourcePort": "e9396429-b29d-493e-bb73-f9e57afe3b39",
+            "targetPort": "4e5efa91-1919-47d7-a20e-5b1c3ac4262a",
+            "isDeleteable": true
+        },
+        {
+            "id": "d55e8368-7233-475c-95ce-473d3d7d3a55",
+            "type": "advanced",
+            "color": "rgba(255,255,255,0.5)",
+            "width": 3,
+            "extras": {},
+            "flowId": "7ac7b86f-1a99-490b-b868-398b421ddc35",
+            "labels": [],
+            "points": [
+                {
+                    "x": 420,
+                    "y": 336,
+                    "id": "a64629bf-97b4-4779-886c-a8c8ad96907a",
+                    "selected": false
+                },
+                {
+                    "x": 420,
+                    "y": 384,
+                    "id": "b29091dc-03fc-497c-b24e-381d112d00f5",
+                    "selected": false
+                }
+            ],
+            "source": "9310a28a-faf2-487e-a00e-0af4fe95a427",
+            "target": "16b82344-2327-4fe4-8674-f0b9d1e91031",
+            "selected": false,
+            "curvyness": 50,
+            "sourcePort": "7b3833b5-6a35-4e24-b4ae-a4aec9c07938",
+            "targetPort": "f08a78fd-6688-455f-be5f-8b2634689a95",
+            "isDeleteable": true
+        },
+        {
+            "id": "55da9ca8-8df9-45cd-ab4c-a42c38a70fb0",
+            "type": "advanced",
+            "color": "rgba(255,255,255,0.5)",
+            "width": 3,
+            "extras": {},
+            "flowId": "7ac7b86f-1a99-490b-b868-398b421ddc35",
+            "labels": [],
+            "points": [
+                {
+                    "x": 419,
+                    "y": 455,
+                    "id": "ab57bee6-7872-4f16-a351-285671e38cee",
+                    "selected": false
+                },
+                {
+                    "x": 336,
+                    "y": 491.5,
+                    "id": "0682834c-c7b9-4d8d-a8dc-20e7d6027cfb",
+                    "selected": false
+                }
+            ],
+            "source": "16b82344-2327-4fe4-8674-f0b9d1e91031",
+            "target": "9a658541-748c-4779-943e-97d5d4c0e01a",
+            "selected": false,
+            "curvyness": 50,
+            "sourcePort": "64d74308-b272-4142-abd5-f0ba676262f6",
+            "targetPort": "f019f79d-5215-44a0-9f96-aa45d04e84a7",
+            "isDeleteable": false
+        },
+        {
+            "id": "39d43a1e-2969-4636-8578-53a4a084ccdc",
+            "type": "advanced",
+            "color": "rgba(255,255,255,0.5)",
+            "width": 3,
+            "extras": {},
+            "flowId": "7ac7b86f-1a99-490b-b868-398b421ddc35",
+            "labels": [],
+            "points": [
+                {
+                    "x": 337,
+                    "y": 526,
+                    "id": "b9a15a80-da0e-499e-863c-bdd72ee7c082",
+                    "selected": false
+                },
+                {
+                    "x": 336,
+                    "y": 566.5,
+                    "id": "77a8ecba-23dd-4e86-b5bd-ff4435981c35",
+                    "selected": false
+                }
+            ],
+            "source": "9a658541-748c-4779-943e-97d5d4c0e01a",
+            "target": "a667d188-60e9-4543-8880-0044187532df",
+            "selected": false,
+            "curvyness": 50,
+            "sourcePort": "804b9853-10e1-4648-8eab-a287f1fcad2d",
+            "targetPort": "82f963f6-1c43-4196-ad33-dd52796d2e18",
+            "isDeleteable": false
+        },
+        {
+            "id": "cd6814c7-130f-4c3a-bbe6-198a64ef4510",
+            "type": "advanced",
+            "color": "rgba(255,255,255,0.5)",
+            "width": 3,
+            "extras": {},
+            "flowId": "7ac7b86f-1a99-490b-b868-398b421ddc35",
+            "labels": [],
+            "points": [
+                {
+                    "x": 419,
+                    "y": 455,
+                    "id": "ba2795c1-661b-47f6-89a7-9d1e9f005885",
+                    "selected": false
+                },
+                {
+                    "x": 496,
+                    "y": 491.5,
+                    "id": "ed578258-3ae5-481d-943b-4690ce51e7b4",
+                    "selected": false
+                }
+            ],
+            "source": "16b82344-2327-4fe4-8674-f0b9d1e91031",
+            "target": "a402f6b8-97a3-49ae-bc5d-17ad28cd2815",
+            "selected": false,
+            "curvyness": 50,
+            "sourcePort": "64d74308-b272-4142-abd5-f0ba676262f6",
+            "targetPort": "5521731b-d3c6-49ca-9262-8cce07bc5b00",
+            "isDeleteable": false
+        },
+        {
+            "id": "0d44c1f7-1984-44d6-a149-42610a349237",
+            "type": "advanced",
+            "color": "rgba(255,255,255,0.5)",
+            "width": 3,
+            "extras": {},
+            "flowId": "7ac7b86f-1a99-490b-b868-398b421ddc35",
+            "labels": [],
+            "points": [
+                {
+                    "x": 497,
+                    "y": 526,
+                    "id": "21a18154-60ef-423a-82c5-e08e0c4149b4",
+                    "selected": false
+                },
+                {
+                    "x": 496,
+                    "y": 566.5,
+                    "id": "63802517-418e-46ba-a8fd-f208e6596c63",
+                    "selected": false
+                }
+            ],
+            "source": "a402f6b8-97a3-49ae-bc5d-17ad28cd2815",
+            "target": "6387e504-5920-422d-8cea-d887e91b5dfb",
+            "selected": false,
+            "curvyness": 50,
+            "sourcePort": "8b208ab2-34c6-47e2-981b-35fcc595f151",
+            "targetPort": "5539fd6a-87d4-45ae-a3ea-59c626d33ab7",
+            "isDeleteable": false
+        },
+        {
+            "id": "17fa38ef-e6f5-403f-8220-9a943f105679",
+            "type": "advanced",
+            "color": "rgba(255,255,255,0.5)",
+            "width": 3,
+            "extras": {},
+            "flowId": "7ac7b86f-1a99-490b-b868-398b421ddc35",
+            "labels": [],
+            "points": [
+                {
+                    "x": 496,
+                    "y": 597,
+                    "id": "e9bbc850-e0ff-46ea-a8dc-754a601157ce",
+                    "selected": false
+                },
+                {
+                    "x": 497,
+                    "y": 649,
+                    "id": "ff57cc27-a1cf-43a7-9992-614649c86b90",
+                    "selected": false
+                }
+            ],
+            "source": "6387e504-5920-422d-8cea-d887e91b5dfb",
+            "target": "b8eba047-3114-4d30-aeef-85a00c984c13",
+            "selected": false,
+            "curvyness": 50,
+            "sourcePort": "40d38d93-0268-4063-91a2-777e9417b678",
+            "targetPort": "2ae01eb4-377e-4fed-8520-dc64f730be2e",
+            "isDeleteable": true
+        },
+        {
+            "id": "8dcb31e8-f7e5-490b-8e3a-75c0064dfff3",
+            "type": "advanced",
+            "color": "rgba(255,255,255,0.5)",
+            "width": 3,
+            "extras": {},
+            "flowId": "7ac7b86f-1a99-490b-b868-398b421ddc35",
+            "labels": [],
+            "points": [
+                {
+                    "x": 497,
+                    "y": 756,
+                    "id": "9bfe23ec-ce35-4a94-b1b0-61135b00f4b6",
+                    "selected": false
+                },
+                {
+                    "x": 497,
+                    "y": 804,
+                    "id": "7adceed3-7a67-44ef-bf40-7b6054809c9c",
+                    "selected": false
+                }
+            ],
+            "source": "b8eba047-3114-4d30-aeef-85a00c984c13",
+            "target": "0f00822a-56e8-4253-bb92-bf3bc8f6b2a5",
+            "selected": false,
+            "curvyness": 50,
+            "sourcePort": "c5ad21f5-8b57-409c-9dba-c507889eb881",
+            "targetPort": "630555c6-a042-45dc-868e-a985e45d6bcb",
+            "isDeleteable": true
+        },
+        {
+            "id": "dd8cffcd-fa96-4d5b-a7f2-300d1a7b7126",
+            "type": "advanced",
+            "color": "rgba(255,255,255,0.5)",
+            "width": 3,
+            "extras": {},
+            "flowId": "7ac7b86f-1a99-490b-b868-398b421ddc35",
+            "labels": [],
+            "points": [
+                {
+                    "x": 455.65625,
+                    "y": 878,
+                    "id": "8b01dba9-cb92-4a64-9e8d-088aac0c3b43",
+                    "selected": false
+                },
+                {
+                    "x": 497,
+                    "y": 804,
+                    "id": "e4bc53dc-c51b-4cff-97a3-7dc5bbb25850",
+                    "selected": false
+                }
+            ],
+            "source": "0f00822a-56e8-4253-bb92-bf3bc8f6b2a5",
+            "target": "0f00822a-56e8-4253-bb92-bf3bc8f6b2a5",
+            "selected": false,
+            "curvyness": 50,
+            "sourcePort": "02a61ba8-b8e6-425b-9f88-bdb7467a22b3",
+            "targetPort": "630555c6-a042-45dc-868e-a985e45d6bcb",
+            "isDeleteable": true
+        },
+        {
+            "id": "51ff2d47-1e1d-49cf-8538-6e95c9d62cf1",
+            "type": "advanced",
+            "color": "rgba(255,255,255,0.5)",
+            "width": 3,
+            "extras": {},
+            "flowId": "7ac7b86f-1a99-490b-b868-398b421ddc35",
+            "labels": [],
+            "points": [
+                {
+                    "x": 544.328125,
+                    "y": 877,
+                    "id": "407d74a7-ec41-4ef7-9a0f-522ed7a76d9c",
+                    "selected": false
+                },
+                {
+                    "x": 561.515625,
+                    "y": 926,
+                    "id": "29cbbf5e-bdcf-4adf-9c52-69f3efa3c61e",
+                    "selected": false
+                }
+            ],
+            "source": "0f00822a-56e8-4253-bb92-bf3bc8f6b2a5",
+            "target": "f20bf748-9806-420a-9a22-e731c29d3137",
+            "selected": false,
+            "curvyness": 50,
+            "sourcePort": "a0f2934d-0614-4fe7-9478-44261a8bf025",
+            "targetPort": "81692352-2836-455e-914a-824b7e0e8be2",
+            "isDeleteable": true
+        },
+        {
+            "id": "6974c3ac-f172-496d-8678-900af11d9c30",
+            "type": "advanced",
+            "color": "rgba(255,255,255,0.5)",
+            "width": 3,
+            "extras": {},
+            "flowId": "7ac7b86f-1a99-490b-b868-398b421ddc35",
+            "labels": [],
+            "points": [
+                {
+                    "x": 558.4375,
+                    "y": 966,
+                    "id": "30b42b32-f0fa-4834-8599-39b256dbf80a",
+                    "selected": false
+                },
+                {
+                    "x": 621.375,
+                    "y": 1047,
+                    "id": "76155f1a-9b52-453c-ae37-872e4366dd6d",
+                    "selected": false
+                }
+            ],
+            "source": "f20bf748-9806-420a-9a22-e731c29d3137",
+            "target": "30503d43-8503-449b-94b6-f683da34987f",
+            "selected": false,
+            "curvyness": 50,
+            "sourcePort": "18283899-2b8a-4667-8928-e810360392a0",
+            "targetPort": "f212ca9b-83af-4951-8022-adbba581d377",
+            "isDeleteable": true
+        },
+        {
+            "id": "cd62fa0b-8271-4b93-8009-53d65ebe4107",
+            "type": "advanced",
+            "color": "rgba(255,255,255,0.5)",
+            "width": 3,
+            "extras": {},
+            "flowId": "4170b6d3-26ac-4345-a767-3c04045f0916",
+            "labels": [],
+            "points": [
+                {
+                    "x": 406.8125,
+                    "y": 101,
+                    "id": "fcae97e2-3da6-4fe8-8db4-f737d4ce0e65",
+                    "selected": false
+                },
+                {
+                    "x": 392,
+                    "y": 181,
+                    "id": "566abe3c-6289-4a24-b516-c661582cb376",
+                    "selected": false
+                }
+            ],
+            "source": "4170b6d3-26ac-4345-a767-3c04045f0916",
+            "target": "784f5840-ea75-4554-a74a-9021761f4faa",
+            "selected": false,
+            "curvyness": 50,
+            "sourcePort": "86786411-9c0b-466a-a116-711ef4a7b386",
+            "targetPort": "76fc37f8-fd4b-487f-8796-99ae5320193d",
+            "isDeleteable": true
+        }
+    ],
+    "nodes": [
+        {
+            "x": 348,
+            "y": 108,
+            "id": "7ac7b86f-1a99-490b-b868-398b421ddc35",
+            "type": "text",
+            "ports": [
+                {
+                    "id": "e9396429-b29d-493e-bb73-f9e57afe3b39",
+                    "in": false,
+                    "name": "bottom",
+                    "type": "default",
+                    "label": " ",
+                    "links": [
+                        "6594f781-c154-4d8d-8488-ff3386510bfe"
+                    ],
+                    "selected": false,
+                    "parentNode": "7ac7b86f-1a99-490b-b868-398b421ddc35",
+                    "maximumLinks": 1
+                }
+            ],
+            "extras": {
+                "config": {
+                    "title": "Bot starts",
+                    "dialog_type": "trigger",
+                    "is_supported": true,
+                    "is_valid_field": true,
+                    "is_valid_value": true,
+                    "extra_variables": [],
+                    "is_valid_operator": true,
+                    "messageAPIAddress": "",
+                    "is_number_selected": false,
+                    "trigger_conditions": [],
+                    "show_trigger_filters": false,
+                    "is_valid_dialog_title": true,
+                    "store_extra_variables": false,
+                    "is_data_injection_enabled": false,
+                    "startConversationAPIAddress": "",
+                    "trigger_conditions_error_map": [],
+                    "selected_channel_configuration": {
+                        "label": "",
+                        "value": null
+                    },
+                    "connected_channel_configuration": "",
+                    "user_message_subscription_preference": "subscribed",
+                    "show_user_message_subscription_preference": false
+                }
+            },
+            "flowId": "7ac7b86f-1a99-490b-b868-398b421ddc35",
+            "dormant": false,
+            "offsetX": "",
+            "offsetY": "",
+            "selected": false,
+            "dialogType": "trigger",
+            "infoBlocks": [],
+            "referencedAtJumpto": []
+        },
+        {
+            "x": 295,
+            "y": 229,
+            "id": "9310a28a-faf2-487e-a00e-0af4fe95a427",
+            "type": "text",
+            "ports": [
+                {
+                    "id": "4e5efa91-1919-47d7-a20e-5b1c3ac4262a",
+                    "in": true,
+                    "name": "top",
+                    "type": "default",
+                    "label": " ",
+                    "links": [
+                        "6594f781-c154-4d8d-8488-ff3386510bfe"
+                    ],
+                    "selected": false,
+                    "parentNode": "9310a28a-faf2-487e-a00e-0af4fe95a427",
+                    "maximumLinks": 1
+                },
+                {
+                    "id": "7b3833b5-6a35-4e24-b4ae-a4aec9c07938",
+                    "in": false,
+                    "name": "bottom",
+                    "type": "default",
+                    "label": " ",
+                    "links": [
+                        "d55e8368-7233-475c-95ce-473d3d7d3a55"
+                    ],
+                    "selected": false,
+                    "parentNode": "9310a28a-faf2-487e-a00e-0af4fe95a427",
+                    "maximumLinks": 1
+                }
+            ],
+            "extras": {
+                "config": {
+                    "text": "What is your…",
+                    "type": "text",
+                    "title": "Collect Input 1",
+                    "value": "3246534f-b92a-4932-9150-9763b23cede3",
+                    "content": "What is your…",
+                    "version": 2,
+                    "parameter": "",
+                    "input_type": {
+                        "label": "text",
+                        "value": "text"
+                    },
+                    "plain_text": "What is your…",
+                    "dialog_type": "input",
+                    "is_supported": true,
+                    "message_info": {
+                        "is_enabled": false,
+                        "is_disabled": false,
+                        "title_source": "",
+                        "title_content": "",
+                        "is_valid_title": true,
+                        "title_plain_text": "",
+                        "description_source": "",
+                        "description_content": "",
+                        "description_plain_text": ""
+                    },
+                    "regex_pattern": "",
+                    "is_valid_title": true,
+                    "failure_message": "",
+                    "parameter_label": "",
+                    "success_message": "",
+                    "fallback_message": "",
+                    "is_valid_dialog_title": true,
+                    "link_tracking_enabled": false,
+                    "is_valid_message_input": true,
+                    "is_valid_regex_pattern": true,
+                    "failure_message_content": "",
+                    "success_message_content": "",
+                    "fallback_message_content": "",
+                    "is_valid_failure_message": true,
+                    "failure_message_plain_text": "",
+                    "success_message_plain_text": "",
+                    "fallback_message_plain_text": ""
+                }
+            },
+            "flowId": "7ac7b86f-1a99-490b-b868-398b421ddc35",
+            "dormant": false,
+            "offsetX": "",
+            "offsetY": "",
+            "selected": false,
+            "dialogType": "input",
+            "infoBlocks": [],
+            "referencedAtJumpto": [
+                "30503d43-8503-449b-94b6-f683da34987f"
+            ]
+        },
+        {
+            "x": 295,
+            "y": 384,
+            "id": "16b82344-2327-4fe4-8674-f0b9d1e91031",
+            "type": "text",
+            "ports": [
+                {
+                    "id": "f08a78fd-6688-455f-be5f-8b2634689a95",
+                    "in": true,
+                    "name": "top",
+                    "type": "default",
+                    "label": " ",
+                    "links": [
+                        "d55e8368-7233-475c-95ce-473d3d7d3a55"
+                    ],
+                    "selected": false,
+                    "parentNode": "16b82344-2327-4fe4-8674-f0b9d1e91031",
+                    "maximumLinks": 1
+                },
+                {
+                    "id": "64d74308-b272-4142-abd5-f0ba676262f6",
+                    "in": false,
+                    "name": "bottom",
+                    "type": "default",
+                    "label": " ",
+                    "links": [
+                        "55da9ca8-8df9-45cd-ab4c-a42c38a70fb0",
+                        "cd6814c7-130f-4c3a-bbe6-198a64ef4510"
+                    ],
+                    "selected": false,
+                    "parentNode": "16b82344-2327-4fe4-8674-f0b9d1e91031",
+                    "maximumLinks": 1
+                }
+            ],
+            "extras": {
+                "config": {
+                    "type": "cardview",
+                    "title": "Carousel 1",
+                    "value": "c80c04d5-673f-40f9-840e-65e4af055ec6",
+                    "cardview": [
+                        {
+                            "file": {
+                                "name": "",
+                                "path": "",
+                                "size": "",
+                                "type": ""
+                            },
+                            "text": "Card description",
+                            "value": "c3a32889-b32f-490d-ab20-05b7b44dc7e3",
+                            "buttons": [
+                                {
+                                    "url": {
+                                        "link": "",
+                                        "target": "new"
+                                    },
+                                    "value": "9d4ae2c8-b074-4e3d-bc09-46b4c08895a9",
+                                    "action": {
+                                        "label": "branch",
+                                        "value": "branch"
+                                    },
+                                    "btn_text": "Button 1",
+                                    "btn_content": "Button 1",
+                                    "source_port": "dcc94bc1-e3df-49be-a7d3-b7797704e6e7",
+                                    "button_payload": {
+                                        "source": "",
+                                        "content": "",
+                                        "plain_text": ""
+                                    },
+                                    "custom_node_id": "a667d188-60e9-4543-8880-0044187532df",
+                                    "is_valid_input_url": true,
+                                    "is_valid_button_text": true
+                                }
+                            ],
+                            "content": "Card description",
+                            "item_title": "Card 1",
+                            "plain_text": "Card description",
+                            "source_port": "804b9853-10e1-4648-8eab-a287f1fcad2d",
+                            "custom_node_id": "9a658541-748c-4779-943e-97d5d4c0e01a",
+                            "is_valid_content": true,
+                            "is_valid_item_title": true
+                        },
+                        {
+                            "file": {
+                                "name": "",
+                                "path": "",
+                                "size": "",
+                                "type": ""
+                            },
+                            "text": "Card description",
+                            "value": "481fb32e-feb5-434b-b2b8-9209f0aa1ab1",
+                            "buttons": [
+                                {
+                                    "url": {
+                                        "link": "",
+                                        "target": "new"
+                                    },
+                                    "value": "0a62591a-9f4b-4e37-bec3-732ca9bcfd76",
+                                    "action": {
+                                        "label": "branch",
+                                        "value": "branch"
+                                    },
+                                    "btn_text": "Button 1",
+                                    "btn_content": "Button 1",
+                                    "source_port": "40d38d93-0268-4063-91a2-777e9417b678",
+                                    "button_payload": {
+                                        "source": "",
+                                        "content": "",
+                                        "plain_text": ""
+                                    },
+                                    "custom_node_id": "6387e504-5920-422d-8cea-d887e91b5dfb",
+                                    "is_valid_input_url": true,
+                                    "is_valid_button_text": true
+                                }
+                            ],
+                            "content": "Card description",
+                            "item_title": "Card 2",
+                            "plain_text": "Card description",
+                            "source_port": "8b208ab2-34c6-47e2-981b-35fcc595f151",
+                            "custom_node_id": "a402f6b8-97a3-49ae-bc5d-17ad28cd2815",
+                            "is_valid_content": true,
+                            "is_valid_item_title": true
+                        }
+                    ],
+                    "parameter": "",
+                    "dialog_type": "cardview",
+                    "is_supported": true,
+                    "parameter_label": "",
+                    "free_input_enabled": false,
+                    "is_valid_dialog_title": true,
+                    "link_tracking_enabled": false,
+                    "button_payload_response_variable": ""
+                }
+            },
+            "flowId": "7ac7b86f-1a99-490b-b868-398b421ddc35",
+            "dormant": false,
+            "offsetX": "",
+            "offsetY": "",
+            "selected": false,
+            "dialogType": "cardview",
+            "infoBlocks": [],
+            "referencedAtJumpto": []
+        },
+        {
+            "x": 295,
+            "y": 484,
+            "id": "9a658541-748c-4779-943e-97d5d4c0e01a",
+            "type": "text",
+            "ports": [
+                {
+                    "id": "f019f79d-5215-44a0-9f96-aa45d04e84a7",
+                    "in": true,
+                    "name": "top",
+                    "type": "default",
+                    "label": " ",
+                    "links": [
+                        "55da9ca8-8df9-45cd-ab4c-a42c38a70fb0"
+                    ],
+                    "selected": false,
+                    "parentNode": "9a658541-748c-4779-943e-97d5d4c0e01a",
+                    "maximumLinks": 1
+                },
+                {
+                    "id": "804b9853-10e1-4648-8eab-a287f1fcad2d",
+                    "in": false,
+                    "name": "bottom",
+                    "type": "default",
+                    "label": " ",
+                    "links": [
+                        "39d43a1e-2969-4636-8578-53a4a084ccdc"
+                    ],
+                    "selected": false,
+                    "parentNode": "9a658541-748c-4779-943e-97d5d4c0e01a",
+                    "maximumLinks": 1
+                }
+            ],
+            "extras": {
+                "config": {
+                    "text": "",
+                    "title": "Card 1",
+                    "parentType": "cardview",
+                    "dialog_type": "custom",
+                    "is_supported": true,
+                    "is_valid_dialog_title": true
+                }
+            },
+            "flowId": "7ac7b86f-1a99-490b-b868-398b421ddc35",
+            "dormant": false,
+            "offsetX": "",
+            "offsetY": "",
+            "selected": false,
+            "dialogType": "custom",
+            "infoBlocks": [],
+            "referencedAtJumpto": []
+        },
+        {
+            "x": 295,
+            "y": 559,
+            "id": "a667d188-60e9-4543-8880-0044187532df",
+            "type": "text",
+            "ports": [
+                {
+                    "id": "82f963f6-1c43-4196-ad33-dd52796d2e18",
+                    "in": true,
+                    "name": "top",
+                    "type": "default",
+                    "label": " ",
+                    "links": [
+                        "39d43a1e-2969-4636-8578-53a4a084ccdc"
+                    ],
+                    "selected": false,
+                    "parentNode": "a667d188-60e9-4543-8880-0044187532df",
+                    "maximumLinks": 1
+                },
+                {
+                    "id": "dcc94bc1-e3df-49be-a7d3-b7797704e6e7",
+                    "in": false,
+                    "name": "bottom",
+                    "type": "default",
+                    "label": " ",
+                    "links": [],
+                    "selected": false,
+                    "parentNode": "a667d188-60e9-4543-8880-0044187532df",
+                    "maximumLinks": 1
+                }
+            ],
+            "extras": {
+                "config": {
+                    "text": "",
+                    "title": "Button 1",
+                    "parentType": "cardview_branch",
+                    "dialog_type": "custom",
+                    "is_supported": true,
+                    "is_valid_dialog_title": true
+                }
+            },
+            "flowId": "7ac7b86f-1a99-490b-b868-398b421ddc35",
+            "dormant": false,
+            "offsetX": "",
+            "offsetY": "",
+            "selected": false,
+            "dialogType": "custom",
+            "infoBlocks": [],
+            "referencedAtJumpto": []
+        },
+        {
+            "x": 455,
+            "y": 484,
+            "id": "a402f6b8-97a3-49ae-bc5d-17ad28cd2815",
+            "type": "text",
+            "ports": [
+                {
+                    "id": "5521731b-d3c6-49ca-9262-8cce07bc5b00",
+                    "in": true,
+                    "name": "top",
+                    "type": "default",
+                    "label": " ",
+                    "links": [
+                        "cd6814c7-130f-4c3a-bbe6-198a64ef4510"
+                    ],
+                    "selected": false,
+                    "parentNode": "a402f6b8-97a3-49ae-bc5d-17ad28cd2815",
+                    "maximumLinks": 1
+                },
+                {
+                    "id": "8b208ab2-34c6-47e2-981b-35fcc595f151",
+                    "in": false,
+                    "name": "bottom",
+                    "type": "default",
+                    "label": " ",
+                    "links": [
+                        "0d44c1f7-1984-44d6-a149-42610a349237"
+                    ],
+                    "selected": false,
+                    "parentNode": "a402f6b8-97a3-49ae-bc5d-17ad28cd2815",
+                    "maximumLinks": 1
+                }
+            ],
+            "extras": {
+                "config": {
+                    "text": "",
+                    "title": "Card 2",
+                    "parentType": "cardview",
+                    "dialog_type": "custom",
+                    "is_supported": true,
+                    "is_valid_dialog_title": true
+                }
+            },
+            "flowId": "7ac7b86f-1a99-490b-b868-398b421ddc35",
+            "dormant": false,
+            "offsetX": "",
+            "offsetY": "",
+            "selected": false,
+            "dialogType": "custom",
+            "infoBlocks": [],
+            "referencedAtJumpto": []
+        },
+        {
+            "x": 455,
+            "y": 559,
+            "id": "6387e504-5920-422d-8cea-d887e91b5dfb",
+            "type": "text",
+            "ports": [
+                {
+                    "id": "5539fd6a-87d4-45ae-a3ea-59c626d33ab7",
+                    "in": true,
+                    "name": "top",
+                    "type": "default",
+                    "label": " ",
+                    "links": [
+                        "0d44c1f7-1984-44d6-a149-42610a349237"
+                    ],
+                    "selected": false,
+                    "parentNode": "6387e504-5920-422d-8cea-d887e91b5dfb",
+                    "maximumLinks": 1
+                },
+                {
+                    "id": "40d38d93-0268-4063-91a2-777e9417b678",
+                    "in": false,
+                    "name": "bottom",
+                    "type": "default",
+                    "label": " ",
+                    "links": [
+                        "17fa38ef-e6f5-403f-8220-9a943f105679"
+                    ],
+                    "selected": false,
+                    "parentNode": "6387e504-5920-422d-8cea-d887e91b5dfb",
+                    "maximumLinks": 1
+                }
+            ],
+            "extras": {
+                "config": {
+                    "text": "",
+                    "title": "Button 1",
+                    "parentType": "cardview_branch",
+                    "dialog_type": "custom",
+                    "is_supported": true,
+                    "is_valid_dialog_title": true
+                }
+            },
+            "flowId": "7ac7b86f-1a99-490b-b868-398b421ddc35",
+            "dormant": false,
+            "offsetX": "",
+            "offsetY": "",
+            "selected": false,
+            "dialogType": "custom",
+            "infoBlocks": [],
+            "referencedAtJumpto": []
+        },
+        {
+            "x": 372,
+            "y": 649,
+            "id": "b8eba047-3114-4d30-aeef-85a00c984c13",
+            "type": "text",
+            "ports": [
+                {
+                    "id": "2ae01eb4-377e-4fed-8520-dc64f730be2e",
+                    "in": true,
+                    "name": "top",
+                    "type": "default",
+                    "label": " ",
+                    "links": [
+                        "17fa38ef-e6f5-403f-8220-9a943f105679"
+                    ],
+                    "selected": false,
+                    "parentNode": "b8eba047-3114-4d30-aeef-85a00c984c13",
+                    "maximumLinks": 1
+                },
+                {
+                    "id": "c5ad21f5-8b57-409c-9dba-c507889eb881",
+                    "in": false,
+                    "name": "bottom",
+                    "type": "default",
+                    "label": " ",
+                    "links": [
+                        "8dcb31e8-f7e5-490b-8e3a-75c0064dfff3"
+                    ],
+                    "selected": false,
+                    "parentNode": "b8eba047-3114-4d30-aeef-85a00c984c13",
+                    "maximumLinks": 1
+                }
+            ],
+            "extras": {
+                "config": {
+                    "text": "Please fill in the following details",
+                    "title": "Form 1",
+                    "value": "111bd770-3c21-484a-bb6f-7a6682b56e10",
+                    "content": "Please fill in the following details",
+                    "version": 2,
+                    "plain_text": "Please fill in the following details",
+                    "dialog_type": "form",
+                    "form_fields": [
+                        {
+                            "icon": "icon-name",
+                            "value": "ea747a38-97dd-494a-9071-0a5325cc1733",
+                            "parameter": "",
+                            "field_name": "Name",
+                            "parameter_label": "¿·$user.info.name·?",
+                            "saved_parameter": "",
+                            "is_optional_field": false,
+                            "is_valid_field_name": true
+                        },
+                        {
+                            "icon": "icon-mail",
+                            "value": "b19f7ec6-e16c-4539-aa11-862d8af092bb",
+                            "parameter": "",
+                            "field_name": "Email",
+                            "parameter_label": "¿·$user.info.email·?",
+                            "saved_parameter": "",
+                            "is_optional_field": false,
+                            "is_valid_field_name": true
+                        },
+                        {
+                            "icon": "icon-phone",
+                            "value": "6a132d1d-2a6f-49b0-ada2-13eb9426be34",
+                            "parameter": "",
+                            "field_name": "Phone",
+                            "parameter_label": "¿·$user.info.phone·?",
+                            "saved_parameter": "",
+                            "is_optional_field": false,
+                            "is_valid_field_name": true
+                        }
+                    ],
+                    "is_supported": true,
+                    "message_info": {
+                        "is_enabled": false,
+                        "is_disabled": false,
+                        "title_source": "",
+                        "title_content": "",
+                        "is_valid_title": true,
+                        "title_plain_text": "",
+                        "description_source": "",
+                        "description_content": "",
+                        "description_plain_text": ""
+                    },
+                    "is_valid_dialog_title": true,
+                    "link_tracking_enabled": false,
+                    "is_valid_message_input": true
+                }
+            },
+            "flowId": "7ac7b86f-1a99-490b-b868-398b421ddc35",
+            "dormant": false,
+            "offsetX": "",
+            "offsetY": "",
+            "selected": false,
+            "dialogType": "form",
+            "infoBlocks": [],
+            "referencedAtJumpto": []
+        },
+        {
+            "x": 372,
+            "y": 804,
+            "id": "0f00822a-56e8-4253-bb92-bf3bc8f6b2a5",
+            "type": "text",
+            "ports": [
+                {
+                    "id": "630555c6-a042-45dc-868e-a985e45d6bcb",
+                    "in": true,
+                    "name": "top",
+                    "type": "default",
+                    "label": " ",
+                    "links": [
+                        "8dcb31e8-f7e5-490b-8e3a-75c0064dfff3",
+                        "dd8cffcd-fa96-4d5b-a7f2-300d1a7b7126"
+                    ],
+                    "selected": false,
+                    "parentNode": "0f00822a-56e8-4253-bb92-bf3bc8f6b2a5",
+                    "maximumLinks": 1
+                },
+                {
+                    "id": "02a61ba8-b8e6-425b-9f88-bdb7467a22b3",
+                    "in": false,
+                    "name": "bottomLeft",
+                    "type": "default",
+                    "label": " ",
+                    "links": [
+                        "dd8cffcd-fa96-4d5b-a7f2-300d1a7b7126"
+                    ],
+                    "selected": false,
+                    "parentNode": "0f00822a-56e8-4253-bb92-bf3bc8f6b2a5",
+                    "maximumLinks": 1
+                },
+                {
+                    "id": "a0f2934d-0614-4fe7-9478-44261a8bf025",
+                    "in": false,
+                    "name": "bottomRight",
+                    "type": "default",
+                    "label": " ",
+                    "links": [
+                        "51ff2d47-1e1d-49cf-8538-6e95c9d62cf1"
+                    ],
+                    "selected": false,
+                    "parentNode": "0f00822a-56e8-4253-bb92-bf3bc8f6b2a5",
+                    "maximumLinks": 1
+                }
+            ],
+            "extras": {
+                "config": {
+                    "title": "Answer AI 1",
+                    "top_k": 1,
+                    "persona": {
+                        "source": "You are a smart assistant.  You will try to answer the questions from the context information provided to you. Always try to provide responses in a HTML format. If not possible, provide response in plain text. If you do not have the answer to the question asked, respond with “Sorry, I do not know the answer to this. Can you try asking something else?“",
+                        "content": "You are a smart assistant.  You will try to answer the questions from the context information provided to you. Always try to provide responses in a HTML format. If not possible, provide response in plain text. If you do not have the answer to the question asked, respond with “Sorry, I do not know the answer to this. Can you try asking something else?“",
+                        "plain_text": "You are a smart assistant.  You will try to answer the questions from the context information provided to you. Always try to provide responses in a HTML format. If not possible, provide response in plain text. If you do not have the answer to the question asked, respond with “Sorry, I do not know the answer to this. Can you try asking something else?“"
+                    },
+                    "question": {
+                        "source": "How can I help you?",
+                        "content": "How can I help you?",
+                        "plain_text": "How can I help you?"
+                    },
+                    "functions": [],
+                    "model_name": "gpt-4o",
+                    "dialog_type": "faq",
+                    "is_supported": true,
+                    "message_info": {
+                        "is_enabled": false,
+                        "is_disabled": false,
+                        "title_source": "",
+                        "title_content": "",
+                        "is_valid_title": true,
+                        "title_plain_text": "",
+                        "description_source": "",
+                        "description_content": "",
+                        "description_plain_text": ""
+                    },
+                    "display_as_file": false,
+                    "display_as_list": false,
+                    "is_valid_persona": true,
+                    "is_variable_empty": false,
+                    "knowledge_base_id": null,
+                    "display_as_buttons": false,
+                    "display_as_carousel": false,
+                    "is_feedback_enabled": true,
+                    "is_valid_model_name": true,
+                    "restrict_answer_size": "256",
+                    "is_valid_dialog_title": true,
+                    "creativity_in_response": "0.5",
+                    "is_chat_history_enabled": false,
+                    "context_of_conversations": 1,
+                    "is_answer_contain_source": false,
+                    "is_valid_knowledge_base_id": true,
+                    "is_valid_restrict_answer_size": true,
+                    "is_valid_creativity_in_response": true
+                }
+            },
+            "flowId": "7ac7b86f-1a99-490b-b868-398b421ddc35",
+            "dormant": false,
+            "offsetX": "",
+            "offsetY": "",
+            "selected": false,
+            "dialogType": "faq",
+            "infoBlocks": [],
+            "referencedAtJumpto": []
+        },
+        {
+            "x": 515,
+            "y": 925,
+            "id": "f20bf748-9806-420a-9a22-e731c29d3137",
+            "type": "text",
+            "ports": [
+                {
+                    "id": "81692352-2836-455e-914a-824b7e0e8be2",
+                    "in": true,
+                    "name": "top",
+                    "type": "default",
+                    "label": " ",
+                    "links": [
+                        "51ff2d47-1e1d-49cf-8538-6e95c9d62cf1"
+                    ],
+                    "selected": false,
+                    "parentNode": "f20bf748-9806-420a-9a22-e731c29d3137",
+                    "maximumLinks": 1
+                },
+                {
+                    "id": "18283899-2b8a-4667-8928-e810360392a0",
+                    "in": false,
+                    "name": "bottom",
+                    "type": "default",
+                    "label": " ",
+                    "links": [
+                        "6974c3ac-f172-496d-8678-900af11d9c30"
+                    ],
+                    "selected": false,
+                    "parentNode": "f20bf748-9806-420a-9a22-e731c29d3137",
+                    "maximumLinks": 1
+                }
+            ],
+            "extras": {
+                "config": {
+                    "title": "Flow 1",
+                    "dialog_type": "flow",
+                    "is_supported": true,
+                    "flow_start_id": "4170b6d3-26ac-4345-a767-3c04045f0916",
+                    "is_valid_dialog_title": true
+                }
+            },
+            "flowId": "7ac7b86f-1a99-490b-b868-398b421ddc35",
+            "dormant": false,
+            "offsetX": "",
+            "offsetY": "",
+            "selected": false,
+            "dialogType": "flow",
+            "infoBlocks": [],
+            "referencedAtJumpto": []
+        },
+        {
+            "x": 572,
+            "y": 1046,
+            "id": "30503d43-8503-449b-94b6-f683da34987f",
+            "type": "text",
+            "ports": [
+                {
+                    "id": "f212ca9b-83af-4951-8022-adbba581d377",
+                    "in": true,
+                    "name": "top",
+                    "type": "default",
+                    "label": " ",
+                    "links": [
+                        "6974c3ac-f172-496d-8678-900af11d9c30"
+                    ],
+                    "selected": false,
+                    "parentNode": "30503d43-8503-449b-94b6-f683da34987f",
+                    "maximumLinks": 1
+                }
+            ],
+            "extras": {
+                "config": {
+                    "title": "Jump 1",
+                    "dialog_type": "jump_to",
+                    "is_supported": true,
+                    "selected_block": {
+                        "label": "Collect Input 1",
+                        "value": "9310a28a-faf2-487e-a00e-0af4fe95a427",
+                        "dialogType": "input"
+                    },
+                    "is_valid_dialog_title": true,
+                    "is_selected_block_empty": false
+                }
+            },
+            "flowId": "7ac7b86f-1a99-490b-b868-398b421ddc35",
+            "dormant": false,
+            "offsetX": "",
+            "offsetY": "",
+            "selected": false,
+            "dialogType": "jump_to",
+            "infoBlocks": [],
+            "referencedAtJumpto": []
+        },
+        {
+            "x": 320,
+            "y": 60,
+            "id": "4170b6d3-26ac-4345-a767-3c04045f0916",
+            "type": "text",
+            "ports": [
+                {
+                    "id": "86786411-9c0b-466a-a116-711ef4a7b386",
+                    "in": false,
+                    "name": "bottom",
+                    "type": "default",
+                    "label": " ",
+                    "links": [
+                        "cd62fa0b-8271-4b93-8009-53d65ebe4107"
+                    ],
+                    "selected": false,
+                    "parentNode": "4170b6d3-26ac-4345-a767-3c04045f0916",
+                    "maximumLinks": 1
+                }
+            ],
+            "extras": {
+                "config": {
+                    "title": "Flow 1 - Flow starts",
+                    "dialog_type": "flow_start",
+                    "is_supported": true,
+                    "parentNodeID": "f20bf748-9806-420a-9a22-e731c29d3137",
+                    "is_valid_dialog_title": true
+                }
+            },
+            "flowId": "4170b6d3-26ac-4345-a767-3c04045f0916",
+            "dormant": false,
+            "offsetX": "",
+            "offsetY": "",
+            "selected": false,
+            "dialogType": "flow_start",
+            "infoBlocks": [],
+            "referencedAtJumpto": []
+        },
+        {
+            "x": 267,
+            "y": 181,
+            "id": "784f5840-ea75-4554-a74a-9021761f4faa",
+            "type": "text",
+            "ports": [
+                {
+                    "id": "76fc37f8-fd4b-487f-8796-99ae5320193d",
+                    "in": true,
+                    "name": "top",
+                    "type": "default",
+                    "label": " ",
+                    "links": [
+                        "cd62fa0b-8271-4b93-8009-53d65ebe4107"
+                    ],
+                    "selected": false,
+                    "parentNode": "784f5840-ea75-4554-a74a-9021761f4faa",
+                    "maximumLinks": 1
+                },
+                {
+                    "id": "a2deecb0-8cbe-41ca-85d9-21c621cae526",
+                    "in": false,
+                    "name": "bottom",
+                    "type": "default",
+                    "label": " ",
+                    "links": [],
+                    "selected": false,
+                    "parentNode": "784f5840-ea75-4554-a74a-9021761f4faa",
+                    "maximumLinks": 1
+                }
+            ],
+            "extras": {
+                "config": {
+                    "text": "Please fill in the following details",
+                    "title": "Form 2",
+                    "value": "ccca80ff-8dd7-46c6-adad-4b71933ed82e",
+                    "content": "Please fill in the following details",
+                    "version": 2,
+                    "plain_text": "Please fill in the following details",
+                    "dialog_type": "form",
+                    "form_fields": [
+                        {
+                            "icon": "icon-name",
+                            "value": "d2a2b6f6-0407-4b67-b49b-adf1cd08d9a7",
+                            "parameter": "",
+                            "field_name": "Name",
+                            "parameter_label": "¿·$user.info.name·?",
+                            "saved_parameter": "",
+                            "is_optional_field": false,
+                            "is_valid_field_name": true
+                        },
+                        {
+                            "icon": "icon-mail",
+                            "value": "9877edfe-e8d7-4f20-a0cc-6d27d5278821",
+                            "parameter": "",
+                            "field_name": "Email",
+                            "parameter_label": "¿·$user.info.email·?",
+                            "saved_parameter": "",
+                            "is_optional_field": false,
+                            "is_valid_field_name": true
+                        },
+                        {
+                            "icon": "icon-phone",
+                            "value": "0fad06f1-8307-439a-958b-aec749dd6ec4",
+                            "parameter": "",
+                            "field_name": "Phone",
+                            "parameter_label": "¿·$user.info.phone·?",
+                            "saved_parameter": "",
+                            "is_optional_field": false,
+                            "is_valid_field_name": true
+                        }
+                    ],
+                    "is_supported": true,
+                    "message_info": {
+                        "is_enabled": false,
+                        "is_disabled": false,
+                        "title_source": "",
+                        "title_content": "",
+                        "is_valid_title": true,
+                        "title_plain_text": "",
+                        "description_source": "",
+                        "description_content": "",
+                        "description_plain_text": ""
+                    },
+                    "is_valid_dialog_title": true,
+                    "link_tracking_enabled": false,
+                    "is_valid_message_input": true
+                }
+            },
+            "flowId": "4170b6d3-26ac-4345-a767-3c04045f0916",
+            "dormant": false,
+            "offsetX": "",
+            "offsetY": "",
+            "selected": false,
+            "dialogType": "form",
+            "infoBlocks": [],
+            "referencedAtJumpto": []
+        }
+    ],
+    "offsetX": 583,
+    "offsetY": 151,
+    "version": 2,
+    "gridSize": 0,
+    "extraInfo": {
+        "faq": 1,
+        "file": 1,
+        "flow": 1,
+        "form": 2,
+        "input": 1,
+        "buttons": 2,
+        "jump_to": 1,
+        "cardview": 1
+    },
+    "hotKeyword": [],
+    "isCompressedView": false,
+    "outboundDelayFlow": {},
+    "outboundEmailFlow": {},
+    "isAccountConfigured": {
+        "google": false,
+        "hubspot": false,
+        "zendesk": false,
+        "airtable": false,
+        "calendly": false,
+        "zoho_crm": false,
+        "freshdesk": false,
+        "salesforce": false,
+        "slack_live_chat": false,
+        "google_analytics": false,
+        "zendesk_live_chat": false,
+        "slack_notification": false
+    },
+    "deployedOutboundDelayFlow": {},
+    "deployedOutboundEmailFlow": {}
+}
