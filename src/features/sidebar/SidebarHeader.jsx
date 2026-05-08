@@ -22,7 +22,7 @@ export default function SidebarHeader({ setLayerStack, layerIndex, onClose }) {
             <button
                 type="button"
                 className="node-sidebar__close"
-                onClick={onClose}
+                onClick={() => onClose()}
                 aria-label="Close sidebar"
             >
                 ×
