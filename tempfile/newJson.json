@@ -1,0 +1,2776 @@
+{
+    "offsetX": 178.19999999999993,
+    "offsetY": -709,
+     "id":"001f196d-1731-4a3e-966b-b343f287927f",
+    "nodes": [
+      {
+        "id": "413b76d1-0de9-4303-a0ed-227146f9baa2",
+        "type": "custum-node",
+        "position": {
+          "x": 673.5,
+          "y": 16
+        },
+        "data": {
+          "label": "Bot is triggered if…",
+           
+          "originalExtras": {
+            "flow": {
+              "goal": "Bot is triggered if…",
+              "dialog": "",
+              "options": [],
+              "callback": null,
+              "parameter": "",
+              "dialog_type": "trigger",
+              "dialog_block": null,
+              "fallback_answer": {}
+            },
+            "config": {
+              "url": [
+                "/",
+                "/",
+                "/"
+              ],
+              "title": "Bot is triggered if…",
+              "languages": [],
+              "url_match": "any",
+              "date_range": {
+                "endDate": "",
+                "startDate": ""
+              },
+              "dialog_type": "trigger",
+              "is_connected": true,
+              "is_supported": true,
+              "url_operator": "includes",
+              "unique_values": [
+                "f0a192b3-cab9-4ca3-82ee-b2e51f487a7c",
+                "b7a4f6ec-70c2-41bb-8330-528a395f8f30",
+                "fd7221da-b954-4066-bdb5-09a34b5c2282"
+              ],
+              "is_valid_field": true,
+              "is_valid_value": true,
+              "extra_variables": [],
+              "url_with_filters": [
+                {
+                  "value": "/",
+                  "filter": {
+                    "label": "Contains",
+                    "value": "contains"
+                  }
+                }
+              ],
+              "is_valid_operator": true,
+              "condition_operator": "any",
+              "is_number_selected": false,
+              "trigger_conditions": [],
+              "show_trigger_filters": false,
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true,
+              "store_extra_variables": false,
+              "is_data_injection_enabled": false,
+              "trigger_conditions_error_map": [],
+              "selected_channel_configuration": {
+                "label": "",
+                "value": null
+              },
+              "connected_channel_configuration": "",
+              "user_message_subscription_preference": false
+            }
+          }
+        }
+      },
+      {
+        "id": "1a254e8e-dc46-4331-8487-3dbdaa3df749",
+        "type": "text",
+        "position": {
+          "x": 634,
+          "y": 434
+        },
+        "data": {
+          "label": "Choose from menu",
+          "originalExtras": {
+            "config": {
+              "text": "<p>How can I help you today?</p>",
+              "title": "Choose from menu",
+              "value": "7a61b55e-54f6-4f39-ab0f-4f5470ed0aae",
+              "buttons": [
+                {
+                  "url": {
+                    "link": "",
+                    "target": "new"
+                  },
+                  "value": "e5f3542c-c5c8-4336-a518-ff14811fc4a0",
+                  "action": {
+                    "label": "branch",
+                    "value": "branch"
+                  },
+                  "btn_text": "Make a reservation",
+                  "btn_content": "{\"blocks\":[{\"key\":\"90pir\",\"text\":\"Make a reservation \",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+                  "source_port": "3898497a-c842-445c-be0a-3c73bedd0d49",
+                  "button_payload": {
+                    "source": "",
+                    "content": "",
+                    "plain_text": ""
+                  },
+                  "custom_node_id": "4dbaf45c-bfcd-48e1-9262-a54a48f94a91",
+                  "is_valid_input_url": true,
+                  "is_valid_button_text": true
+                },
+                {
+                  "value": "ea1cea0f-6ccd-4d50-aba8-ebd8575c2a64",
+                  "action": {
+                    "label": "branch",
+                    "value": "branch"
+                  },
+                  "btn_text": "Cancel a reservation",
+                  "btn_content": "{\"blocks\":[{\"key\":\"7fb0n\",\"text\":\"Cancel a reservation \",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+                  "source_port": "5142f949-527c-4ad1-94ec-988367c17b1b",
+                  "button_payload": {
+                    "source": "",
+                    "content": "",
+                    "plain_text": ""
+                  },
+                  "custom_node_id": "712ce844-4983-4a29-8eb9-61ab5b56963a",
+                  "is_valid_input_url": true,
+                  "is_valid_button_text": true
+                },
+                {
+                  "value": "0774e8c7-1dd3-4b76-95c1-a604bd00788c",
+                  "action": {
+                    "label": "branch",
+                    "value": "branch"
+                  },
+                  "btn_text": "View the Menu",
+                  "btn_content": "{\"blocks\":[{\"key\":\"f8m83\",\"text\":\"View the Menu\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+                  "source_port": "fdf9a51d-5d1c-473e-9910-ba5b93e1b03a",
+                  "button_payload": {
+                    "source": "",
+                    "content": "",
+                    "plain_text": ""
+                  },
+                  "custom_node_id": "31e03550-a5d4-4023-a31f-dc0782df7667",
+                  "is_valid_input_url": true,
+                  "is_valid_button_text": true
+                },
+                {
+                  "value": "0c5c7b0a-a4d1-48e6-bad5-fead48e2f1a2",
+                  "action": {
+                    "label": "branch",
+                    "value": "branch"
+                  },
+                  "btn_text": "Button 4",
+                  "btn_content": "Button 4",
+                  "source_port": "759da4ae-90cc-4279-b754-a53ae39c2df8",
+                  "button_payload": {
+                    "source": "",
+                    "content": "",
+                    "plain_text": ""
+                  },
+                  "custom_node_id": "eac9a7f9-f1e3-411f-895d-5652a1678f9e",
+                  "is_valid_input_url": true,
+                  "is_valid_button_text": true
+                },
+                {
+                  "value": "9c697bb3-be7d-4e2c-9c54-8f08c4660b48",
+                  "action": {
+                    "label": "branch",
+                    "value": "branch"
+                  },
+                  "btn_text": "Button 6",
+                  "btn_content": "Button 6",
+                  "source_port": "f34a850f-a63e-4abe-83d2-d9ff782a3183",
+                  "button_payload": {
+                    "source": "",
+                    "content": "",
+                    "plain_text": ""
+                  },
+                  "custom_node_id": "508afe24-6738-42d6-99db-70d5a7042782",
+                  "is_valid_input_url": true,
+                  "is_valid_button_text": true
+                }
+              ],
+              "content": "{\"blocks\":[{\"key\":\"ab5i5\",\"text\":\"How can I help you today?\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+              "parameter": "",
+              "plain_text": "How can I help you today?",
+              "dialog_type": "buttons",
+              "is_featured": true,
+              "is_connected": true,
+              "is_supported": true,
+              "message_info": {
+                "is_enabled": false,
+                "is_disabled": false,
+                "title_source": "",
+                "title_content": "",
+                "is_valid_title": true,
+                "title_plain_text": "",
+                "description_source": "",
+                "description_content": "",
+                "description_plain_text": ""
+              },
+              "buttons_order": "as defined",
+              "buttons_layout": "horizontal",
+              "search_enabled": false,
+              "parameter_label": "",
+              "fallback_message": "Please enter a valid option from the mentioned choices",
+              "multi_select_enabled": false,
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true,
+              "link_tracking_enabled": false,
+              "is_valid_message_input": true,
+              "fallback_message_content": "Please enter a valid option from the mentioned choices",
+              "is_valid_failure_message": true,
+              "fallback_message_plain_text": "Please enter a valid option from the mentioned choices",
+              "button_payload_response_variable": ""
+            }
+          }
+        }
+      },
+      {
+        "id": "4dbaf45c-bfcd-48e1-9262-a54a48f94a91",
+        "type": "text",
+        "position": {
+          "x": 386,
+          "y": 590
+        },
+        "data": {
+          "label": "Make a reservation",
+          "originalExtras": {
+            "config": {
+              "text": "",
+              "title": "Make a reservation",
+              "parentType": "buttons_branch",
+              "dialog_type": "custom",
+              "is_featured": true,
+              "is_supported": true,
+              "is_valid_input": true,
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true
+            }
+          }
+        }
+      },
+      {
+        "id": "712ce844-4983-4a29-8eb9-61ab5b56963a",
+        "type": "text",
+        "position": {
+          "x": 54,
+          "y": 590
+        },
+        "data": {
+          "label": "Cancel a reservation",
+          "originalExtras": {
+            "config": {
+              "text": "",
+              "title": "Cancel a reservation",
+              "parentType": "buttons_branch",
+              "dialog_type": "custom",
+              "is_featured": true,
+              "is_supported": true,
+              "is_valid_input": true,
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true
+            }
+          }
+        }
+      },
+      {
+        "id": "31e03550-a5d4-4023-a31f-dc0782df7667",
+        "type": "text",
+        "position": {
+          "x": 718,
+          "y": 590
+        },
+        "data": {
+          "label": "View the Menu",
+          "originalExtras": {
+            "config": {
+              "text": "",
+              "title": "View the Menu",
+              "parentType": "buttons_branch",
+              "dialog_type": "custom",
+              "is_featured": true,
+              "is_supported": true,
+              "is_valid_input": true,
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true
+            }
+          }
+        }
+      },
+      {
+        "id": "c96e2299-151e-40f4-a46a-bd97e92c4329",
+        "type": "text",
+        "position": {
+          "x": 302,
+          "y": 680
+        },
+        "data": {
+          "label": "Make a Reservation - Selected",
+          "originalExtras": {
+            "config": {
+              "title": "Make a Reservation - Selected",
+              "dialog_type": "message",
+              "is_featured": true,
+              "is_connected": true,
+              "is_supported": true,
+              "message_info": {
+                "is_enabled": false,
+                "is_disabled": false,
+                "title_source": "",
+                "title_content": "",
+                "is_valid_title": true,
+                "title_plain_text": "",
+                "description_source": "",
+                "description_content": "",
+                "description_plain_text": ""
+              },
+              "message_block": [
+                {
+                  "text": "<p>I love spontaneous walk-ins, but reservations are best!</p>",
+                  "type": "text",
+                  "value": "9fd459bc-0eba-4942-abe1-f6f786c2ca3d",
+                  "content": "{\"blocks\":[{\"key\":\"fd2kh\",\"text\":\"I love spontaneous walk-ins, but reservations are best!\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+                  "plain_text": "I love spontaneous walk-ins, but reservations are best!",
+                  "is_valid_message_input": true
+                },
+                {
+                  "text": "Hi there! My name is...",
+                  "type": "text",
+                  "value": "9ecea77c-677f-44f0-82d5-ee0ce4712559",
+                  "content": "Hi there! My name is...",
+                  "plain_text": "Hi there! My name is...",
+                  "is_valid_message_input": true
+                }
+              ],
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true,
+              "link_tracking_enabled": false
+            }
+          }
+        }
+      },
+      {
+        "id": "f3f18fd5-5c48-4b0c-a991-4bf3ac6bfdeb",
+        "type": "text",
+        "position": {
+          "x": 302,
+          "y": 1304
+        },
+        "data": {
+          "label": "Making Reservation - Select Date",
+          "originalExtras": {
+            "config": {
+              "text": "<p>When will you be visiting?</p>\n<p><br></p>\n<p>Please select the date and time</p>",
+              "title": "Making Reservation - Select Date",
+              "value": "fd754760-7e03-4a04-abcb-5e3bd8059272",
+              "content": "{\"blocks\":[{\"key\":\"arlvv\",\"text\":\"When will you be visiting?\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"fuajp\",\"text\":\"\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"c561i\",\"text\":\"Please select the date and time\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+              "parameter": "",
+              "plain_text": "When will you be visiting?\n\nPlease select the date and time",
+              "dialog_type": "calendar",
+              "is_featured": true,
+              "calendar_tab": 0,
+              "exclude_days": [],
+              "is_connected": true,
+              "is_supported": true,
+              "exclude_dates": [],
+              "is_valid_input": true,
+              "date_range_type": {
+                "id": 0,
+                "type": "Single date"
+              },
+              "datepicker_type": "single",
+              "parameter_label": "",
+              "is_feature_authorized": true,
+              "is_past_dates_enabled": false,
+              "is_valid_dialog_title": true,
+              "link_tracking_enabled": false,
+              "is_valid_message_input": true,
+              "is_date_selection_enabled": false
+            }
+          }
+        }
+      },
+      {
+        "id": "3bfd3594-fdfb-4ce3-9cef-b23f23313de5",
+        "type": "text",
+        "position": {
+          "x": -30,
+          "y": 680
+        },
+        "data": {
+          "label": "Cancel a Reservation - Selected",
+          "originalExtras": {
+            "config": {
+              "title": "Cancel a Reservation - Selected",
+              "dialog_type": "message",
+              "is_featured": true,
+              "is_connected": true,
+              "is_supported": true,
+              "message_info": {
+                "is_enabled": false,
+                "is_disabled": false,
+                "title_source": "",
+                "title_content": "",
+                "is_valid_title": true,
+                "title_plain_text": "",
+                "description_source": "",
+                "description_content": "",
+                "description_plain_text": ""
+              },
+              "message_block": [
+                {
+                  "text": "<p>Certainly, I do understand that sometimes we are all unable to attend.</p>",
+                  "type": "text",
+                  "value": "390f2d2b-77a1-4755-ab0a-539486fdfc12",
+                  "content": "{\"blocks\":[{\"key\":\"5feip\",\"text\":\"Certainly, I do understand that sometimes we are all unable to attend.\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+                  "plain_text": "Certainly, I do understand that sometimes we are all unable to attend.",
+                  "is_valid_message_input": true
+                }
+              ],
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true,
+              "link_tracking_enabled": false
+            }
+          }
+        }
+      },
+      {
+        "id": "60c803f3-6eef-4a23-9208-67a224f3e8b6",
+        "type": "text",
+        "position": {
+          "x": 634,
+          "y": 680
+        },
+        "data": {
+          "label": "View Menu - Selected",
+          "originalExtras": {
+            "config": {
+              "title": "View Menu - Selected",
+              "dialog_type": "message",
+              "is_featured": true,
+              "is_connected": true,
+              "is_supported": true,
+              "message_info": {
+                "is_enabled": false,
+                "is_disabled": false,
+                "title_source": "",
+                "title_content": "",
+                "is_valid_title": true,
+                "title_plain_text": "",
+                "description_source": "",
+                "description_content": "",
+                "description_plain_text": ""
+              },
+              "message_block": [
+                {
+                  "text": "<p>ACME's Downtown Eatery is an authentic Indian cuisine restaurant where we serve the most delicious Indian dishes.</p>",
+                  "type": "text",
+                  "value": "efd7c8e8-e27d-4412-9334-04c686a5d587",
+                  "content": "{\"blocks\":[{\"key\":\"29lga\",\"text\":\"ACME's Downtown Eatery is an authentic Indian cuisine restaurant where we serve the most delicious Indian dishes.\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+                  "plain_text": "ACME's Downtown Eatery is an authentic Indian cuisine restaurant where we serve the most delicious Indian dishes.",
+                  "is_valid_message_input": true
+                },
+                {
+                  "file": {
+                    "name": "5aaa9fdf58a63.jpg",
+                    "path": "https://wotnot-conversation-attachment.storage.googleapis.com/30259_871_WZSS7ty4wboo082030205622SeLb8sFJ_attachment.jpg",
+                    "size": "",
+                    "type": "image/jpeg"
+                  },
+                  "type": "file",
+                  "is_valid_message_input": true
+                }
+              ],
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true,
+              "link_tracking_enabled": false
+            }
+          }
+        }
+      },
+      {
+        "id": "dc88ef71-0eb6-4258-9496-4b808c558a45",
+        "type": "text",
+        "position": {
+          "x": -30,
+          "y": 992
+        },
+        "data": {
+          "label": "Cancel a Reservation - Conversation Ends",
+          "originalExtras": {
+            "config": {
+              "title": "Cancel a Reservation - Conversation Ends",
+              "dialog_type": "message",
+              "is_featured": true,
+              "is_connected": true,
+              "is_supported": true,
+              "message_info": {
+                "is_enabled": false,
+                "is_disabled": false,
+                "title_source": "",
+                "title_content": "",
+                "is_valid_title": true,
+                "title_plain_text": "",
+                "description_source": "",
+                "description_content": "",
+                "description_plain_text": ""
+              },
+              "message_block": [
+                {
+                  "text": "<p>Perfect! I've notified my non-bot friends about it.</p>\n<p>Feel free to chat with me again for when you would like dine with us again.</p>",
+                  "type": "text",
+                  "value": "fd17f6ed-82b9-4555-a546-083014d1c9bc",
+                  "content": "{\"blocks\":[{\"key\":\"1ul0h\",\"text\":\"Perfect! I've notified my non-bot friends about it.\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"3mm9i\",\"text\":\"Feel free to chat with me again for when you would like dine with us again.\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+                  "plain_text": "Perfect! I've notified my non-bot friends about it.\nFeel free to chat with me again for when you would like dine with us again.",
+                  "is_valid_message_input": true
+                }
+              ],
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true,
+              "link_tracking_enabled": false
+            }
+          }
+        }
+      },
+      {
+        "id": "193e8552-7d3d-428e-bbb0-1369117496cc",
+        "type": "text",
+        "position": {
+          "x": 302,
+          "y": 1616
+        },
+        "data": {
+          "label": "Making Reservation - Conversation Ends",
+          "originalExtras": {
+            "config": {
+              "title": "Making Reservation - Conversation Ends",
+              "dialog_type": "message",
+              "is_featured": true,
+              "is_connected": true,
+              "is_supported": true,
+              "message_info": {
+                "is_enabled": false,
+                "is_disabled": false,
+                "title_source": "",
+                "title_content": "",
+                "is_valid_title": true,
+                "title_plain_text": "",
+                "description_source": "",
+                "description_content": "",
+                "description_plain_text": ""
+              },
+              "message_block": [
+                {
+                  "text": "<p>Thanks, $user.info.Name! I just booked your table. One of my non-bot friends will give you a call 2 hours prior to check-in with you.</p>",
+                  "type": "text",
+                  "value": "d2ecff51-0212-42a5-86be-c26165bc614f",
+                  "content": "{\"blocks\":[{\"key\":\"fglfq\",\"text\":\"Thanks, #Name#! I just booked your table. One of my non-bot friends will give you a call 2 hours prior to check-in with you.\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[{\"offset\":8,\"length\":6,\"key\":0}],\"data\":{}}],\"entityMap\":{\"0\":{\"type\":\"#mention\",\"mutability\":\"SEGMENTED\",\"data\":{\"mention\":{\"name\":\"#Name#\",\"value\":\"¿·$user.info.name·?\",\"label\":\"Name\",\"type\":\"contact\",\"pre_text\":\"contact\",\"id\":\"8259ac6a-2d00-45c5-91e3-8db403c69461\"}}}}}",
+                  "plain_text": "Thanks, #Name#! I just booked your table. One of my non-bot friends will give you a call 2 hours prior to check-in with you.",
+                  "is_valid_message_input": true
+                }
+              ],
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true,
+              "link_tracking_enabled": false
+            }
+          }
+        }
+      },
+      {
+        "id": "e94b1f90-f732-451a-b9d0-de450f08d87f",
+        "type": "text",
+        "position": {
+          "x": -30,
+          "y": 836
+        },
+        "data": {
+          "label": "Cancel a Reservation - Collect Name",
+          "originalExtras": {
+            "config": {
+              "text": "<p>Can you help me with the 'name' under which your reservation was made?</p>",
+              "type": "text",
+              "title": "Cancel a Reservation - Collect Name",
+              "value": "610ca21a-b83b-4b2f-bc3f-41f10fd3b456",
+              "content": "{\"blocks\":[{\"key\":\"f1s0i\",\"text\":\"Can you help me with the 'name' under which your reservation was made?\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+              "version": 2,
+              "parameter": "",
+              "input_type": {
+                "label": "text",
+                "value": "text"
+              },
+              "plain_text": "Can you help me with the 'name' under which your reservation was made?",
+              "dialog_type": "input",
+              "is_featured": true,
+              "is_connected": true,
+              "is_supported": true,
+              "message_info": {
+                "is_enabled": false,
+                "is_disabled": false,
+                "title_source": "",
+                "title_content": "",
+                "is_valid_title": true,
+                "title_plain_text": "",
+                "description_source": "",
+                "description_content": "",
+                "description_plain_text": ""
+              },
+              "regex_pattern": "",
+              "is_valid_title": true,
+              "failure_message": "",
+              "parameter_label": "",
+              "success_message": "",
+              "fallback_message": "",
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true,
+              "link_tracking_enabled": false,
+              "is_valid_message_input": true,
+              "is_valid_regex_pattern": true,
+              "failure_message_content": "",
+              "success_message_content": "",
+              "fallback_message_content": "",
+              "is_valid_failure_message": true,
+              "failure_message_plain_text": "",
+              "success_message_plain_text": "",
+              "fallback_message_plain_text": ""
+            }
+          }
+        }
+      },
+      {
+        "id": "b68cef3f-24e3-418b-ae31-1e6bc1d006ce",
+        "type": "text",
+        "position": {
+          "x": 302,
+          "y": 836
+        },
+        "data": {
+          "label": "Making Reservation - Collecting Name",
+          "originalExtras": {
+            "config": {
+              "text": "<p>Answer a few quick questions for me to book your table.</p>\n<p><br></p>\n<p>Let's begin with your name.</p>",
+              "type": "text",
+              "title": "Making Reservation - Collecting Name",
+              "value": "7d02d568-fc14-4a00-90ac-454933444782",
+              "content": "{\"blocks\":[{\"key\":\"bn7k2\",\"text\":\"Answer a few quick questions for me to book your table.\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"5ot9b\",\"text\":\"\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"d30md\",\"text\":\"Let's begin with your name.\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+              "version": 2,
+              "parameter": "$user.info.name",
+              "input_type": {
+                "label": "text",
+                "value": "text"
+              },
+              "plain_text": "Answer a few quick questions for me to book your table.\n\nLet's begin with your name.",
+              "dialog_type": "input",
+              "is_featured": true,
+              "is_connected": true,
+              "is_supported": true,
+              "message_info": {
+                "is_enabled": false,
+                "is_disabled": false,
+                "title_source": "",
+                "title_content": "",
+                "is_valid_title": true,
+                "title_plain_text": "",
+                "description_source": "",
+                "description_content": "",
+                "description_plain_text": ""
+              },
+              "regex_pattern": "",
+              "is_valid_title": true,
+              "failure_message": "",
+              "parameter_label": "¿·$user.info.name·?",
+              "success_message": "",
+              "fallback_message": "",
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true,
+              "link_tracking_enabled": false,
+              "is_valid_message_input": true,
+              "is_valid_regex_pattern": true,
+              "failure_message_content": "",
+              "success_message_content": "",
+              "fallback_message_content": "",
+              "is_valid_failure_message": true,
+              "failure_message_plain_text": "",
+              "success_message_plain_text": "",
+              "fallback_message_plain_text": ""
+            }
+          }
+        }
+      },
+      {
+        "id": "22bb26b0-ac00-46b6-a134-703214723232",
+        "type": "text",
+        "position": {
+          "x": 302,
+          "y": 992
+        },
+        "data": {
+          "label": "Making Reservation - Collecting Phone",
+          "originalExtras": {
+            "config": {
+              "text": "<p>Nice to meet you, ¿·$user.info.name·? </p>\n<p><br></p>\n<p>Lovely! And your phone number?</p>",
+              "type": "text",
+              "title": "Making Reservation - Collecting Phone",
+              "value": "850d055c-49cb-4e73-9a17-1aacdba716dd",
+              "content": "{\"blocks\":[{\"key\":\"92ftj\",\"text\":\"Nice to meet you, #name# \",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[{\"offset\":18,\"length\":6,\"key\":0}],\"data\":{}},{\"key\":\"13bnm\",\"text\":\"\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"4c8jv\",\"text\":\"Lovely! And your phone number?\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{\"0\":{\"type\":\"#mention\",\"mutability\":\"SEGMENTED\",\"data\":{\"mention\":{\"id\":\"¿·$user.info.name·?\",\"value\":\"¿·$user.info.name·?\",\"label\":\"name\",\"name\":\"#name#\",\"pre_text\":\"contact\",\"type\":\"contact\",\"format\":\"name\"}}}}}",
+              "version": 2,
+              "parameter": "$user.info.Phone",
+              "input_type": {
+                "label": "text",
+                "value": "text"
+              },
+              "plain_text": "Nice to meet you, #name# \n\nLovely! And your phone number?",
+              "dialog_type": "input",
+              "is_featured": true,
+              "is_connected": true,
+              "is_supported": true,
+              "message_info": {
+                "is_enabled": false,
+                "is_disabled": false,
+                "title_source": "",
+                "title_content": "",
+                "is_valid_title": true,
+                "title_plain_text": "",
+                "description_source": "",
+                "description_content": "",
+                "description_plain_text": ""
+              },
+              "regex_pattern": "",
+              "is_valid_title": true,
+              "failure_message": "",
+              "parameter_label": "¿·$user.info.Phone·?",
+              "success_message": "",
+              "fallback_message": "",
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true,
+              "link_tracking_enabled": false,
+              "is_valid_message_input": true,
+              "is_valid_regex_pattern": true,
+              "failure_message_content": "",
+              "success_message_content": "",
+              "fallback_message_content": "",
+              "is_valid_failure_message": true,
+              "failure_message_plain_text": "",
+              "success_message_plain_text": "",
+              "fallback_message_plain_text": ""
+            }
+          }
+        }
+      },
+      {
+        "id": "b53069f9-183d-4c25-a259-4eb10a3010c8",
+        "type": "text",
+        "position": {
+          "x": 302,
+          "y": 1148
+        },
+        "data": {
+          "label": "Making Reservation - Table Count",
+          "originalExtras": {
+            "config": {
+              "text": "<p>How many people should I book for?</p>",
+              "type": "text",
+              "title": "Making Reservation - Table Count",
+              "value": "cfc820a7-2885-447c-afaa-3b810f2b80cd",
+              "content": "{\"blocks\":[{\"key\":\"59u08\",\"text\":\"How many people should I book for?\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+              "version": 2,
+              "parameter": "",
+              "input_type": {
+                "label": "text",
+                "value": "text"
+              },
+              "plain_text": "How many people should I book for?",
+              "dialog_type": "input",
+              "is_featured": true,
+              "is_connected": true,
+              "is_supported": true,
+              "message_info": {
+                "is_enabled": false,
+                "is_disabled": false,
+                "title_source": "",
+                "title_content": "",
+                "is_valid_title": true,
+                "title_plain_text": "",
+                "description_source": "",
+                "description_content": "",
+                "description_plain_text": ""
+              },
+              "regex_pattern": "",
+              "is_valid_title": true,
+              "failure_message": "",
+              "parameter_label": "",
+              "success_message": "",
+              "fallback_message": "",
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true,
+              "link_tracking_enabled": false,
+              "is_valid_message_input": true,
+              "is_valid_regex_pattern": true,
+              "failure_message_content": "",
+              "success_message_content": "",
+              "fallback_message_content": "",
+              "is_valid_failure_message": true,
+              "failure_message_plain_text": "",
+              "success_message_plain_text": "",
+              "fallback_message_plain_text": ""
+            }
+          }
+        }
+      },
+      {
+        "id": "f9d5c532-f7fb-40a2-810b-124b30aa09b9",
+        "type": "text",
+        "position": {
+          "x": 302,
+          "y": 1460
+        },
+        "data": {
+          "label": "Making Reservation - Special Request",
+          "originalExtras": {
+            "config": {
+              "text": "<p>Do you have any special requests? Maybe a seating preference?</p>",
+              "type": "text",
+              "title": "Making Reservation - Special Request",
+              "value": "dca0c044-66ff-4474-8d81-89a74b000e66",
+              "content": "{\"blocks\":[{\"key\":\"er3iu\",\"text\":\"Do you have any special requests? Maybe a seating preference?\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+              "version": 2,
+              "parameter": "",
+              "input_type": {
+                "label": "text",
+                "value": "text"
+              },
+              "plain_text": "Do you have any special requests? Maybe a seating preference?",
+              "dialog_type": "input",
+              "is_featured": true,
+              "is_connected": true,
+              "is_supported": true,
+              "message_info": {
+                "is_enabled": false,
+                "is_disabled": false,
+                "title_source": "",
+                "title_content": "",
+                "is_valid_title": true,
+                "title_plain_text": "",
+                "description_source": "",
+                "description_content": "",
+                "description_plain_text": ""
+              },
+              "regex_pattern": "",
+              "is_valid_title": true,
+              "failure_message": "",
+              "parameter_label": "",
+              "success_message": "",
+              "fallback_message": "",
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true,
+              "link_tracking_enabled": false,
+              "is_valid_message_input": true,
+              "is_valid_regex_pattern": true,
+              "failure_message_content": "",
+              "success_message_content": "",
+              "fallback_message_content": "",
+              "is_valid_failure_message": true,
+              "failure_message_plain_text": "",
+              "success_message_plain_text": "",
+              "fallback_message_plain_text": ""
+            }
+          }
+        }
+      },
+      {
+        "id": "55ce281e-a147-4f6b-8e3d-a45d9624652b",
+        "type": "text",
+        "position": {
+          "x": 745.25,
+          "y": 836
+        },
+        "data": {
+          "label": "Collect Input 11",
+          "originalExtras": {
+            "config": {
+              "text": "What is your…",
+              "type": "text",
+              "title": "Collect Input 11",
+              "value": "e65d131f-0a58-4386-bd1b-826b13c45f17",
+              "content": "What is your…",
+              "version": 2,
+              "parameter": "",
+              "input_type": {
+                "label": "text",
+                "value": "text"
+              },
+              "plain_text": "What is your…",
+              "dialog_type": "input",
+              "is_featured": true,
+              "is_connected": true,
+              "is_supported": true,
+              "message_info": {
+                "is_enabled": false,
+                "is_disabled": false,
+                "title_source": "",
+                "title_content": "",
+                "is_valid_title": true,
+                "title_plain_text": "",
+                "description_source": "",
+                "description_content": "",
+                "description_plain_text": ""
+              },
+              "regex_pattern": "",
+              "is_valid_title": true,
+              "failure_message": "",
+              "parameter_label": "",
+              "success_message": "",
+              "fallback_message": "",
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true,
+              "link_tracking_enabled": false,
+              "is_valid_message_input": true,
+              "is_valid_regex_pattern": true,
+              "failure_message_content": "",
+              "success_message_content": "",
+              "fallback_message_content": "",
+              "is_valid_failure_message": true,
+              "failure_message_plain_text": "",
+              "success_message_plain_text": "",
+              "fallback_message_plain_text": ""
+            }
+          }
+        }
+      },
+      {
+        "id": "d57a2a65-fa31-4c9d-83ac-2d43ab3649de",
+        "type": "text",
+        "position": {
+          "x": 302,
+          "y": 1772
+        },
+        "data": {
+          "label": "Carousel 1",
+          "originalExtras": {
+            "config": {
+              "type": "cardview",
+              "title": "Carousel 1",
+              "value": "6a9db156-e743-4ce1-ba09-fe4827f64649",
+              "cardview": [
+                {
+                  "file": {
+                    "name": "",
+                    "path": "",
+                    "size": "",
+                    "type": ""
+                  },
+                  "text": "Card description",
+                  "value": "80a4681d-b224-471e-89d3-cc44e8ba51bc",
+                  "buttons": [
+                    {
+                      "url": {
+                        "link": "",
+                        "target": "new"
+                      },
+                      "value": "53ed93f5-0720-4107-9dc1-696a8faadb7a",
+                      "action": {
+                        "label": "branch",
+                        "value": "branch"
+                      },
+                      "btn_text": "Button 1",
+                      "btn_content": "Button 1",
+                      "source_port": "f81212e1-c971-4bba-b7b6-4d85652cb3cf",
+                      "button_payload": {
+                        "source": "",
+                        "content": "",
+                        "plain_text": ""
+                      },
+                      "custom_node_id": "917af634-3a22-42f7-a26b-0dde26f77bc2",
+                      "is_valid_input_url": true,
+                      "is_valid_button_text": true
+                    }
+                  ],
+                  "content": "Card description",
+                  "item_title": "Card 1",
+                  "plain_text": "Card description",
+                  "source_port": "ce2cc122-38f8-4996-94e5-d5a9d72c947a",
+                  "custom_node_id": "4c0099b5-3d62-4a7f-bc07-476e34f954b8",
+                  "is_valid_content": true,
+                  "is_valid_item_title": true
+                },
+                {
+                  "file": {
+                    "name": "",
+                    "path": "",
+                    "size": "",
+                    "type": ""
+                  },
+                  "text": "Card description",
+                  "value": "f3f610bb-e9a1-47cf-a01a-791437bd6424",
+                  "buttons": [
+                    {
+                      "url": {
+                        "link": "",
+                        "target": "new"
+                      },
+                      "value": "6719928f-1e97-4f9e-9f8a-1d92675af003",
+                      "action": {
+                        "label": "branch",
+                        "value": "branch"
+                      },
+                      "btn_text": "Button 1",
+                      "btn_content": "Button 1",
+                      "source_port": "7b2d6619-f972-4794-960c-75a36fbcb9e3",
+                      "button_payload": {
+                        "source": "",
+                        "content": "",
+                        "plain_text": ""
+                      },
+                      "custom_node_id": "001f196d-1731-4a3e-966b-b343f287927f",
+                      "is_valid_input_url": true,
+                      "is_valid_button_text": true
+                    }
+                  ],
+                  "content": "Card description",
+                  "item_title": "Card 2",
+                  "plain_text": "Card description",
+                  "source_port": "b407a9cf-ffd4-47e4-94a0-ce7a8a5c84d8",
+                  "custom_node_id": "8b5d7103-8321-4633-b6b7-6a29959f8c2e",
+                  "is_valid_content": true,
+                  "is_valid_item_title": true
+                }
+              ],
+              "parameter": "",
+              "dialog_type": "cardview",
+              "is_featured": true,
+              "is_connected": true,
+              "is_supported": true,
+              "parameter_label": "",
+              "free_input_enabled": false,
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true,
+              "link_tracking_enabled": false,
+              "button_payload_response_variable": ""
+            }
+          }
+        }
+      },
+      {
+        "id": "4c0099b5-3d62-4a7f-bc07-476e34f954b8",
+        "type": "text",
+        "position": {
+          "x": 220,
+          "y": 1894
+        },
+        "data": {
+          "label": "Card 1",
+          "originalExtras": {
+            "config": {
+              "text": "",
+              "title": "Card 1",
+              "parentType": "cardview",
+              "dialog_type": "custom",
+              "is_featured": true,
+              "is_supported": true,
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true
+            }
+          }
+        }
+      },
+      {
+        "id": "917af634-3a22-42f7-a26b-0dde26f77bc2",
+        "type": "text",
+        "position": {
+          "x": 220,
+          "y": 1984
+        },
+        "data": {
+          "label": "Button 1",
+          "originalExtras": {
+            "config": {
+              "text": "",
+              "title": "Button 1",
+              "parentType": "cardview_branch",
+              "dialog_type": "custom",
+              "is_featured": true,
+              "is_supported": true,
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true
+            }
+          }
+        }
+      },
+      {
+        "id": "8b5d7103-8321-4633-b6b7-6a29959f8c2e",
+        "type": "text",
+        "position": {
+          "x": 552,
+          "y": 1894
+        },
+        "data": {
+          "label": "Card 2",
+          "originalExtras": {
+            "config": {
+              "text": "",
+              "title": "Card 2",
+              "parentType": "cardview",
+              "dialog_type": "custom",
+              "is_featured": true,
+              "is_supported": true,
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true
+            }
+          }
+        }
+      },
+      {
+        "id": "001f196d-1731-4a3e-966b-b343f287927f",
+        "type": "text",
+        "position": {
+          "x": 552,
+          "y": 1984
+        },
+        "data": {
+          "label": "Button 1",
+          "originalExtras": {
+            "config": {
+              "text": "",
+              "title": "Button 1",
+              "parentType": "cardview_branch",
+              "dialog_type": "custom",
+              "is_featured": true,
+              "is_supported": true,
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true
+            }
+          }
+        }
+      },
+      {
+        "id": "c3a176d4-0a81-4eca-9dd7-843d704f6f4a",
+        "type": "text",
+        "position": {
+          "x": 634,
+          "y": 122
+        },
+        "data": {
+          "label": "Send message 8",
+          "originalExtras": {
+            "config": {
+              "title": "Send message 8",
+              "dialog_type": "message",
+              "is_featured": true,
+              "is_connected": true,
+              "is_supported": true,
+              "message_info": {
+                "is_enabled": false,
+                "is_disabled": false,
+                "title_source": "",
+                "title_content": "",
+                "is_valid_title": true,
+                "title_plain_text": "",
+                "description_source": "",
+                "description_content": "",
+                "description_plain_text": ""
+              },
+              "message_block": [
+                {
+                  "text": "Hi there! My name is…",
+                  "type": "text",
+                  "value": "ce7537af-4bcb-433b-b94b-112b1efed108",
+                  "content": "Hi there! My name is…",
+                  "plain_text": "Hi there! My name is…",
+                  "is_valid_message_input": true
+                }
+              ],
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true,
+              "link_tracking_enabled": false
+            }
+          }
+        }
+      },
+      {
+        "id": "eac9a7f9-f1e3-411f-895d-5652a1678f9e",
+        "type": "text",
+        "position": {
+          "x": 1226,
+          "y": 713
+        },
+        "data": {
+          "label": "Button 4",
+          "originalExtras": {
+            "config": {
+              "text": "",
+              "title": "Button 4",
+              "parentType": "buttons_branch",
+              "dialog_type": "custom",
+              "is_featured": true,
+              "is_supported": true,
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true
+            }
+          }
+        }
+      },
+      {
+        "id": "508afe24-6738-42d6-99db-70d5a7042782",
+        "type": "text",
+        "position": {
+          "x": 1050,
+          "y": 590
+        },
+        "data": {
+          "label": "Button 6",
+          "originalExtras": {
+            "config": {
+              "text": "",
+              "title": "Button 6",
+              "parentType": "buttons_branch",
+              "dialog_type": "custom",
+              "is_featured": true,
+              "is_supported": true,
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true
+            }
+          }
+        }
+      },
+      {
+        "id": "b32c3cb5-dabc-4b07-84a8-de72f64b6d78",
+        "type": "text",
+        "position": {
+          "x": 468,
+          "y": 2074
+        },
+        "data": {
+          "label": "Collect Input 12",
+          "originalExtras": {
+            "config": {
+              "text": "What is your…",
+              "type": "text",
+              "title": "Collect Input 12",
+              "value": "213dccf5-e850-4421-b1cc-257ab6c5eaae",
+              "content": "What is your…",
+              "version": 2,
+              "parameter": "",
+              "input_type": {
+                "label": "text",
+                "value": "text"
+              },
+              "plain_text": "What is your…",
+              "dialog_type": "input",
+              "is_featured": true,
+              "is_connected": true,
+              "is_supported": true,
+              "message_info": {
+                "is_enabled": false,
+                "is_disabled": false,
+                "title_source": "",
+                "title_content": "",
+                "is_valid_title": true,
+                "title_plain_text": "",
+                "description_source": "",
+                "description_content": "",
+                "description_plain_text": ""
+              },
+              "regex_pattern": "",
+              "is_valid_title": true,
+              "failure_message": "",
+              "parameter_label": "",
+              "success_message": "",
+              "fallback_message": "",
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true,
+              "link_tracking_enabled": false,
+              "is_valid_message_input": true,
+              "is_valid_regex_pattern": true,
+              "failure_message_content": "",
+              "success_message_content": "",
+              "fallback_message_content": "",
+              "is_valid_failure_message": true,
+              "failure_message_plain_text": "",
+              "success_message_plain_text": "",
+              "fallback_message_plain_text": ""
+            }
+          }
+        }
+      },
+      {
+        "id": "4d998b2e-822d-41e0-a593-ed87b7053344",
+        "type": "text",
+        "position": {
+          "x": 468,
+          "y": 2230
+        },
+        "data": {
+          "label": "Buttons 2",
+          "originalExtras": {
+            "config": {
+              "text": "What would you like to choose?",
+              "title": "Buttons 2",
+              "value": "65faf7ba-f87e-43aa-84ce-16c4be8af159",
+              "buttons": [
+                {
+                  "url": {
+                    "link": "",
+                    "target": "new"
+                  },
+                  "value": "d78659c0-a1f2-4bae-b717-3976a875e80a",
+                  "action": {
+                    "label": "branch",
+                    "value": "branch"
+                  },
+                  "btn_text": "Button 1",
+                  "btn_content": "Button 1",
+                  "source_port": "819ecabf-65a8-474d-b12e-67562cc9b474",
+                  "button_payload": {
+                    "source": "",
+                    "content": "",
+                    "plain_text": ""
+                  },
+                  "custom_node_id": "26a8f566-a154-47e5-a6bb-4e2b9ebd5582",
+                  "is_valid_input_url": true,
+                  "is_valid_button_text": true
+                },
+                {
+                  "value": "a0117e1f-bdf0-4d35-908e-424e7c845c2d",
+                  "action": {
+                    "label": "branch",
+                    "value": "branch"
+                  },
+                  "btn_text": "Button 2",
+                  "btn_content": "Button 2",
+                  "source_port": "58d76c9c-39e1-48bd-b6f2-1c311aa88708",
+                  "button_payload": {
+                    "source": "",
+                    "content": "",
+                    "plain_text": ""
+                  },
+                  "custom_node_id": "419fe721-7cec-4014-ba52-6aef27604050",
+                  "is_valid_input_url": true,
+                  "is_valid_button_text": true
+                },
+                {
+                  "value": "60320328-4da0-4f60-8cf0-23b6264e9c5d",
+                  "action": {
+                    "label": "branch",
+                    "value": "branch"
+                  },
+                  "btn_text": "Button 3",
+                  "btn_content": "Button 3",
+                  "source_port": "905ab3da-3459-4dcb-877f-6bcaed81bd24",
+                  "button_payload": {
+                    "source": "",
+                    "content": "",
+                    "plain_text": ""
+                  },
+                  "custom_node_id": "f168c4f3-086a-43ec-b907-2081b8b2ef68",
+                  "is_valid_input_url": true,
+                  "is_valid_button_text": true
+                }
+              ],
+              "content": "What would you like to choose?",
+              "parameter": "",
+              "plain_text": "What would you like to choose?",
+              "dialog_type": "buttons",
+              "is_featured": true,
+              "is_connected": true,
+              "is_supported": true,
+              "message_info": {
+                "is_enabled": false,
+                "is_disabled": false,
+                "title_source": "",
+                "title_content": "",
+                "is_valid_title": true,
+                "title_plain_text": "",
+                "description_source": "",
+                "description_content": "",
+                "description_plain_text": ""
+              },
+              "buttons_order": "as defined",
+              "buttons_layout": "horizontal",
+              "search_enabled": false,
+              "parameter_label": "",
+              "fallback_message": "Please enter a valid option from the mentioned choices",
+              "free_input_enabled": false,
+              "multi_select_enabled": false,
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true,
+              "link_tracking_enabled": false,
+              "is_valid_message_input": true,
+              "fallback_message_content": "Please enter a valid option from the mentioned choices",
+              "is_valid_failure_message": true,
+              "fallback_message_plain_text": "Please enter a valid option from the mentioned choices",
+              "button_payload_response_variable": ""
+            }
+          }
+        }
+      },
+      {
+        "id": "26a8f566-a154-47e5-a6bb-4e2b9ebd5582",
+        "type": "text",
+        "position": {
+          "x": 220,
+          "y": 2386
+        },
+        "data": {
+          "label": "Button 1",
+          "originalExtras": {
+            "config": {
+              "text": "",
+              "title": "Button 1",
+              "parentType": "buttons_branch",
+              "dialog_type": "custom",
+              "is_featured": true,
+              "is_supported": true,
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true
+            }
+          }
+        }
+      },
+      {
+        "id": "419fe721-7cec-4014-ba52-6aef27604050",
+        "type": "text",
+        "position": {
+          "x": 552,
+          "y": 2386
+        },
+        "data": {
+          "label": "Button 2",
+          "originalExtras": {
+            "config": {
+              "text": "",
+              "title": "Button 2",
+              "parentType": "buttons_branch",
+              "dialog_type": "custom",
+              "is_featured": true,
+              "is_supported": true,
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true
+            }
+          }
+        }
+      },
+      {
+        "id": "f168c4f3-086a-43ec-b907-2081b8b2ef68",
+        "type": "text",
+        "position": {
+          "x": 884,
+          "y": 2386
+        },
+        "data": {
+          "label": "Button 3",
+          "originalExtras": {
+            "config": {
+              "text": "",
+              "title": "Button 3",
+              "parentType": "buttons_branch",
+              "dialog_type": "custom",
+              "is_featured": true,
+              "is_supported": true,
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true
+            }
+          }
+        }
+      },
+      {
+        "id": "fe46f052-2b30-45ee-ae4b-f53bdeda2bae",
+        "type": "text",
+        "position": {
+          "x": 745.25,
+          "y": 1009
+        },
+        "data": {
+          "label": "Carousel 2cvxcv",
+          "originalExtras": {
+            "config": {
+              "type": "cardview",
+              "title": "Carousel 2cvxcv",
+              "value": "cf741420-a73a-49e3-9090-f1feb9d2437b",
+              "cardview": [
+                {
+                  "file": {
+                    "name": "",
+                    "path": "",
+                    "size": "",
+                    "type": ""
+                  },
+                  "text": "Card description",
+                  "value": "82e1438e-959c-4f00-9761-bcc1434a9109",
+                  "buttons": [
+                    {
+                      "url": {
+                        "link": "",
+                        "target": "new"
+                      },
+                      "value": "d5eed2ae-28fb-41d6-89bb-49ec637752a9",
+                      "action": {
+                        "label": "branch",
+                        "value": "branch"
+                      },
+                      "btn_text": "Button 1",
+                      "btn_content": "Button 1",
+                      "source_port": "b1eb8fbf-8781-4485-a96c-10846e53215c",
+                      "button_payload": {
+                        "source": "",
+                        "content": "",
+                        "plain_text": ""
+                      },
+                      "custom_node_id": "e81abd1d-2e20-4852-84e9-35d022d4e5f0",
+                      "is_valid_input_url": true,
+                      "is_valid_button_text": true
+                    }
+                  ],
+                  "content": "Card description",
+                  "item_title": "Card 1",
+                  "plain_text": "Card description",
+                  "source_port": "c48f8244-c1dc-4c4d-8998-d20672287566",
+                  "custom_node_id": "be70c434-5861-48a2-9402-dbf1b9f0e7b5",
+                  "is_valid_content": true,
+                  "is_valid_item_title": true
+                }
+              ],
+              "parameter": "",
+              "dialog_type": "cardview",
+              "is_featured": true,
+              "is_connected": true,
+              "is_supported": true,
+              "parameter_label": "",
+              "free_input_enabled": false,
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true,
+              "link_tracking_enabled": false,
+              "button_payload_response_variable": ""
+            }
+          }
+        }
+      },
+      {
+        "id": "be70c434-5861-48a2-9402-dbf1b9f0e7b5",
+        "type": "text",
+        "position": {
+          "x": 829.25,
+          "y": 1181
+        },
+        "data": {
+          "label": "Card 1",
+          "originalExtras": {
+            "config": {
+              "text": "",
+              "title": "Card 1",
+              "parentType": "cardview",
+              "dialog_type": "custom",
+              "is_featured": true,
+              "is_supported": true,
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true
+            }
+          }
+        }
+      },
+      {
+        "id": "e81abd1d-2e20-4852-84e9-35d022d4e5f0",
+        "type": "text",
+        "position": {
+          "x": 829.25,
+          "y": 1337
+        },
+        "data": {
+          "label": "Button 1",
+          "originalExtras": {
+            "config": {
+              "text": "",
+              "title": "Button 1",
+              "parentType": "cardview_branch",
+              "dialog_type": "custom",
+              "is_featured": true,
+              "is_supported": true,
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true
+            }
+          }
+        }
+      },
+      {
+        "id": "8d21b8f5-9aef-4446-9826-5951815de8d9",
+        "type": "text",
+        "position": {
+          "x": 634,
+          "y": 278
+        },
+        "data": {
+          "label": "Collect Input 13",
+          "originalExtras": {
+            "config": {
+              "text": "<p>What is your…zszdqwe</p>",
+              "type": "text",
+              "title": "Collect Input 13",
+              "value": "e01590bd-ec55-4cfa-85e8-6e86d69fd264",
+              "content": "{\"blocks\":[{\"key\":\"9n6qp\",\"text\":\"What is your…zszdqwe\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+              "version": 2,
+              "parameter": "$user.info.contact_created_by",
+              "input_type": {
+                "label": "text",
+                "value": "text"
+              },
+              "plain_text": "What is your…zszdqwe",
+              "dialog_type": "input",
+              "is_featured": true,
+              "is_connected": true,
+              "is_supported": true,
+              "message_info": {
+                "is_enabled": false,
+                "is_disabled": false,
+                "title_source": "",
+                "title_content": "",
+                "is_valid_title": true,
+                "title_plain_text": "",
+                "description_source": "",
+                "description_content": "",
+                "description_plain_text": ""
+              },
+              "regex_pattern": "",
+              "is_valid_title": true,
+              "failure_message": "",
+              "parameter_label": "¿·$user.info.contact_created_by·?",
+              "success_message": "",
+              "fallback_message": "",
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true,
+              "link_tracking_enabled": false,
+              "is_valid_message_input": true,
+              "is_valid_regex_pattern": true,
+              "failure_message_content": "",
+              "success_message_content": "",
+              "fallback_message_content": "",
+              "is_valid_failure_message": true,
+              "failure_message_plain_text": "",
+              "success_message_plain_text": "",
+              "fallback_message_plain_text": ""
+            }
+          }
+        }
+      },
+      {
+        "id": "a8e31253-2886-4248-b8ef-d778cd76a11b",
+        "type": "text",
+        "position": {
+          "x": 745.25,
+          "y": 1477
+        },
+        "data": {
+          "label": "Google Calendar 1",
+          "originalExtras": {
+            "config": {
+              "title": "Google Calendar 1",
+              "dialog_type": "appointment_booking",
+              "is_featured": true,
+              "is_connected": true,
+              "is_supported": true,
+              "date_selection": {
+                "button_text": "Choose date",
+                "error_message": "Error! Choose a valid option from the list",
+                "question_to_ask": "Please select your preferred date",
+                "button_text_source": "Choose date",
+                "button_text_content": "Choose date",
+                "error_message_source": "Error! Choose a valid option from the list",
+                "error_message_content": "Error! Choose a valid option from the list",
+                "question_to_ask_source": "Please select your preferred date",
+                "question_to_ask_content": "Please select your preferred date"
+              },
+              "selected_event": {
+                "label": "Zsa",
+                "value": "462",
+                "labelAvatar": {},
+                "customTooltip": "Munna Thakur"
+              },
+              "time_selection": {
+                "button_text": "Choose timeslot",
+                "error_message": "Error! Choose a valid option from the list",
+                "question_to_ask": "Please select your preferred timeslot",
+                "button_text_source": "Choose timeslot",
+                "button_text_content": "Choose timeslot",
+                "error_message_source": "Error! Choose a valid option from the list",
+                "error_message_content": "Error! Choose a valid option from the list",
+                "question_to_ask_source": "Please select your preferred timeslot",
+                "question_to_ask_content": "Please select your preferred timeslot"
+              },
+              "addon_version_id": 33,
+              "confirmation_message": "Your meeting has been booked!",
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true,
+              "is_selected_event_empty": false,
+              "confirmation_message_source": "Your meeting has been booked!",
+              "confirmation_message_content": "Your meeting has been booked!",
+              "is_confirmation_message_valid": true,
+              "is_selected_event_attendee_empty": false,
+              "is_date_selection_button_text_valid": true,
+              "is_time_selection_button_text_valid": true,
+              "is_date_selection_error_message_valid": true,
+              "is_time_selection_error_message_valid": true,
+              "is_date_selection_question_to_ask_valid": true,
+              "is_time_selection_question_to_ask_valid": true
+            }
+          }
+        }
+      },
+      {
+        "id": "2673faca-430e-4791-b6ae-d96ea03d386b",
+        "type": "text",
+        "position": {
+          "x": 825.75,
+          "y": 1649
+        },
+        "data": {
+          "label": "Flow 1",
+          "originalExtras": {
+            "config": {
+              "title": "Flow 1",
+              "dialog_type": "flow",
+              "is_featured": true,
+              "is_connected": true,
+              "is_supported": true,
+              "flow_start_id": "734dba8b-1822-454b-a971-62a61e72b77c",
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true
+            }
+          }
+        }
+      },
+      {
+        "id": "734dba8b-1822-454b-a971-62a61e72b77c",
+        "type": "text",
+        "position": {
+          "x": 315,
+          "y": -68.75
+        },
+        "data": {
+          "label": "Flow 1 - Flow starts",
+          "originalExtras": {
+            "config": {
+              "title": "Flow 1 - Flow starts",
+              "dialog_type": "flow_start",
+              "is_featured": true,
+              "is_connected": true,
+              "is_supported": true,
+              "parentNodeID": "2673faca-430e-4791-b6ae-d96ea03d386b",
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true
+            }
+          }
+        }
+      },
+      {
+        "id": "91e1a651-5b5d-4d86-8284-d73e3a945a1d",
+        "type": "text",
+        "position": {
+          "x": 253.25,
+          "y": 77.25
+        },
+        "data": {
+          "label": "Collect Input 14",
+          "originalExtras": {
+            "config": {
+              "text": "<p>adada</p>",
+              "type": "text",
+              "title": "Collect Input 14",
+              "value": "a4a4adb6-2575-42a0-8806-cf59533633f8",
+              "content": "{\"blocks\":[{\"key\":\"5mq64\",\"text\":\"adada\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+              "version": 2,
+              "parameter": "",
+              "input_type": {
+                "label": "text",
+                "value": "text"
+              },
+              "plain_text": "adada",
+              "dialog_type": "input",
+              "is_featured": true,
+              "is_connected": true,
+              "is_supported": true,
+              "message_info": {
+                "is_enabled": false,
+                "is_disabled": false,
+                "title_source": "",
+                "title_content": "",
+                "is_valid_title": true,
+                "title_plain_text": "",
+                "description_source": "",
+                "description_content": "",
+                "description_plain_text": ""
+              },
+              "regex_pattern": "",
+              "is_valid_title": true,
+              "failure_message": "",
+              "parameter_label": "",
+              "success_message": "",
+              "fallback_message": "",
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true,
+              "link_tracking_enabled": false,
+              "is_valid_message_input": true,
+              "is_valid_regex_pattern": true,
+              "failure_message_content": "",
+              "success_message_content": "",
+              "fallback_message_content": "",
+              "is_valid_failure_message": true,
+              "failure_message_plain_text": "",
+              "success_message_plain_text": "",
+              "fallback_message_plain_text": ""
+            }
+          }
+        }
+      },
+      {
+        "id": "aa2a867f-cb23-42f6-ba30-9f3c8e96740e",
+        "type": "text",
+        "position": {
+          "x": 1044.5,
+          "y": 2698.75
+        },
+        "data": {
+          "label": "Answer AI 2",
+          "originalExtras": {
+            "config": {
+              "title": "Answer AI 2",
+              "top_k": 1,
+              "persona": {
+                "source": "You are a smart assistant.  You will try to answer the questions from the context information provided to you. Always try to provide responses in a HTML format. If not possible, provide response in plain text. If you do not have the answer to the question asked, respond with “Sorry, I do not know the answer to this. Can you try asking something else?“",
+                "content": "You are a smart assistant.  You will try to answer the questions from the context information provided to you. Always try to provide responses in a HTML format. If not possible, provide response in plain text. If you do not have the answer to the question asked, respond with “Sorry, I do not know the answer to this. Can you try asking something else?“",
+                "plain_text": "You are a smart assistant.  You will try to answer the questions from the context information provided to you. Always try to provide responses in a HTML format. If not possible, provide response in plain text. If you do not have the answer to the question asked, respond with “Sorry, I do not know the answer to this. Can you try asking something else?“"
+              },
+              "question": {
+                "source": "How can I help you?",
+                "content": "How can I help you?",
+                "plain_text": "How can I help you?"
+              },
+              "functions": [],
+              "model_name": "gpt-4o",
+              "dialog_type": "faq",
+              "is_connected": false,
+              "is_supported": true,
+              "message_info": {
+                "is_enabled": false,
+                "is_disabled": false,
+                "title_source": "",
+                "title_content": "",
+                "is_valid_title": true,
+                "title_plain_text": "",
+                "description_source": "",
+                "description_content": "",
+                "description_plain_text": ""
+              },
+              "display_as_file": false,
+              "display_as_list": false,
+              "is_valid_persona": true,
+              "is_variable_empty": false,
+              "knowledge_base_id": 6942,
+              "display_as_buttons": false,
+              "display_as_carousel": false,
+              "is_feedback_enabled": true,
+              "is_valid_model_name": true,
+              "restrict_answer_size": "256",
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true,
+              "creativity_in_response": "0.5",
+              "is_chat_history_enabled": false,
+              "context_of_conversations": 1,
+              "is_answer_contain_source": false,
+              "is_valid_knowledge_base_id": true,
+              "is_valid_restrict_answer_size": true,
+              "is_valid_creativity_in_response": true
+            }
+          }
+        }
+      },
+      {
+        "id": "9fb230f2-f079-44ef-963d-3873a24d762f",
+        "type": "text",
+        "position": {
+          "x": 825.75,
+          "y": 1770
+        },
+        "data": {
+          "label": "Answer AI 3",
+          "originalExtras": {
+            "config": {
+              "title": "Answer AI 3",
+              "top_k": 1,
+              "persona": {
+                "source": "You are a smart assistant.  You will try to answer the questions from the context information provided to you. Always try to provide responses in a HTML format. If not possible, provide response in plain text. If you do not have the answer to the question asked, respond with “Sorry, I do not know the answer to this. Can you try asking something else?“",
+                "content": "You are a smart assistant.  You will try to answer the questions from the context information provided to you. Always try to provide responses in a HTML format. If not possible, provide response in plain text. If you do not have the answer to the question asked, respond with “Sorry, I do not know the answer to this. Can you try asking something else?“",
+                "plain_text": "You are a smart assistant.  You will try to answer the questions from the context information provided to you. Always try to provide responses in a HTML format. If not possible, provide response in plain text. If you do not have the answer to the question asked, respond with “Sorry, I do not know the answer to this. Can you try asking something else?“"
+              },
+              "question": {
+                "source": "How can I help you?",
+                "content": "How can I help you?",
+                "plain_text": "How can I help you?"
+              },
+              "functions": [],
+              "model_name": "gpt-4o",
+              "dialog_type": "faq",
+              "is_supported": true,
+              "message_info": {
+                "is_enabled": false,
+                "is_disabled": false,
+                "title_source": "",
+                "title_content": "",
+                "is_valid_title": true,
+                "title_plain_text": "",
+                "description_source": "",
+                "description_content": "",
+                "description_plain_text": ""
+              },
+              "display_as_file": false,
+              "display_as_list": false,
+              "is_valid_persona": true,
+              "is_variable_empty": false,
+              "knowledge_base_id": null,
+              "display_as_buttons": false,
+              "display_as_carousel": false,
+              "is_feedback_enabled": true,
+              "is_valid_model_name": true,
+              "restrict_answer_size": "256",
+              "is_valid_dialog_title": true,
+              "creativity_in_response": "0.5",
+              "is_chat_history_enabled": false,
+              "context_of_conversations": 1,
+              "is_answer_contain_source": false,
+              "is_valid_knowledge_base_id": false,
+              "is_valid_restrict_answer_size": true,
+              "is_valid_creativity_in_response": true
+            }
+          }
+        }
+      },
+      {
+        "id": "9ac1a743-b12c-4ee2-bc27-9fa762fac4cc",
+        "type": "text",
+        "position": {
+          "x": 1284,
+          "y": 122
+        },
+        "data": {
+          "label": "Send message 9",
+          "originalExtras": {
+            "config": {
+              "title": "Send message 9",
+              "flowId": "413b76d1-0de9-4303-a0ed-227146f9baa2",
+              "dialog_type": "message",
+              "is_featured": true,
+              "is_connected": true,
+              "is_supported": true,
+              "message_info": {
+                "is_enabled": false,
+                "is_disabled": false,
+                "title_source": "",
+                "title_content": "",
+                "is_valid_title": true,
+                "title_plain_text": "",
+                "description_source": "",
+                "description_content": "",
+                "description_plain_text": ""
+              },
+              "message_block": [
+                {
+                  "text": "Hi there! My name is…",
+                  "type": "text",
+                  "value": "ce7537af-4bcb-433b-b94b-112b1efed108",
+                  "content": "Hi there! My name is…",
+                  "plain_text": "Hi there! My name is…",
+                  "is_valid_message_input": true
+                }
+              ],
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": true,
+              "link_tracking_enabled": false
+            }
+          }
+        }
+      },
+      {
+        "id": "abf76b92-d0ea-46c5-b60a-87c1c830de25",
+        "type": "text",
+        "position": {
+          "x": 1182.75,
+          "y": 294.5
+        },
+        "data": {
+          "label": "Send message 8",
+          "originalExtras": {
+            "config": {
+              "title": "Send message 8",
+              "flowId": "413b76d1-0de9-4303-a0ed-227146f9baa2",
+              "dialog_type": "message",
+              "is_featured": true,
+              "is_connected": true,
+              "is_supported": true,
+              "message_info": {
+                "is_enabled": false,
+                "is_disabled": false,
+                "title_source": "",
+                "title_content": "",
+                "is_valid_title": true,
+                "title_plain_text": "",
+                "description_source": "",
+                "description_content": "",
+                "description_plain_text": ""
+              },
+              "message_block": [
+                {
+                  "text": "Hi there! My name is…",
+                  "type": "text",
+                  "value": "ce7537af-4bcb-433b-b94b-112b1efed108",
+                  "content": "Hi there! My name is…",
+                  "plain_text": "Hi there! My name is…",
+                  "is_valid_message_input": true
+                }
+              ],
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": false,
+              "link_tracking_enabled": false
+            }
+          }
+        }
+      },
+      {
+        "id": "f33be814-f401-409c-a2f6-53126fdd1cb4",
+        "type": "text",
+        "position": {
+          "x": 1380.25,
+          "y": 94.5
+        },
+        "data": {
+          "label": "Send message 8",
+          "originalExtras": {
+            "config": {
+              "title": "Send message 8",
+              "flowId": "413b76d1-0de9-4303-a0ed-227146f9baa2",
+              "dialog_type": "message",
+              "is_featured": true,
+              "is_connected": true,
+              "is_supported": true,
+              "message_info": {
+                "is_enabled": false,
+                "is_disabled": false,
+                "title_source": "",
+                "title_content": "",
+                "is_valid_title": true,
+                "title_plain_text": "",
+                "description_source": "",
+                "description_content": "",
+                "description_plain_text": ""
+              },
+              "message_block": [
+                {
+                  "text": "Hi there! My name is…",
+                  "type": "text",
+                  "value": "ce7537af-4bcb-433b-b94b-112b1efed108",
+                  "content": "Hi there! My name is…",
+                  "plain_text": "Hi there! My name is…",
+                  "is_valid_message_input": true
+                }
+              ],
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": false,
+              "link_tracking_enabled": false
+            }
+          }
+        }
+      },
+      {
+        "id": "ce93427a-b631-425d-ab51-16a10da84ddc",
+        "type": "text",
+        "position": {
+          "x": 1109,
+          "y": 70.75
+        },
+        "data": {
+          "label": "Send message 8",
+          "originalExtras": {
+            "config": {
+              "title": "Send message 8",
+              "flowId": "413b76d1-0de9-4303-a0ed-227146f9baa2",
+              "dialog_type": "message",
+              "is_featured": true,
+              "is_connected": true,
+              "is_supported": true,
+              "message_info": {
+                "is_enabled": false,
+                "is_disabled": false,
+                "title_source": "",
+                "title_content": "",
+                "is_valid_title": true,
+                "title_plain_text": "",
+                "description_source": "",
+                "description_content": "",
+                "description_plain_text": ""
+              },
+              "message_block": [
+                {
+                  "text": "Hi there! My name is…",
+                  "type": "text",
+                  "value": "ce7537af-4bcb-433b-b94b-112b1efed108",
+                  "content": "Hi there! My name is…",
+                  "plain_text": "Hi there! My name is…",
+                  "is_valid_message_input": true
+                }
+              ],
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": false,
+              "link_tracking_enabled": false
+            }
+          }
+        }
+      },
+      {
+        "id": "5c3bce65-cf64-4efb-8a4a-2424907afcff",
+        "type": "text",
+        "position": {
+          "x": 1382.75,
+          "y": 1342
+        },
+        "data": {
+          "label": "Google Calendar 1",
+          "originalExtras": {
+            "config": {
+              "title": "Google Calendar 1",
+              "flowId": "413b76d1-0de9-4303-a0ed-227146f9baa2",
+              "dialog_type": "appointment_booking",
+              "is_featured": true,
+              "is_connected": true,
+              "is_supported": true,
+              "date_selection": {
+                "button_text": "Choose date",
+                "error_message": "Error! Choose a valid option from the list",
+                "question_to_ask": "Please select your preferred date",
+                "button_text_source": "Choose date",
+                "button_text_content": "Choose date",
+                "error_message_source": "Error! Choose a valid option from the list",
+                "error_message_content": "Error! Choose a valid option from the list",
+                "question_to_ask_source": "Please select your preferred date",
+                "question_to_ask_content": "Please select your preferred date"
+              },
+              "selected_event": {
+                "label": "Zsa",
+                "value": "462",
+                "labelAvatar": {},
+                "customTooltip": "Munna Thakur"
+              },
+              "time_selection": {
+                "button_text": "Choose timeslot",
+                "error_message": "Error! Choose a valid option from the list",
+                "question_to_ask": "Please select your preferred timeslot",
+                "button_text_source": "Choose timeslot",
+                "button_text_content": "Choose timeslot",
+                "error_message_source": "Error! Choose a valid option from the list",
+                "error_message_content": "Error! Choose a valid option from the list",
+                "question_to_ask_source": "Please select your preferred timeslot",
+                "question_to_ask_content": "Please select your preferred timeslot"
+              },
+              "addon_version_id": 33,
+              "confirmation_message": "Your meeting has been booked!",
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": false,
+              "is_selected_event_empty": false,
+              "confirmation_message_source": "Your meeting has been booked!",
+              "confirmation_message_content": "Your meeting has been booked!",
+              "is_confirmation_message_valid": true,
+              "is_selected_event_attendee_empty": false,
+              "is_date_selection_button_text_valid": true,
+              "is_time_selection_button_text_valid": true,
+              "is_date_selection_error_message_valid": true,
+              "is_time_selection_error_message_valid": true,
+              "is_date_selection_question_to_ask_valid": true,
+              "is_time_selection_question_to_ask_valid": true
+            }
+          }
+        }
+      },
+      {
+        "id": "29a7455e-7526-4e1b-8bf2-e04c15bd5199",
+        "type": "text",
+        "position": {
+          "x": 1124.5,
+          "y": 1141.5
+        },
+        "data": {
+          "label": "Making Reservation - Select Date",
+          "originalExtras": {
+            "config": {
+              "text": "<p>When will you be visiting?</p>\n<p><br></p>\n<p>Please select the date and time</p>",
+              "title": "Making Reservation - Select Date",
+              "value": "fd754760-7e03-4a04-abcb-5e3bd8059272",
+              "flowId": "413b76d1-0de9-4303-a0ed-227146f9baa2",
+              "content": "{\"blocks\":[{\"key\":\"arlvv\",\"text\":\"When will you be visiting?\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"fuajp\",\"text\":\"\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"c561i\",\"text\":\"Please select the date and time\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+              "parameter": "",
+              "plain_text": "When will you be visiting?\n\nPlease select the date and time",
+              "dialog_type": "calendar",
+              "is_featured": true,
+              "calendar_tab": 0,
+              "exclude_days": [],
+              "is_connected": true,
+              "is_supported": true,
+              "exclude_dates": [],
+              "is_valid_input": true,
+              "date_range_type": {
+                "id": 0,
+                "type": "Single date"
+              },
+              "datepicker_type": "single",
+              "parameter_label": "",
+              "is_feature_authorized": true,
+              "is_past_dates_enabled": false,
+              "is_valid_dialog_title": false,
+              "link_tracking_enabled": false,
+              "is_valid_message_input": true,
+              "is_date_selection_enabled": false
+            }
+          }
+        }
+      },
+      {
+        "id": "1e614ae7-b6bd-4100-aa09-d93365259561",
+        "type": "text",
+        "position": {
+          "x": 1128.25,
+          "y": 1297.5
+        },
+        "data": {
+          "label": "Making Reservation - Special Request",
+          "originalExtras": {
+            "config": {
+              "text": "<p>Do you have any special requests? Maybe a seating preference?</p>",
+              "type": "text",
+              "title": "Making Reservation - Special Request",
+              "value": "dca0c044-66ff-4474-8d81-89a74b000e66",
+              "flowId": "413b76d1-0de9-4303-a0ed-227146f9baa2",
+              "content": "{\"blocks\":[{\"key\":\"er3iu\",\"text\":\"Do you have any special requests? Maybe a seating preference?\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+              "version": 2,
+              "parameter": "",
+              "input_type": {
+                "label": "text",
+                "value": "text"
+              },
+              "plain_text": "Do you have any special requests? Maybe a seating preference?",
+              "dialog_type": "input",
+              "is_featured": true,
+              "is_connected": true,
+              "is_supported": true,
+              "message_info": {
+                "is_enabled": false,
+                "is_disabled": false,
+                "title_source": "",
+                "title_content": "",
+                "is_valid_title": true,
+                "title_plain_text": "",
+                "description_source": "",
+                "description_content": "",
+                "description_plain_text": ""
+              },
+              "regex_pattern": "",
+              "is_valid_title": true,
+              "failure_message": "",
+              "parameter_label": "",
+              "success_message": "",
+              "fallback_message": "",
+              "is_feature_authorized": true,
+              "is_valid_dialog_title": false,
+              "link_tracking_enabled": false,
+              "is_valid_message_input": true,
+              "is_valid_regex_pattern": true,
+              "failure_message_content": "",
+              "success_message_content": "",
+              "fallback_message_content": "",
+              "is_valid_failure_message": true,
+              "failure_message_plain_text": "",
+              "success_message_plain_text": "",
+              "fallback_message_plain_text": ""
+            }
+          }
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "c86d86fa-ceb8-445d-8989-bffe63810db0",
+        "source": "1a254e8e-dc46-4331-8487-3dbdaa3df749",
+        "target": "4dbaf45c-bfcd-48e1-9262-a54a48f94a91",
+        "sourceHandle": "d41ec80b-fa67-4625-9522-7b2d8b2c8f4f",
+        "targetHandle": "fe020b86-8b62-406e-b205-e31dbb544ec3",
+        "hidden":false,
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        },
+        "data":{
+            "isDeleteable":false
+
+        }
+      },
+      {
+        "id": "ba48c18c-955a-40e5-884d-549cb2519a73",
+        "source": "1a254e8e-dc46-4331-8487-3dbdaa3df749",
+        "target": "712ce844-4983-4a29-8eb9-61ab5b56963a",
+        "sourceHandle": "d41ec80b-fa67-4625-9522-7b2d8b2c8f4f",
+        "targetHandle": "790bac74-3596-4ecc-af98-152934dd8643",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "f7e1cead-52d6-41d1-b8e6-a6c194ed8fb2",
+        "source": "1a254e8e-dc46-4331-8487-3dbdaa3df749",
+        "target": "31e03550-a5d4-4023-a31f-dc0782df7667",
+        "sourceHandle": "d41ec80b-fa67-4625-9522-7b2d8b2c8f4f",
+        "targetHandle": "e8f67b24-ecdf-4b37-8ebd-4cabbe592acc",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "baad6cdc-6d85-4167-8021-2b42c6682f31",
+        "source": "4dbaf45c-bfcd-48e1-9262-a54a48f94a91",
+        "target": "c96e2299-151e-40f4-a46a-bd97e92c4329",
+        "sourceHandle": "3898497a-c842-445c-be0a-3c73bedd0d49",
+        "targetHandle": "3f53df38-a833-4a36-99b3-80b2bf05ddc4",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "b142d41e-4554-42f1-ac4e-928bdf62bf09",
+        "source": "712ce844-4983-4a29-8eb9-61ab5b56963a",
+        "target": "3bfd3594-fdfb-4ce3-9cef-b23f23313de5",
+        "sourceHandle": "5142f949-527c-4ad1-94ec-988367c17b1b",
+        "targetHandle": "bc36d4af-8768-4265-931f-f60b9f261fd4",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "b507334f-787b-476a-9c57-2d75e796a3ec",
+        "source": "3bfd3594-fdfb-4ce3-9cef-b23f23313de5",
+        "target": "e94b1f90-f732-451a-b9d0-de450f08d87f",
+        "sourceHandle": "e6e8aec3-857d-47c0-aad2-c5b6f1384d9d",
+        "targetHandle": "1f1c6bc3-cffc-4010-a126-11c7cea1721d",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "e1e2a5bd-9803-4c7d-82fe-aa916b6eb1fd",
+        "source": "e94b1f90-f732-451a-b9d0-de450f08d87f",
+        "target": "dc88ef71-0eb6-4258-9496-4b808c558a45",
+        "sourceHandle": "8e85f716-b284-4362-8733-40f6d866c7c9",
+        "targetHandle": "43baf42c-2750-4a98-8dc4-ee7d765e3948",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "263a1a1f-f45e-4307-9797-e3d91f6cbe61",
+        "source": "c96e2299-151e-40f4-a46a-bd97e92c4329",
+        "target": "b68cef3f-24e3-418b-ae31-1e6bc1d006ce",
+        "sourceHandle": "3b802394-c0e3-4dd5-b5c4-790ee451059c",
+        "targetHandle": "6da80235-fdd6-4936-b232-ed2def67675f",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "1aad8557-cde1-4d36-92e1-6c423d8f8ba5",
+        "source": "b68cef3f-24e3-418b-ae31-1e6bc1d006ce",
+        "target": "22bb26b0-ac00-46b6-a134-703214723232",
+        "sourceHandle": "2ab29322-ff04-4262-925f-764ee0df11fd",
+        "targetHandle": "b42d52a9-ce07-411d-9e83-4cd7f200f15a",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "4a3659f9-0b50-4660-b9de-27f7361ec03d",
+        "source": "22bb26b0-ac00-46b6-a134-703214723232",
+        "target": "b53069f9-183d-4c25-a259-4eb10a3010c8",
+        "sourceHandle": "ef86a9a8-3b5a-4a50-af55-9b4000c7799b",
+        "targetHandle": "3d27b1cd-6a60-4da0-89ac-7a68d26b6c09",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "3532fd20-052c-4556-ab8b-0c01768d1297",
+        "source": "b53069f9-183d-4c25-a259-4eb10a3010c8",
+        "target": "f3f18fd5-5c48-4b0c-a991-4bf3ac6bfdeb",
+        "sourceHandle": "05afc42d-2f9a-4127-9be4-0eac5410ea65",
+        "targetHandle": "47e3fbc4-2863-49d7-85eb-a06281b91577",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "694f5153-e870-49ca-a3f4-6ef4e60d4e76",
+        "source": "f3f18fd5-5c48-4b0c-a991-4bf3ac6bfdeb",
+        "target": "f9d5c532-f7fb-40a2-810b-124b30aa09b9",
+        "sourceHandle": "34b3746a-62c0-4cf9-8ee5-e8305cdc1c99",
+        "targetHandle": "88a150b2-366f-4840-8342-4a7cb44b6dea",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "95f10365-5c0c-4d8c-9245-56a1adf4cfe0",
+        "source": "f9d5c532-f7fb-40a2-810b-124b30aa09b9",
+        "target": "193e8552-7d3d-428e-bbb0-1369117496cc",
+        "sourceHandle": "5bdb221d-cf84-47dd-bab4-3b2afaddf294",
+        "targetHandle": "74efa0de-bfac-4bf4-91a7-c23f50737ee5",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "2cae25cc-8cc8-4491-b8e6-262ec294c147",
+        "source": "60c803f3-6eef-4a23-9208-67a224f3e8b6",
+        "target": "55ce281e-a147-4f6b-8e3d-a45d9624652b",
+        "sourceHandle": "e462c9f2-9fc7-4b26-9821-2eb761927436",
+        "targetHandle": "9eabe838-7813-495b-938a-b6b4b3effa19",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "d29872ec-040b-4bb1-af08-37071ca5f066",
+        "source": "193e8552-7d3d-428e-bbb0-1369117496cc",
+        "target": "d57a2a65-fa31-4c9d-83ac-2d43ab3649de",
+        "sourceHandle": "670ce11e-b06c-47fc-8b90-56519d55a3b8",
+        "targetHandle": "4a1fc11a-f601-44d3-9eae-cae410cdb935",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "456cc2aa-76bb-4318-a5b3-3e20acb0ad67",
+        "source": "d57a2a65-fa31-4c9d-83ac-2d43ab3649de",
+        "target": "4c0099b5-3d62-4a7f-bc07-476e34f954b8",
+        "sourceHandle": "75ae5c33-55b9-41b7-9efd-a4f10a751cd9",
+        "targetHandle": "2607f781-bd74-4844-a8e1-0e6b6a955f66",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "232e6eca-5d6e-4413-80aa-5eaaaf4832eb",
+        "source": "4c0099b5-3d62-4a7f-bc07-476e34f954b8",
+        "target": "917af634-3a22-42f7-a26b-0dde26f77bc2",
+        "sourceHandle": "ce2cc122-38f8-4996-94e5-d5a9d72c947a",
+        "targetHandle": "ad5e135f-a892-4927-b706-e1cd7210c570",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "515d6ede-ff16-4b66-9962-8ed4c70f3c64",
+        "source": "d57a2a65-fa31-4c9d-83ac-2d43ab3649de",
+        "target": "8b5d7103-8321-4633-b6b7-6a29959f8c2e",
+        "sourceHandle": "75ae5c33-55b9-41b7-9efd-a4f10a751cd9",
+        "targetHandle": "904cfd81-376f-4e4a-a5c0-c0ffa75b85b6",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "63f055a0-0a69-47c2-a80a-f141b899a8df",
+        "source": "8b5d7103-8321-4633-b6b7-6a29959f8c2e",
+        "target": "001f196d-1731-4a3e-966b-b343f287927f",
+        "sourceHandle": "b407a9cf-ffd4-47e4-94a0-ce7a8a5c84d8",
+        "targetHandle": "12bad280-0242-4c7f-8fa2-916df8d3e356",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "4f83200a-acba-484a-92e0-b4a499fd1e62",
+        "source": "1a254e8e-dc46-4331-8487-3dbdaa3df749",
+        "target": "eac9a7f9-f1e3-411f-895d-5652a1678f9e",
+        "sourceHandle": "d41ec80b-fa67-4625-9522-7b2d8b2c8f4f",
+        "targetHandle": "c85cb096-cdf8-4f55-9bca-38b800ee835c",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "ec484338-520e-4302-b6ce-411570d47be5",
+        "source": "1a254e8e-dc46-4331-8487-3dbdaa3df749",
+        "target": "508afe24-6738-42d6-99db-70d5a7042782",
+        "sourceHandle": "d41ec80b-fa67-4625-9522-7b2d8b2c8f4f",
+        "targetHandle": "1cb91f91-9722-4845-a756-1fdac6654d53",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "cd88c533-cc0b-4ede-92c2-91be8b36c67b",
+        "source": "001f196d-1731-4a3e-966b-b343f287927f",
+        "target": "b32c3cb5-dabc-4b07-84a8-de72f64b6d78",
+        "sourceHandle": "7b2d6619-f972-4794-960c-75a36fbcb9e3",
+        "targetHandle": "9632b11f-92eb-442c-9a0e-f99a598f0d08",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "765a0104-3c45-4c21-ac5d-f61aed40d248",
+        "source": "b32c3cb5-dabc-4b07-84a8-de72f64b6d78",
+        "target": "4d998b2e-822d-41e0-a593-ed87b7053344",
+        "sourceHandle": "ffedfb62-4d62-4aa1-b2d3-8367151ef7b7",
+        "targetHandle": "3ab7d7a0-e3a4-485f-9138-a43fc0c562da",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "8621740c-4d84-44ad-8a7b-d344289a80ef",
+        "source": "4d998b2e-822d-41e0-a593-ed87b7053344",
+        "target": "26a8f566-a154-47e5-a6bb-4e2b9ebd5582",
+        "sourceHandle": "23a4e8b6-a811-4186-8925-33f5dcb14cc2",
+        "targetHandle": "8d94f3eb-78a2-47c9-a720-a936c7ee9e09",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "1cf6680c-358e-4702-b08d-b1afe47135de",
+        "source": "4d998b2e-822d-41e0-a593-ed87b7053344",
+        "target": "419fe721-7cec-4014-ba52-6aef27604050",
+        "sourceHandle": "23a4e8b6-a811-4186-8925-33f5dcb14cc2",
+        "targetHandle": "5d50f9e7-60b3-4570-80d6-e12aee105696",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "573c9c35-bff1-4818-9ffb-1a956395e020",
+        "source": "4d998b2e-822d-41e0-a593-ed87b7053344",
+        "target": "f168c4f3-086a-43ec-b907-2081b8b2ef68",
+        "sourceHandle": "23a4e8b6-a811-4186-8925-33f5dcb14cc2",
+        "targetHandle": "0a8dfc92-3785-4ace-91f1-141ab3aa8919",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "76181198-9740-4ea1-935f-e4bc3345848e",
+        "source": "55ce281e-a147-4f6b-8e3d-a45d9624652b",
+        "target": "fe46f052-2b30-45ee-ae4b-f53bdeda2bae",
+        "sourceHandle": "53c1d27a-7f5a-4ae3-8220-db71a93581ce",
+        "targetHandle": "7e27d5d2-43c2-49c4-8b30-2288b3148223",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "de907b23-2c4b-45d8-ad55-d437a753d7f8",
+        "source": "fe46f052-2b30-45ee-ae4b-f53bdeda2bae",
+        "target": "be70c434-5861-48a2-9402-dbf1b9f0e7b5",
+        "sourceHandle": "c90b65c1-40e9-448c-8747-d25d34cd2fab",
+        "targetHandle": "ef7ee349-9cac-4bad-b393-e6d605cfcddf",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "26f6732a-a0a4-45c4-b0bd-8b989558165b",
+        "source": "be70c434-5861-48a2-9402-dbf1b9f0e7b5",
+        "target": "e81abd1d-2e20-4852-84e9-35d022d4e5f0",
+        "sourceHandle": "c48f8244-c1dc-4c4d-8998-d20672287566",
+        "targetHandle": "08988e3a-e223-4169-ae50-b860b4f9769a",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "f3445d52-03f4-4e9f-a97b-e369ebbf45d8",
+        "source": "31e03550-a5d4-4023-a31f-dc0782df7667",
+        "target": "60c803f3-6eef-4a23-9208-67a224f3e8b6",
+        "sourceHandle": "fdf9a51d-5d1c-473e-9910-ba5b93e1b03a",
+        "targetHandle": "e6ed7a58-76f8-45de-8f56-bf2c73620ce0",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "0d623c30-0a23-46dd-b218-b1fae89ee5dc",
+        "source": "413b76d1-0de9-4303-a0ed-227146f9baa2",
+        "target": "c3a176d4-0a81-4eca-9dd7-843d704f6f4a",
+        "sourceHandle": "5fb6c8fe-c61f-42aa-8b06-739d3b0269d3",
+        "targetHandle": "2ebf9954-6885-44bf-b3fb-027d60a66d3a",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "595c9d2d-197b-43fc-ad3d-4cb6edd4423d",
+        "source": "eac9a7f9-f1e3-411f-895d-5652a1678f9e",
+        "target": "55ce281e-a147-4f6b-8e3d-a45d9624652b",
+        "sourceHandle": "759da4ae-90cc-4279-b754-a53ae39c2df8",
+        "targetHandle": "9eabe838-7813-495b-938a-b6b4b3effa19",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "f7dcff21-35ca-4784-82a4-ce435b9e4184",
+        "source": "c3a176d4-0a81-4eca-9dd7-843d704f6f4a",
+        "target": "8d21b8f5-9aef-4446-9826-5951815de8d9",
+        "sourceHandle": "b12c0382-1eb0-4c5a-a590-85fae81ec450",
+        "targetHandle": "8cd876f1-584a-4092-868e-cc186d162ded",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "5bea06bc-cc95-47f9-8f00-a6a5d527a5d7",
+        "source": "8d21b8f5-9aef-4446-9826-5951815de8d9",
+        "target": "1a254e8e-dc46-4331-8487-3dbdaa3df749",
+        "sourceHandle": "2a1811a1-dc53-4397-906b-ceccb15fd7a7",
+        "targetHandle": "48f52693-b2a0-44f9-855f-25503e1fde32",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "e85f5f69-644f-4f26-b9bc-564e048471f3",
+        "source": "e81abd1d-2e20-4852-84e9-35d022d4e5f0",
+        "target": "a8e31253-2886-4248-b8ef-d778cd76a11b",
+        "sourceHandle": "b1eb8fbf-8781-4485-a96c-10846e53215c",
+        "targetHandle": "e5b2f8eb-ff78-40e8-8b21-9f898d8d2c3e",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "44aebd69-d49b-49e8-a116-874f26ad455f",
+        "source": "a8e31253-2886-4248-b8ef-d778cd76a11b",
+        "target": "91e1a651-5b5d-4d86-8284-d73e3a945a1d",
+        "sourceHandle": "0e98ae01-d039-4405-b3aa-17a2389e3b61",
+        "targetHandle": "77991f7a-c800-459b-9cf3-696403883008",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "5d5498ee-610a-4a1f-b1d2-66123cf9b38e",
+        "source": "734dba8b-1822-454b-a971-62a61e72b77c",
+        "target": "91e1a651-5b5d-4d86-8284-d73e3a945a1d",
+        "sourceHandle": "30df9bcb-c997-439b-ae95-d63c4197f086",
+        "targetHandle": "10acfe2d-dd3c-47e7-a854-1afeb5afd337",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "204891d7-a2b9-49d7-aa95-a52a0f837892",
+        "source": "91e1a651-5b5d-4d86-8284-d73e3a945a1d",
+        "target": "aa2a867f-cb23-42f6-ba30-9f3c8e96740e",
+        "sourceHandle": "900c00d9-3c0e-4c97-984c-12c02a0bfde8",
+        "targetHandle": "69bc110f-cee8-4451-a046-8b7f19f601a5",
+        "animated": true,
+        "style": {
+          "stroke": "#b1b1b7"
+        }
+      },
+      {
+        "id": "f0b19404-b211-4152-aba5-a860a262070d",
+        "source": "2673faca-430e-4791-b6ae-d96ea03d386b",
+        "target": "9fb230f2-f079-44ef-963d-3873a24d762f",
+        "sourceHandle": "24212d5a-dd67-4c5c-82db-6292d6773080",
+        "targetHandle": "a66f8624-5e89-4976-aa41-4f09baf2c5cc",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      },
+      {
+        "id": "a0a9f610-edb2-4534-b23d-db83b3bb4a57",
+        "source": "29a7455e-7526-4e1b-8bf2-e04c15bd5199",
+        "target": "1e614ae7-b6bd-4100-aa09-d93365259561",
+        "sourceHandle": "1b49cbe3-ea20-44b8-83be-e38514116dc4",
+        "targetHandle": "a4b53bcc-a1a1-4106-99ac-cf64959ad527",
+        "animated": true,
+        "style": {
+          "stroke": "rgba(255,255,255,0.5)"
+        }
+      }
+    ],
+    "extraInfo": {
+    "end": 3,
+    "faq": 3,
+    "flow": 1,
+    "form": 1,
+    "input": 16,
+    "buttons": 2,
+    "message": 8,
+    "ai_agent": 3,
+    "calendar": 2,
+    "cardview": 3,
+    "appointment_booking": 1
+  },
+  "isCompressedView": false,
+  "outboundDelayFlow": {},
+  "outboundEmailFlow": {},
+  "isAccountConfigured": {
+    "google": false,
+    "hubspot": false,
+    "zendesk": false,
+    "airtable": false,
+    "calendly": false,
+    "zoho_crm": false,
+    "freshdesk": false,
+    "salesforce": false,
+    "slack_live_chat": false,
+    "google_analytics": false,
+    "zendesk_live_chat": false,
+    "slack_notification": false
+  },
+  "deployedOutboundDelayFlow": {},
+  "deployedOutboundEmailFlow": {},
+   "background":{
+    "gap":2,
+    "size":1
+   }
+  }
+
+
+  
