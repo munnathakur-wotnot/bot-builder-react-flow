@@ -18,9 +18,9 @@ export default function MultiSelectToolbar({
 
   return (
     <div
-      className="ms-toolbar"
+      className="ms-toolbar no-select"
       role="toolbar"
-      aria-label="Multi-select actions no-select"
+      aria-label="Multi-select actions"
     >
       <span className="ms-toolbar__count">{count} selected</span>
 
