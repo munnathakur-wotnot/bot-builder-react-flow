@@ -19,6 +19,7 @@ export default function ContextMenu({
   setEdges,
   getNextNodeId,
   nuberOfNodes,
+  activeFlowId,
 }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState(null);
@@ -34,6 +35,7 @@ export default function ContextMenu({
         menuState,
         nodes,
         getNextNodeId,
+        activeFlowId,
       });
 
       if (!result) {
@@ -64,6 +66,7 @@ export default function ContextMenu({
         edges,
         totalToAdd,
         getNextNodeId,
+        activeFlowId,
         onComplete: ({ nodes, edges }) => {
           setNodes(nodes);
           setEdges(edges);
@@ -107,7 +110,7 @@ export default function ContextMenu({
   return (
     <div
       className="context-menu"
-      style={{ top: menuState.y, left: menuState.x, maxHeight: menuHeight }}
+      style={{ top: menuState.y, left: menuState.x, maxHeight: menuHeight, transform: "translateX(-50%)" }}
       role="menu"
     >
       <div className="context-menu__header">

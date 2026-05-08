@@ -42,3 +42,59 @@
     border-color: #6366f1;
     box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
   }
+
+/* ── Enter-flow / Enter-the-flow button ───────────────────────── */
+.jump-card__enter-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  letter-spacing: 0.01em;
+}
+
+.jump-card__enter-btn:active {
+  transform: scale(0.98);
+}
+
+.jump-card__enter-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Flow node variant — blue */
+.flow-selector-card__enter {
+  background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.28);
+}
+
+.flow-selector-card__enter:not(:disabled):hover {
+  opacity: 0.88;
+}
+
+/* Jump node variant — purple */
+.jump-card__enter-btn--jump {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(109, 40, 217, 0.28);
+}
+
+.jump-card__enter-btn--jump:not(:disabled):hover {
+  opacity: 0.88;
+}
+
+/* ── Flow selector card overrides ────────────────────────────── */
+.flow-selector-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.1);
+}

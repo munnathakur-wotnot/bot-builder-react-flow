@@ -1,5 +1,6 @@
 import { useCallback, useRef } from "react";
 import { removeNodeConnectionsForEdges } from "../utils";
+import { pushToastGlobal } from "../../../shared/ui/feedback/Toast.jsx";
 
 /**
  * Encapsulates delete / copy / clone logic for canvas nodes.
@@ -57,14 +58,44 @@ export function useNodeActions({
   // ── Copy (to clipboard) ───────────────────────────────────────
   const copyNode = useCallback(
     (nodeId) => {
-      const node = nodesRef.current.find((n) => n.id === nodeId);
+      const allNodes = nodesRef.current;
+
+      const node = allNodes.find((n) => n.id === nodeId);
+
       if (!node) return;
-      const text = JSON.stringify(
-        { type: node.data.type, data: node.data },
-        null,
-        2,
+
+      // carousel ho to uske members bhi copy karo
+      let nodesToCopy = [node];
+
+      if (node.data?.type === "carousel") {
+        const members = allNodes.filter((n) => n.data?.groupId === nodeId);
+
+        nodesToCopy = [node, ...members];
+      }
+
+      const copiedIds = new Set(nodesToCopy.map((n) => n.id));
+
+      const copiedEdges = edgesRef.current.filter(
+        (e) => copiedIds.has(e.source) && copiedIds.has(e.target),
       );
-      navigator.clipboard?.writeText(text).catch(() => {});
+
+      const payload = {
+        type: "flow/nodes",
+        mousePosition: null, // paste time pe overwrite hoga
+        nodes: nodesToCopy,
+        edges: copiedEdges,
+      };
+
+      navigator.clipboard
+        ?.writeText(JSON.stringify(payload, null, 2))
+        .then(() => {
+          const label = node.data?.title ?? "Node";
+          const extra = nodesToCopy.length > 1 ? ` (+${nodesToCopy.length - 1} sub-nodes)` : "";
+          pushToastGlobal(`"${label}"${extra} copied.`, "info");
+        })
+        .catch(() => {
+          pushToastGlobal("Copy failed — clipboard access denied.", "error");
+        });
     },
     [nodesRef],
   );
@@ -198,13 +229,43 @@ export function useNodeActions({
   const copyNodes = useCallback(
     (nodeIds) => {
       const allNodes = nodesRef.current;
-      const items = nodeIds
-        .map((id) => allNodes.find((n) => n.id === id))
-        .filter(Boolean)
-        .map((n) => ({ type: n.data.type, data: n.data }));
+
+      // expand carousel groups
+      const expandedIds = new Set(nodeIds);
+
+      nodeIds.forEach((id) => {
+        const node = allNodes.find((n) => n.id === id);
+
+        if (node?.data?.type === "carousel") {
+          allNodes.forEach((n) => {
+            if (n.data?.groupId === id) {
+              expandedIds.add(n.id);
+            }
+          });
+        }
+      });
+
+      const nodesToCopy = allNodes.filter((n) => expandedIds.has(n.id));
+
+      const copiedEdges = edgesRef.current.filter(
+        (e) => expandedIds.has(e.source) && expandedIds.has(e.target),
+      );
+
+      const payload = {
+        type: "flow/nodes",
+        mousePosition: null,
+        nodes: nodesToCopy,
+        edges: copiedEdges,
+      };
+
       navigator.clipboard
-        ?.writeText(JSON.stringify(items, null, 2))
-        .catch(() => {});
+        ?.writeText(JSON.stringify(payload, null, 2))
+        .then(() => {
+          pushToastGlobal(`${nodeIds.length} node${nodeIds.length !== 1 ? "s" : ""} copied.`, "info");
+        })
+        .catch(() => {
+          pushToastGlobal("Copy failed — clipboard access denied.", "error");
+        });
     },
     [nodesRef],
   );
