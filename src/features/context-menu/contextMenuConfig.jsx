@@ -52,6 +52,12 @@ export const MENU_CATEGORIES = [
         icon: Icons.condition,
         color: "#0ea5e9",
       },
+      {
+        id: "flow",
+        label: "Flow",
+        icon: Icons.flow,
+        color: "#0ea5e9",
+      },
     ],
   },
 ];

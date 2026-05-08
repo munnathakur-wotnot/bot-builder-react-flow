@@ -25,11 +25,13 @@ export function createFlowNode({
   icon = "",
   groupId,
   isValidDragConn = true,
+  flowId = null,
 }) {
   const node = {
     id,
     type,
     position: { x, y },
+    flowId,          // top-level — used by canvas filter, not inside data
     data: {
       id,
       inPorts,
@@ -57,6 +59,7 @@ export function createEdge(
   isNotDeletable = false,
   sourceHandle = "",
   hidden,
+  flowId = null,
 ) {
   const handle = sourceHandle || "default";
 
@@ -67,6 +70,7 @@ export function createEdge(
     hidden,
     sourceHandle: handle,
     type: "custom",
+    flowId,          // top-level — used by canvas filter
     data: { isNotDeletable },
   };
 }
@@ -108,6 +112,7 @@ function getNodeConfig(type, allNodes) {
       iCategory: "logic",
       extraData: {
         jumpNode: { id: "", title: "Select Node" },
+        _isJump: true,
       },
     },
     default: {
@@ -143,6 +148,7 @@ export function buildSingleNodePayload({
   allNodes,
   type = "default",
   sourceHandle = "",
+  activeFlowId = null,
 }) {
   const newNodeId = getNextNodeId();
 
@@ -158,16 +164,24 @@ export function buildSingleNodePayload({
     metaType: config.metaType,
     icon: config.icon,
     iCategory: config.iCategory,
+    flowId: activeFlowId,
   });
+
+  const extraData = { ...config.extraData };
+  // Jump nodes get a unique targetFlowId using their own node ID
+  if (config.metaType === "jump") {
+    extraData.targetFlowId = newNodeId;
+    delete extraData._isJump;
+  }
 
   newNode.data = {
     ...newNode.data,
-    ...config.extraData,
+    ...extraData,
   };
 
   return {
     nodesToAdd: [newNode],
-    edgesToAdd: [createEdge(sourceNodeId, newNodeId, false, sourceHandle)],
+    edgesToAdd: [createEdge(sourceNodeId, newNodeId, false, sourceHandle, undefined, activeFlowId)],
     dataPatch: {
       [newNodeId]: {
         ...nodeData,
@@ -188,6 +202,7 @@ export function buildCarouselPayload({
   getNextNodeId,
   allNodes,
   sourceHandle = "",
+  activeFlowId = null,
 }) {
   const carouselId = getNextNodeId();
 
@@ -228,6 +243,7 @@ export function buildCarouselPayload({
     description: "Carousel Node",
     metaType: "carousel",
     iCategory: "collect",
+    flowId: activeFlowId,
   });
 
   carouselNode.data.cards = cards;
@@ -235,7 +251,7 @@ export function buildCarouselPayload({
   carouselNode.data.connected = true;
 
   const nodes = [carouselNode];
-  const edges = [createEdge(sourceNodeId, carouselId, false, sourceHandle)];
+  const edges = [createEdge(sourceNodeId, carouselId, false, sourceHandle, undefined, activeFlowId)];
 
   cards.forEach((card, index) => {
     const x = startX + index * (NODE_WIDTH + HORIZONTAL_GAP);
@@ -252,6 +268,7 @@ export function buildCarouselPayload({
       groupId: carouselId,
       isValidDragConn: false,
       connected: true,
+      flowId: activeFlowId,
     });
 
     cardNode.data.buttons = card.buttons;
@@ -267,12 +284,13 @@ export function buildCarouselPayload({
       title: card.buttons[0].title,
       groupId: carouselId,
       isValidDragConn: false,
+      flowId: activeFlowId,
     });
     buttonNode.data.isSubNode = true;
     nodes.push(cardNode, buttonNode);
 
-    edges.push(createEdge(carouselId, card.id, true));
-    edges.push(createEdge(card.id, buttonId, true));
+    edges.push(createEdge(carouselId, card.id, true, "", undefined, activeFlowId));
+    edges.push(createEdge(card.id, buttonId, true, "", undefined, activeFlowId));
   });
 
   return {
@@ -296,6 +314,7 @@ export function buildFormPayload({
   getNextNodeId,
   allNodes,
   sourceHandle = "",
+  activeFlowId = null,
 }) {
   const newNodeId = getNextNodeId();
 
@@ -314,13 +333,14 @@ export function buildFormPayload({
     description: nodeData.description ?? "",
     metaType: "form",
     iCategory: "collect",
+    flowId: activeFlowId,
   });
 
   newNode.data.fields = nodeData.fields ?? [];
 
   return {
     nodesToAdd: [newNode],
-    edgesToAdd: [createEdge(sourceNodeId, newNodeId, false, sourceHandle)],
+    edgesToAdd: [createEdge(sourceNodeId, newNodeId, false, sourceHandle, undefined, activeFlowId)],
     selectedNodeId: newNodeId,
   };
 }
@@ -334,16 +354,18 @@ export function buildMenuActionMap({
   templates,
   getNextNodeId,
   sourceHandle,
+  activeFlowId = null,
 }) {
   return {
     carousel: () =>
-      buildCarouselPayload({ ...context, getNextNodeId, sourceHandle }),
+      buildCarouselPayload({ ...context, getNextNodeId, sourceHandle, activeFlowId }),
 
     condition: () =>
       buildConditionPayload({
         ...context,
         getNextNodeId,
         sourceHandle,
+        activeFlowId,
       }),
 
     collectInput: () =>
@@ -353,6 +375,7 @@ export function buildMenuActionMap({
         getNextNodeId,
         type: "default",
         sourceHandle,
+        activeFlowId,
       }),
 
     form: () =>
@@ -361,6 +384,7 @@ export function buildMenuActionMap({
         nodeData: templates.form,
         getNextNodeId,
         sourceHandle,
+        activeFlowId,
       }),
 
     delay: () =>
@@ -370,6 +394,7 @@ export function buildMenuActionMap({
         getNextNodeId,
         type: "delay",
         sourceHandle,
+        activeFlowId,
       }),
 
     jump: () =>
@@ -379,6 +404,7 @@ export function buildMenuActionMap({
         getNextNodeId,
         type: "jump",
         sourceHandle,
+        activeFlowId,
       }),
 
     answer_ai: () =>
@@ -388,7 +414,73 @@ export function buildMenuActionMap({
         getNextNodeId,
         type: "ai_answer",
         sourceHandle,
+        activeFlowId,
       }),
+
+    flow: () =>
+      buildFlowNodePayload({
+        ...context,
+        getNextNodeId,
+        sourceHandle,
+        activeFlowId,
+      }),
+  };
+}
+
+/* =========================================================
+   FLOW NODE BUILDER
+   Creates a "flow" node on the current canvas + auto-seeds a
+   "Flow starts" trigger node inside the new sub-flow.
+========================================================= */
+
+export function buildFlowNodePayload({
+  sourceNode,
+  sourceNodeId,
+  getNextNodeId,
+  allNodes,
+  sourceHandle = "",
+  activeFlowId = null,
+}) {
+  const flowNodeId = getNextNodeId();
+  const flowStartId = getNextNodeId();
+
+  const title = getIncrementalTitle({
+    allNodes,
+    metaType: "flow",
+    baseTitle: "Flow",
+  });
+
+  // The "flow" node visible on the current canvas scope
+  const flowNode = createFlowNode({
+    id: flowNodeId,
+    x: sourceNode.position.x,
+    y: sourceNode.position.y + 220,
+    inPorts: [sourceNodeId],
+    title,
+    metaType: "flow",
+    iCategory: "logic",
+    flowId: activeFlowId,
+  });
+  flowNode.data.targetFlowId = flowNodeId; // sub-flow scope keyed by this node's ID
+
+  // Auto-seeded "Flow starts" node inside the new sub-flow
+  const flowStartNode = createFlowNode({
+    id: flowStartId,
+    x: 600,
+    y: 200,
+    title: `${title} - Flow starts`,
+    metaType: "flowStart",
+    iCategory: "logic",
+    flowId: flowNodeId, // belongs to the new sub-flow
+    connected: false,
+  });
+
+  return {
+    nodesToAdd: [flowNode, flowStartNode],
+    edgesToAdd: [
+      createEdge(sourceNodeId, flowNodeId, false, sourceHandle, undefined, activeFlowId),
+    ],
+    selectedNodeId: flowNodeId,
   };
 }
 
@@ -617,6 +709,7 @@ export function buildConditionPayload({
   getNextNodeId,
   allNodes,
   sourceHandle = "",
+  activeFlowId = null,
 }) {
   const conditionRootId = getNextNodeId();
 
@@ -670,13 +763,14 @@ export function buildConditionPayload({
     metaType: "conditionRoot",
     iCategory: "logic",
     connected: true,
+    flowId: activeFlowId,
   });
 
   rootNode.data.children = children;
 
   const nodes = [rootNode];
   const edges = [
-    createEdge(sourceNodeId, conditionRootId, false, sourceHandle),
+    createEdge(sourceNodeId, conditionRootId, false, sourceHandle, undefined, activeFlowId),
   ];
 
   // Create only ONE LEVEL children
@@ -693,15 +787,15 @@ export function buildConditionPayload({
       groupId: conditionRootId,
       isValidDragConn: false,
       connected: true,
+      flowId: activeFlowId,
     });
     childNode.data.conditionType = "ALL";
     childNode.data.conditions = [];
     childNode.data.isSubNode = true;
-    childIds;
 
     nodes.push(childNode);
 
-    edges.push(createEdge(conditionRootId, child.id, true));
+    edges.push(createEdge(conditionRootId, child.id, true, "", undefined, activeFlowId));
   });
 
   return {

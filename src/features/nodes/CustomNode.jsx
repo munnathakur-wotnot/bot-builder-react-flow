@@ -18,7 +18,7 @@ function CustomNode({ id, data }) {
   const nodeErrors = validationErrors?.current?.[id] ?? [];
   const hasErrors = data.isErrorShow && nodeErrors.length > 0;
 
-  const isStartNode = data.type === "start";
+  const isStartNode = data.type === "start" || data.type === "flowStart";
   const isConnected = data?.connected;
   const isDoubleOutport = data?.doubleHandler ?? false;
   const isSelfLoop = data?.successOutport?.[0] === id;
@@ -30,15 +30,20 @@ function CustomNode({ id, data }) {
     ? hasSuccessOutport && hasFailureOutport
     : data.outPorts?.length > 0;
 
-  // Safe menu open
+  // Safe menu open — centers on node X
   const handleOpenMenu = useCallback(
     ({ event, type, isSelfLoop, isMenuOpen }) => {
       event?.stopPropagation();
 
+      // event.currentTarget is null in mouseup callbacks — use event.target only
+      const nodeEl = event?.target?.closest?.(".react-flow__node");
+      const rect = nodeEl?.getBoundingClientRect();
+      const centerX = rect ? rect.left + rect.width / 2 : event?.clientX;
+
       openMenu({
         nodeId: id,
-        x: event?.clientX,
-        y: event?.clientY + 10,
+        x: centerX,
+        y: rect ? rect.bottom + 8 : (event?.clientY ?? 0) + 20,
         type,
         isSelfLoop,
         isMenuOpen,
@@ -56,8 +61,8 @@ function CustomNode({ id, data }) {
 
         openMenu({
           nodeId: id,
-          x: rect.left + 80,
-          y: rect.bottom + 10,
+          x: rect.left + rect.width / 2,
+          y: rect.bottom + 8,
         });
       }
     },
@@ -105,14 +110,9 @@ function CustomNode({ id, data }) {
   if (!data) return null;
 
   const typeClassName = `custom-node custom-node--${data.type ?? "default"}${data.isSearchHighlight ? " custom-node--search-highlight" : ""}${hasErrors ? " custom-node--has-errors" : ""}${isActive ? " custom-node--executing" : ""}${isExecuted ? " custom-node--executed" : ""}`;
-  const titleClassName =
-    data.type === "delay" || data.type === "jump"
-      ? "custom-node__header-delay"
-      : "custom-node__header";
-  const titleTextClassName =
-    data.type === "delay" || data.type === "jump"
-      ? "small-node-title"
-      : "custom-node__title";
+  const isSmallPill = data.type === "delay" || data.type === "jump" || data.type === "flow" || data.type === "flowStart";
+  const titleClassName = isSmallPill ? "custom-node__header-delay" : "custom-node__header";
+  const titleTextClassName = isSmallPill ? "small-node-title" : "custom-node__title";
 
   return (
     <div
@@ -159,7 +159,7 @@ function CustomNode({ id, data }) {
         </p>
       </div>
       {/* Description */}
-      {!(data.type === "delay" || data.type === "jump" || isSubNode) && (
+      {!isSmallPill && !isSubNode && (
         <p className="custom-node__description">{data.description || ""}</p>
       )}
       {/* Hover toolbar */}
