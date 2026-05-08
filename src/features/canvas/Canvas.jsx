@@ -18,7 +18,7 @@ import {
 import "@xyflow/react/dist/style.css";
 import "./Canvas.css";
 import CustomNode from "../nodes/CustomNode";
-import { INITIAL_EDGES, INITIAL_NODES } from "./constants";
+import { getInitialValue } from "./constants";
 import CustomEdge from "../edges/CustomEdge";
 import { FlowCallbacksProvider } from "./FlowCallbacksContext.jsx";
 import HeaderTooltip from "../../shared/ui/tooltip/HeaderTooltip.jsx";
@@ -38,6 +38,7 @@ import { useCanvasIO } from "./hooks/useCanvasIO.js";
 // import FlowBreadcrumb from "./FlowBreadcrumb.jsx";
 import { useToast } from "../../shared/ui/feedback/Toast.jsx";
 import socket from "../socket/useSocket.js";
+import { useLocalStorage } from "./hooks/useLocalStrorege.js";
 
 const nodeTypes = { custom: CustomNode };
 const edgeTypes = { custom: CustomEdge };
@@ -52,6 +53,8 @@ const StaticControls = React.memo(function StaticControls() {
 
 export default function CanvasFlow() {
   // ── State ────────────────────────────────────────────────────
+  const { getNodesEdges, setNodesEdges } = useLocalStorage();
+  const { INITIAL_NODES, INITIAL_EDGES } = getInitialValue(getNodesEdges);
   const [nodes, setNodes, onNodesChange] = useNodesState(INITIAL_NODES);
   const [edges, setEdges, onEdgesChange] = useEdgesState(INITIAL_EDGES);
   const [selectedNodeId, _setSelectedNodeId] = useState(null);
@@ -71,6 +74,10 @@ export default function CanvasFlow() {
   const validationErrors = useRef(null);
   const selectedNodeIdRef = useRef(null);
   const pointerRef = useRef({ x: 100, y: 100 });
+
+  useEffect(() => {
+    setNodesEdges(nodes, edges);
+  }, [nodes, edges]);
 
   // ── React Flow ───────────────────────────────────────────────
   const { fitView, screenToFlowPosition } = useReactFlow();
@@ -92,7 +99,7 @@ export default function CanvasFlow() {
   // Defined early so useFlowScope / useCanvasIO can receive it
   const setSelectedNodeIdUpdate = useCallback(
     (id = null) => {
-      const prevSelectedId = selectedNodeIdRef.current;
+      const prevSelectedId = selectedNodeIdRef?.current;
       if (prevSelectedId) {
         updateSingleNode(prevSelectedId, (node) => ({
           ...node,
@@ -104,6 +111,7 @@ export default function CanvasFlow() {
     },
     [updateSingleNode],
   );
+  console.log(nodes, "User Node Selected");
 
   // highlight remote selected node
   useEffect(() => {
@@ -114,8 +122,7 @@ export default function CanvasFlow() {
       ...node,
       data: {
         ...node.data,
-        isSearchHighlight: true,
-        selectedBy: userNodeSelected.name,
+        selectedUser: userNodeSelected,
       },
     }));
 
@@ -125,8 +132,7 @@ export default function CanvasFlow() {
         ...node,
         data: {
           ...node.data,
-          isSearchHighlight: false,
-          selectedBy: null,
+          selectedUser: null,
         },
       }));
     };
