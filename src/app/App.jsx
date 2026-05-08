@@ -2,6 +2,7 @@
 import RemoteCursor from "../features/socket/RemoteCursor";
 import socket from "../features/socket/useSocket";
 import Canvas from "../features/canvas";
+import { throttle } from "lodash";
 
 export default function App() {
   useEffect(() => {
@@ -13,17 +14,21 @@ export default function App() {
       name: userName,
     });
 
-    const handleMove = (e) => {
+    // throttle = every 50ms only one emit
+    const handleMove = throttle((e) => {
       socket.emit("cursor-move", {
         x: e.clientX,
         y: e.clientY,
       });
-    };
+    }, 50);
 
     window.addEventListener("mousemove", handleMove);
 
     return () => {
       window.removeEventListener("mousemove", handleMove);
+
+      // cleanup throttle
+      handleMove.cancel();
     };
   }, []);
 

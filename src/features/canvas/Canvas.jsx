@@ -1,4 +1,10 @@
-﻿import React, { useCallback, useMemo, useRef, useState } from "react";
+﻿import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Background,
   Controls,
@@ -29,8 +35,9 @@ import useUpdateNode from "../../shared/hooks/useUpdateNode.js";
 import { useFlowPaste } from "./hooks/useFlowPaste.js";
 import { useFlowScope } from "./hooks/useFlowScope.js";
 import { useCanvasIO } from "./hooks/useCanvasIO.js";
-import FlowBreadcrumb from "./FlowBreadcrumb.jsx";
+// import FlowBreadcrumb from "./FlowBreadcrumb.jsx";
 import { useToast } from "../../shared/ui/feedback/Toast.jsx";
+import socket from "../socket/useSocket.js";
 
 const nodeTypes = { custom: CustomNode };
 const edgeTypes = { custom: CustomEdge };
@@ -53,6 +60,7 @@ export default function CanvasFlow() {
   const [menuState, setMenuState] = useState(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const { ToastContainer } = useToast();
+  const [userNodeSelected, setUserNodeSelected] = useState(null);
 
   // ── Refs ─────────────────────────────────────────────────────
   const nextIdRef = useRef(2);
@@ -97,16 +105,73 @@ export default function CanvasFlow() {
     [updateSingleNode],
   );
 
+  // highlight remote selected node
+  useEffect(() => {
+    if (!userNodeSelected?.nodeId) return;
+
+    // highlight selected node
+    updateSingleNode(userNodeSelected.nodeId, (node) => ({
+      ...node,
+      data: {
+        ...node.data,
+        isSearchHighlight: true,
+        selectedBy: userNodeSelected.name,
+      },
+    }));
+
+    // cleanup old highlight
+    return () => {
+      updateSingleNode(userNodeSelected.nodeId, (node) => ({
+        ...node,
+        data: {
+          ...node.data,
+          isSearchHighlight: false,
+          selectedBy: null,
+        },
+      }));
+    };
+  }, [userNodeSelected, updateSingleNode]);
+
+  // emit selected node
+  useEffect(() => {
+    if (selectedNodeId) {
+      socket.emit("node-selected", {
+        nodeId: selectedNodeId,
+      });
+    } else {
+      socket.emit("node-unselected");
+    }
+  }, [selectedNodeId]);
+
+  // listen socket events
+  useEffect(() => {
+    const handleNodeSelected = (data) => {
+      setUserNodeSelected(data);
+    };
+
+    const handleNodeUnselected = () => {
+      setUserNodeSelected(null);
+    };
+
+    socket.on("node-selected", handleNodeSelected);
+    socket.on("node-unselected", handleNodeUnselected);
+
+    return () => {
+      socket.off("node-selected", handleNodeSelected);
+      socket.off("node-unselected", handleNodeUnselected);
+    };
+  }, []);
+
   // ── Feature hooks ────────────────────────────────────────────
   const {
     activeFlowId,
-    visibleNodes,
-    visibleEdges,
-    flowOptions,
-    activeFlowLabel,
+    // visibleNodes,
+    // visibleEdges,
+    // flowOptions,
+    // activeFlowLabel,
     handleEnterFlow,
-    handleGoHome,
-    handleSelectFlow,
+    // handleGoHome,
+    // handleSelectFlow,
   } = useFlowScope({ nodes, edges, setSelectedNodeIdUpdate });
 
   const { importFileRef, handleImportChange, triggerImport, handleExport } =
@@ -291,8 +356,8 @@ export default function CanvasFlow() {
 
         <FlowCallbacksProvider value={flowCallbacks}>
           <ReactFlow
-            nodes={visibleNodes}
-            edges={visibleEdges}
+            nodes={nodes}
+            edges={edges}
             onMouseMove={onMouseMove}
             nodeTypes={nodeTypes}
             selectionMode={SelectionMode.Partial}
@@ -320,14 +385,14 @@ export default function CanvasFlow() {
             <MiniMap />
             <StaticControls />
 
-            <FlowBreadcrumb
+            {/* <FlowBreadcrumb
               activeFlowId={activeFlowId}
               activeFlowLabel={activeFlowLabel}
               flowOptions={flowOptions}
               visibleNodes={visibleNodes}
               onGoHome={handleGoHome}
               onSelectFlow={handleSelectFlow}
-            />
+            /> */}
 
             {selectedNodeIds.length >= 1 && (
               <MultiSelectToolbar
@@ -371,7 +436,7 @@ export default function CanvasFlow() {
 
           <NodeSearchModal
             open={searchOpen}
-            nodes={visibleNodes}
+            nodes={nodes}
             onSelect={handleNodeFound}
             onClose={() => setSearchOpen(false)}
           />
