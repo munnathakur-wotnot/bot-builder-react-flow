@@ -34,6 +34,15 @@ export const cursorStore = {
     return state;
   },
 
+  /** Call this immediately after join-room ack to avoid the getMeStamp() null window */
+  setMe(user) {
+    setState((prev) => ({
+      ...prev,
+      me: user,
+      cursors: { ...prev.cursors, [user.id]: user },
+    }));
+  },
+
   init() {
 
     // avoid multiple bindings

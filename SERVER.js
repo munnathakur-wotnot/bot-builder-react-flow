@@ -93,7 +93,7 @@ io.on("connection", (socket) => {
   console.log("CONNECTED:", socket.id);
 
   // ── Join room ────────────────────────────────────────────────
-  socket.on("join-room", ({ roomId, name }) => {
+  socket.on("join-room", ({ roomId, name }, ack) => {
     socket.join(roomId);
 
     users[socket.id] = {
@@ -112,6 +112,8 @@ io.on("connection", (socket) => {
 
     socket.emit("existing-users", roomUsers);
     socket.emit("me", users[socket.id]);
+    // Also ack immediately so the client can use user data before any events
+    if (typeof ack === "function") ack(users[socket.id]);
     socket.to(roomId).emit("user-joined", users[socket.id]);
 
     // Send existing drag / menu locks to the joining user so their UI is correct
