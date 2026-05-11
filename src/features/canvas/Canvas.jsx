@@ -1,10 +1,4 @@
-﻿import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+﻿import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
   Background,
   Controls,
@@ -18,7 +12,6 @@ import {
 import "@xyflow/react/dist/style.css";
 import "./Canvas.css";
 import CustomNode from "../nodes/CustomNode";
-import { INITIAL_EDGES, INITIAL_NODES } from "./constants";
 import CustomEdge from "../edges/CustomEdge";
 import { FlowCallbacksProvider } from "./FlowCallbacksContext.jsx";
 import HeaderTooltip from "../../shared/ui/tooltip/HeaderTooltip.jsx";
@@ -79,8 +72,12 @@ export default function CanvasFlow() {
   const { updateSingleNode } = useUpdateNode(setNodes);
 
   // ── Collaborative socket hook ────────────────────────────────
-  const { remoteDragMapRef, emitDragStart, emitDragEnd, emitNodeChanged } =
-    useCollabSocket({ selectedNodeId, menuState, updateSingleNode, setNodes });
+  const { remoteDragMapRef, emitDragStart, emitDragEnd } = useCollabSocket({
+    selectedNodeId,
+    menuState,
+    updateSingleNode,
+    setNodes,
+  });
 
   validationErrors.current = useMemo(
     () => validateAllNodesKeys(nodes),
@@ -110,8 +107,6 @@ export default function CanvasFlow() {
     },
     [updateSingleNode],
   );
-
-
 
   // ── Feature hooks ────────────────────────────────────────────
   const {
