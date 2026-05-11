@@ -106,18 +106,42 @@ function CustomNode({ id, data }) {
 
   const isSubNode = data?.isSubNode;
   const showToolbar = !isStartNode && !isSubNode;
+  const selectedBy = data?.selectedBy ?? null;
+  const selectedByColor = data?.selectedByColor ?? null;
+  const isDraggedBy = data?.isDraggedBy ?? null;
+  const isDraggedByColor = data?.isDraggedByColor ?? null;
+  const isMenuOpenBy = data?.isMenuOpenBy ?? null;
+  const isMenuOpenByColor = data?.isMenuOpenByColor ?? null;
+
+  // If another remote user is dragging this node, make it non-draggable locally
+  const isLockedByRemote = Boolean(isDraggedBy);
 
   if (!data) return null;
 
-  const typeClassName = `custom-node custom-node--${data.type ?? "default"}${data.isSearchHighlight ? " custom-node--search-highlight" : ""}${hasErrors ? " custom-node--has-errors" : ""}${isActive ? " custom-node--executing" : ""}${isExecuted ? " custom-node--executed" : ""}`;
+  const typeClassName = [
+    `custom-node custom-node--${data.type ?? "default"}`,
+    data.isSearchHighlight ? "custom-node--search-highlight" : "",
+    hasErrors ? "custom-node--has-errors" : "",
+    isActive ? "custom-node--executing" : "",
+    isExecuted ? "custom-node--executed" : "",
+    isLockedByRemote ? "custom-node--drag-locked" : "",
+  ].filter(Boolean).join(" ");
+
   const isSmallPill = data.type === "delay" || data.type === "jump" || data.type === "flow" || data.type === "flowStart";
   const titleClassName = isSmallPill ? "custom-node__header-delay" : "custom-node__header";
   const titleTextClassName = isSmallPill ? "small-node-title" : "custom-node__title";
 
+  // Priority: drag lock > menu open > selected-by for border color
+  const borderColor = isDraggedByColor || isMenuOpenByColor || selectedByColor;
+  const remoteUserStyle = borderColor
+    ? { border: `2px solid ${borderColor}`, boxShadow: `0 0 0 3px ${borderColor}33` }
+    : {};
+
   return (
     <div
       className={typeClassName}
-      style={isSubNode ? { width: "120px" } : {}}
+      style={isSubNode ? { width: "120px", ...remoteUserStyle } : remoteUserStyle}
+      data-locked={isLockedByRemote ? "true" : undefined}
       onClick={
         isStartNode && !isConnected
           ? (e) => handleOpenMenu({ event: e })
@@ -127,6 +151,49 @@ function CustomNode({ id, data }) {
       role={isStartNode && !isConnected ? "button" : undefined}
       tabIndex={isStartNode && !isConnected ? 0 : undefined}
     >
+      {/* Drag-lock overlay — blocks interaction while another user drags */}
+      {isLockedByRemote && (
+        <div className="custom-node__drag-lock-overlay" />
+      )}
+
+      {/* Dragging badge */}
+      {isDraggedBy && (
+        <div
+          className="custom-node__remote-user-badge custom-node__remote-user-badge--dragging"
+          style={{ background: isDraggedByColor }}
+        >
+          <span className="custom-node__remote-user-avatar" style={{ background: isDraggedByColor }}>
+            {isDraggedBy[0]?.toUpperCase()}
+          </span>
+          ✦ {isDraggedBy} is dragging
+        </div>
+      )}
+
+      {/* Menu-open badge */}
+      {!isDraggedBy && isMenuOpenBy && (
+        <div
+          className="custom-node__remote-user-badge custom-node__remote-user-badge--menu"
+          style={{ background: isMenuOpenByColor }}
+        >
+          <span className="custom-node__remote-user-avatar" style={{ background: isMenuOpenByColor }}>
+            {isMenuOpenBy[0]?.toUpperCase()}
+          </span>
+          ☰ {isMenuOpenBy} has menu open
+        </div>
+      )}
+
+      {/* Selected-by badge */}
+      {!isDraggedBy && !isMenuOpenBy && selectedBy && (
+        <div
+          className="custom-node__remote-user-badge"
+          style={{ background: selectedByColor }}
+        >
+          <span className="custom-node__remote-user-avatar" style={{ background: selectedByColor }}>
+            {selectedBy[0]?.toUpperCase()}
+          </span>
+          {selectedBy}
+        </div>
+      )}
       {/* Error badge */}
       {hasErrors && !isSubNode && (
         <div className="custom-node__error-badge" title={nodeErrors.join("\n")}>
@@ -248,7 +315,13 @@ export default memo(CustomNode, (prev, next) => {
     prevData?.knowledgeBaseId === nextData?.knowledgeBaseId &&
     prevData?.functionIds === nextData?.functionIds &&
     prevData?.isErrorShow === nextData.isErrorShow &&
-    prevData?.isSearchHighlight === nextData?.isSearchHighlight
+    prevData?.isSearchHighlight === nextData?.isSearchHighlight &&
+    prevData?.selectedBy === nextData?.selectedBy &&
+    prevData?.selectedByColor === nextData?.selectedByColor &&
+    prevData?.isDraggedBy === nextData?.isDraggedBy &&
+    prevData?.isDraggedByColor === nextData?.isDraggedByColor &&
+    prevData?.isMenuOpenBy === nextData?.isMenuOpenBy &&
+    prevData?.isMenuOpenByColor === nextData?.isMenuOpenByColor
   );
 });
 

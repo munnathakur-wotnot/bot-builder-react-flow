@@ -1,10 +1,4 @@
-﻿import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+﻿import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
   Background,
   Controls,
@@ -18,7 +12,6 @@ import {
 import "@xyflow/react/dist/style.css";
 import "./Canvas.css";
 import CustomNode from "../nodes/CustomNode";
-import { INITIAL_EDGES, INITIAL_NODES } from "./constants";
 import CustomEdge from "../edges/CustomEdge";
 import { FlowCallbacksProvider } from "./FlowCallbacksContext.jsx";
 import HeaderTooltip from "../../shared/ui/tooltip/HeaderTooltip.jsx";
@@ -37,7 +30,8 @@ import { useFlowScope } from "./hooks/useFlowScope.js";
 import { useCanvasIO } from "./hooks/useCanvasIO.js";
 // import FlowBreadcrumb from "./FlowBreadcrumb.jsx";
 import { useToast } from "../../shared/ui/feedback/Toast.jsx";
-import socket from "../socket/useSocket.js";
+import { useLocalStorage, getPersistedFlow } from "./hooks/useLocalStrorege.js";
+import { useCollabSocket } from "./hooks/useCollabSocket.js";
 
 const nodeTypes = { custom: CustomNode };
 const edgeTypes = { custom: CustomEdge };
@@ -52,15 +46,16 @@ const StaticControls = React.memo(function StaticControls() {
 
 export default function CanvasFlow() {
   // ── State ────────────────────────────────────────────────────
-  const [nodes, setNodes, onNodesChange] = useNodesState(INITIAL_NODES);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(INITIAL_EDGES);
+  const { nodes: persistedNodes, edges: persistedEdges } = getPersistedFlow();
+  const [nodes, setNodes, onNodesChange] = useNodesState(persistedNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(persistedEdges);
+  useLocalStorage({ nodes, edges });
   const [selectedNodeId, _setSelectedNodeId] = useState(null);
   const [selectedNodeIds, setSelectedNodeIds] = useState([]);
   const [nuberOfNodes, setNumberOfNodes] = useState(0);
   const [menuState, setMenuState] = useState(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const { ToastContainer } = useToast();
-  const [userNodeSelected, setUserNodeSelected] = useState(null);
 
   // ── Refs ─────────────────────────────────────────────────────
   const nextIdRef = useRef(2);
@@ -75,6 +70,14 @@ export default function CanvasFlow() {
   // ── React Flow ───────────────────────────────────────────────
   const { fitView, screenToFlowPosition } = useReactFlow();
   const { updateSingleNode } = useUpdateNode(setNodes);
+
+  // ── Collaborative socket hook ────────────────────────────────
+  const { remoteDragMapRef, emitDragStart, emitDragEnd } = useCollabSocket({
+    selectedNodeId,
+    menuState,
+    updateSingleNode,
+    setNodes,
+  });
 
   validationErrors.current = useMemo(
     () => validateAllNodesKeys(nodes),
@@ -104,63 +107,6 @@ export default function CanvasFlow() {
     },
     [updateSingleNode],
   );
-
-  // highlight remote selected node
-  useEffect(() => {
-    if (!userNodeSelected?.nodeId) return;
-
-    // highlight selected node
-    updateSingleNode(userNodeSelected.nodeId, (node) => ({
-      ...node,
-      data: {
-        ...node.data,
-        isSearchHighlight: true,
-        selectedBy: userNodeSelected.name,
-      },
-    }));
-
-    // cleanup old highlight
-    return () => {
-      updateSingleNode(userNodeSelected.nodeId, (node) => ({
-        ...node,
-        data: {
-          ...node.data,
-          isSearchHighlight: false,
-          selectedBy: null,
-        },
-      }));
-    };
-  }, [userNodeSelected, updateSingleNode]);
-
-  // emit selected node
-  useEffect(() => {
-    if (selectedNodeId) {
-      socket.emit("node-selected", {
-        nodeId: selectedNodeId,
-      });
-    } else {
-      socket.emit("node-unselected");
-    }
-  }, [selectedNodeId]);
-
-  // listen socket events
-  useEffect(() => {
-    const handleNodeSelected = (data) => {
-      setUserNodeSelected(data);
-    };
-
-    const handleNodeUnselected = () => {
-      setUserNodeSelected(null);
-    };
-
-    socket.on("node-selected", handleNodeSelected);
-    socket.on("node-unselected", handleNodeUnselected);
-
-    return () => {
-      socket.off("node-selected", handleNodeSelected);
-      socket.off("node-unselected", handleNodeUnselected);
-    };
-  }, []);
 
   // ── Feature hooks ────────────────────────────────────────────
   const {
@@ -196,6 +142,31 @@ export default function CanvasFlow() {
   const { onGroupNodeDragStart, onGroupNodeDrag } = useGroupDrag(
     nodesRef,
     setNodes,
+  );
+
+  // ── Collaborative drag handlers ──────────────────────────────
+  const handleNodeDragStart = useCallback(
+    (event, node) => {
+      if (remoteDragMapRef.current[node.id]) return;
+      emitDragStart(node.id);
+      onGroupNodeDragStart(event, node);
+    },
+    [onGroupNodeDragStart, remoteDragMapRef, emitDragStart],
+  );
+
+  const handleNodeDrag = useCallback(
+    (event, node) => {
+      if (remoteDragMapRef.current[node.id]) return;
+      onGroupNodeDrag(event, node);
+    },
+    [onGroupNodeDrag, remoteDragMapRef],
+  );
+
+  const handleNodeDragStop = useCallback(
+    (_, node) => {
+      emitDragEnd(node.id);
+    },
+    [emitDragEnd],
   );
 
   const {
@@ -340,6 +311,7 @@ export default function CanvasFlow() {
         <HeaderTooltip
           setNodes={setNodes}
           edges={edges}
+          setEdges={setEdges}
           totalNodes={nodes.length}
           nuberOfNodes={nuberOfNodes}
           setNumberOfNodes={setNumberOfNodes}
@@ -371,8 +343,9 @@ export default function CanvasFlow() {
             onConnect={onConnect}
             onConnectStart={handleConnectStart}
             onConnectEnd={handleConnectEnd}
-            onNodeDragStart={onGroupNodeDragStart}
-            onNodeDrag={onGroupNodeDrag}
+            onNodeDragStart={handleNodeDragStart}
+            onNodeDrag={handleNodeDrag}
+            onNodeDragStop={handleNodeDragStop}
             onNodeClick={handleNodeClick}
             onSelectionChange={handleSelectionChange}
             snapToGrid={true}
