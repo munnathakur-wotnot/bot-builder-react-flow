@@ -38,11 +38,17 @@ import { useCanvasIO } from "./hooks/useCanvasIO.js";
 import { useToast } from "../../shared/ui/feedback/Toast.jsx";
 import { useCollabSocket } from "./hooks/useCollabSocket.js";
 import { useCursorStore } from "../socket/useCursorStore.js";
+import { getMeStamp } from "../socket/useCursorStore.js";
 import socket from "../socket/useSocket.js";
 import { viewportStore } from "../../shared/hooks/useViewportStore.js";
+import { EPHEMERAL_NODE_KEYS } from "./constants.js";
+import { useAutoSave } from "./hooks/useAutoSave.js";
 
 const nodeTypes = { custom: CustomNode };
 const edgeTypes = { custom: CustomEdge };
+
+// Fields that are managed purely by socket events and must never be persisted
+// (defined in constants.js — imported above)
 
 const StaticBackground = React.memo(function StaticBackground() {
   return <Background gap={20} size={1} />;
@@ -63,9 +69,12 @@ export default function CanvasFlow() {
   const [nuberOfNodes, setNumberOfNodes] = useState(0);
   const [menuState, setMenuState] = useState(null);
   const [searchOpen, setSearchOpen] = useState(false);
-  const { ToastContainer } = useToast();
+  const { ToastContainer, pushToast } = useToast();
   const { cursors, me } = useCursorStore();
   const isRemoteUpdateRef = useRef(false);
+  // Prevents save-flow from firing before get-flow callback returns (avoids
+  // broadcasting empty [] on mount and overwriting a peer's canvas)
+  const isInitializedRef = useRef(false);
 
   // ── Refs ─────────────────────────────────────────────────────
   const nextIdRef = useRef(2);
@@ -103,33 +112,65 @@ export default function CanvasFlow() {
 
   useEffect(() => {
     socket.emit("get-flow", { roomId: "room-1" }, (flow) => {
+      // Mark as remote update so the save-flow effect doesn't re-broadcast
+      // the just-loaded state back to the server
+      isRemoteUpdateRef.current = true;
       setNodes(flow.nodes || []);
       setEdges(flow.edges || []);
       nextIdRef.current = flow.currentId || 1;
+      // Now safe to start saving local changes
+      isInitializedRef.current = true;
     });
   }, []);
 
   useEffect(() => {
+    if (!isInitializedRef.current) return;
     if (isRemoteUpdateRef.current) {
       isRemoteUpdateRef.current = false;
       return;
     }
 
+    // Strip ephemeral collab fields so the server never stores stale labels
+    const cleanNodes = nodes.map((n) => {
+      const hasEphemeral = EPHEMERAL_NODE_KEYS.some((k) => k in n.data);
+      if (!hasEphemeral) return n;
+      const cleanData = { ...n.data };
+      EPHEMERAL_NODE_KEYS.forEach((k) => delete cleanData[k]);
+      return { ...n, data: cleanData };
+    });
+
     socket.emit("save-flow", {
       roomId: "room-1",
-      nodes,
+      nodes: cleanNodes,
       edges,
       currentId: nextIdRef.current,
     });
   }, [nodes, edges]);
 
   useEffect(() => {
-    socket.on("flow-updated", ({ nodes, edges, currentId }) => {
+    socket.on("flow-updated", ({ nodes: incomingNodes, edges, currentId }) => {
       isRemoteUpdateRef.current = true;
 
-      setNodes(nodes);
-      setEdges(edges);
+      // Preserve any live ephemeral collab state (drag/selection/menu labels)
+      // so an unrelated remote change doesn't wipe an active label
+      setNodes((curr) => {
+        const ephemeralById = {};
+        curr.forEach((n) => {
+          const patch = {};
+          EPHEMERAL_NODE_KEYS.forEach((k) => {
+            if (n.data[k] !== undefined) patch[k] = n.data[k];
+          });
+          if (Object.keys(patch).length) ephemeralById[n.id] = patch;
+        });
 
+        return incomingNodes.map((n) => {
+          const ep = ephemeralById[n.id];
+          if (!ep) return n;
+          return { ...n, data: { ...n.data, ...ep } };
+        });
+      });
+
+      setEdges(edges);
       nextIdRef.current = currentId;
     });
 
@@ -192,6 +233,8 @@ export default function CanvasFlow() {
   const { isSimulating, simulationStore, startSimulation, stopSimulation } =
     useFlowSimulation();
 
+  useAutoSave({ nodes, edges, nextIdRef });
+
   const { onGroupNodeDragStart, onGroupNodeDrag } = useGroupDrag(
     nodesRef,
     setNodes,
@@ -218,8 +261,15 @@ export default function CanvasFlow() {
   const handleNodeDragStop = useCallback(
     (_, node) => {
       emitDragEnd(node.id);
+      const stamp = getMeStamp();
+      if (stamp) {
+        updateSingleNode(node.id, (n) => ({
+          ...n,
+          data: { ...n.data, lastUpdatedBy: stamp },
+        }));
+      }
     },
-    [emitDragEnd],
+    [emitDragEnd, updateSingleNode],
   );
 
   const {
@@ -243,6 +293,7 @@ export default function CanvasFlow() {
     deleteNodes,
     copyNodes,
     cloneNodes,
+    getNodeLockOwner,
   } = useNodeActions({
     nodesRef,
     edges,
@@ -255,9 +306,18 @@ export default function CanvasFlow() {
   // ── Event handlers ───────────────────────────────────────────
   const openMenu = useCallback(
     ({ nodeId, x, y, type, isSelfLoop, isMenuOpen }) => {
+      // Block if a remote user already has this node's menu open
+      const node = nodesRef.current.find((n) => n.id === nodeId);
+      if (node?.data?.isMenuOpenBy) {
+        pushToast(
+          `Menu is already open by ${node.data.isMenuOpenBy}`,
+          "info",
+        );
+        return;
+      }
       setMenuState({ nodeId, x, y, type, isSelfLoop, isMenuOpen });
     },
-    [],
+    [nodesRef, pushToast],
   );
 
   const handleNodeClick = useCallback(
@@ -298,10 +358,12 @@ export default function CanvasFlow() {
         y: flowPosition.y,
       };
 
-      // realtime cursor sync
+      // realtime cursor sync — emit flow coordinates so peers can convert
+      // to their own screen space regardless of zoom/pan
       socket.emit("cursor-move", {
         x: flowPosition.x,
         y: flowPosition.y,
+        isFlow: true,
       });
     },
     [screenToFlowPosition],

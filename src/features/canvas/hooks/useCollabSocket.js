@@ -17,7 +17,6 @@ export function useCollabSocket({
   updateSingleNode,
   setNodes,
 }) {
-  const [userNodeSelected, setUserNodeSelected] = useState(null);
   const [remoteDragMap, setRemoteDragMap] = useState({});
   const [remoteTypingMap, setRemoteTypingMap] = useState({});
 
@@ -27,6 +26,9 @@ export function useCollabSocket({
   // Stable ref so drag-start handler can read latest map without closure issues
   const remoteDragMapRef = useRef({});
   remoteDragMapRef.current = remoteDragMap;
+
+  // userId -> { nodeId, name, color } — tracks every remote user's selected node
+  const remoteSelectionMapRef = useRef({});
 
   // ── Emit: node selected / unselected ─────────────────────────
   useEffect(() => {
@@ -53,37 +55,34 @@ export function useCollabSocket({
     prevMenuNodeIdRef.current = curr;
   }, [menuState]);
 
-  // ── Highlight remote-selected node ────────────────────────────
-  useEffect(() => {
-    if (!userNodeSelected?.nodeId) return;
-
-    updateSingleNode(userNodeSelected.nodeId, (node) => ({
-      ...node,
-      data: {
-        ...node.data,
-        isSearchHighlight: true,
-        selectedBy: userNodeSelected.name,
-        selectedByColor: userNodeSelected.color,
-      },
-    }));
-
-    return () => {
-      updateSingleNode(userNodeSelected.nodeId, (node) => ({
-        ...node,
-        data: {
-          ...node.data,
-          isSearchHighlight: false,
-          selectedBy: null,
-          selectedByColor: null,
-        },
-      }));
-    };
-  }, [userNodeSelected, updateSingleNode]);
-
   // ── Socket listeners ──────────────────────────────────────────
   useEffect(() => {
-    const handleNodeSelected = (data) => setUserNodeSelected(data);
-    const handleNodeUnselected = () => setUserNodeSelected(null);
+    const handleNodeSelected = ({ userId, name, color, nodeId }) => {
+      // Clear the previous node this user had selected (if different)
+      const prev = remoteSelectionMapRef.current[userId];
+      if (prev?.nodeId && prev.nodeId !== nodeId) {
+        updateSingleNode(prev.nodeId, (n) => ({
+          ...n,
+          data: { ...n.data, isSearchHighlight: false, selectedBy: null, selectedByColor: null },
+        }));
+      }
+      remoteSelectionMapRef.current[userId] = { nodeId, name, color };
+      updateSingleNode(nodeId, (n) => ({
+        ...n,
+        data: { ...n.data, isSearchHighlight: true, selectedBy: name, selectedByColor: color },
+      }));
+    };
+
+    const handleNodeUnselected = ({ userId }) => {
+      const prev = remoteSelectionMapRef.current[userId];
+      if (prev?.nodeId) {
+        updateSingleNode(prev.nodeId, (n) => ({
+          ...n,
+          data: { ...n.data, isSearchHighlight: false, selectedBy: null, selectedByColor: null },
+        }));
+      }
+      delete remoteSelectionMapRef.current[userId];
+    };
 
     const handleNodeDragStart = ({ nodeId, name, color }) => {
       setRemoteDragMap((prev) => ({ ...prev, [nodeId]: { name, color } }));
@@ -198,7 +197,10 @@ export function useCollabSocket({
     };
 
     const userLeftHandler = (user) => {
-      console.log(user, "User-left-the");
+      // Clear the departing user's node selection highlight
+      handleNodeUnselected({ userId: user.id });
+      // drag/menu/typing locks are cleaned up via node-drag-end / node-menu-close / node-typing-end
+      // which the server emits from releaseLocksForSocket before user-left fires
     };
 
     socket.on("user-left", userLeftHandler);

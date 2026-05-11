@@ -35,6 +35,7 @@ export const cursorStore = {
   },
 
   init() {
+
     // avoid multiple bindings
     if (this.initialized) return;
 
@@ -115,4 +116,11 @@ export const cursorStore = {
 
 export function useCursorStore() {
   return useSyncExternalStore(cursorStore.subscribe, cursorStore.getSnapshot);
+}
+
+/** Synchronously get a stamp of the current user — safe to call outside React. */
+export function getMeStamp() {
+  const me = state.me;
+  if (!me) return null;
+  return { id: me.id, name: me.name, color: me.color, at: Date.now() };
 }

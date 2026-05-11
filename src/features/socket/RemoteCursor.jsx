@@ -1,12 +1,40 @@
 import React, { useEffect } from "react";
 import "./remote-users.css";
 import { cursorStore, useCursorStore } from "./useCursorStore";
+import { useSyncExternalStore } from "react";
+import { viewportStore } from "../../shared/hooks/useViewportStore";
+
+/** Convert a flow-space coordinate to absolute screen pixels.
+ *  viewport = { x, y, zoom } from React Flow's onMove (relative to canvas container).
+ *  canvasRect = getBoundingClientRect() of the .react-flow element. */
+function flowToScreen(fx, fy, viewport, canvasRect) {
+  return {
+    x: fx * viewport.zoom + viewport.x + canvasRect.left,
+    y: fy * viewport.zoom + viewport.y + canvasRect.top,
+  };
+}
 
 export default function RemoteCursors() {
     useEffect(() => {
         cursorStore.init();
     }, []);
     const { cursors, me } = useCursorStore();
+    const viewport = useSyncExternalStore(
+        viewportStore.subscribe,
+        viewportStore.getSnapshot,
+    );
+
+    // Resolve screen position for a cursor, handling both flow and screen coords
+    const resolveScreenPos = (cursor) => {
+        if (!cursor.isFlow) {
+            // Screen coordinates from outside-canvas areas — use directly
+            return { x: cursor.x, y: cursor.y };
+        }
+        // Flow coordinates from inside canvas — convert using receiver's viewport
+        const canvasEl = document.querySelector(".react-flow");
+        const rect = canvasEl?.getBoundingClientRect() ?? { left: 0, top: 0 };
+        return flowToScreen(cursor.x, cursor.y, viewport, rect);
+    };
 
     return (
         <>
@@ -31,13 +59,15 @@ export default function RemoteCursors() {
             {/* CURSORS */}
             {Object.values(cursors)
                 .filter((u) => u.id !== me?.id)
-                .map((cursor) => (
+                .map((cursor) => {
+                    const pos = resolveScreenPos(cursor);
+                    return (
                     <div
                         key={cursor.id}
                         style={{
                             position: "fixed",
-                            left: cursor.x,
-                            top: cursor.y,
+                            left: pos.x,
+                            top: pos.y,
                             pointerEvents: "none",
                             zIndex: 999999,
                             transition: "all 0.05s linear",
@@ -77,7 +107,8 @@ export default function RemoteCursors() {
                             <span>{cursor.name}</span>
                         </div>
                     </div>
-                ))}
+                    );
+                })}
         </>
     );
 }

@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import useDebouncedCallback from "../../shared/hooks/useDebouncedCallback";
 import AppInput from "../../shared/ui/atoms/AppInput";
 import AppTextarea from "../../shared/ui/atoms/AppTextArea";
+import { getMeStamp } from "../socket/useCursorStore.js";
 
 export default function TitleDescriptionFields({
   nodeData,
@@ -72,6 +73,8 @@ export default function TitleDescriptionFields({
     if (Object.keys(patch).length === 0) {
       return;
     }
+
+    patch.lastUpdatedBy = getMeStamp();
 
     debouncedUpdateNode(patch);
 

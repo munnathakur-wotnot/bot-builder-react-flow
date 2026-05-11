@@ -1,5 +1,12 @@
 export const INITIAL_NODE_ID = "node_1";
 
+/** Collab UI fields that must never be persisted or copied/cloned */
+export const EPHEMERAL_NODE_KEYS = [
+  "isDraggedBy", "isDraggedByColor",
+  "isMenuOpenBy", "isMenuOpenByColor",
+  "isSearchHighlight", "selectedBy", "selectedByColor",
+];
+
 export const INITIAL_NODES = [
   {
     id: INITIAL_NODE_ID,

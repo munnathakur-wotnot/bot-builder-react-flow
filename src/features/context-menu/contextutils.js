@@ -2,6 +2,7 @@ import { MENU_NODE_TEMPLATES } from "../canvas/constants";
 import { buildMenuActionMap } from "../canvas/utils";
 import AiMenu from "./AiContextCard";
 import ContextMenu from "./ContextMenu";
+import { getMeStamp } from "../socket/useCursorStore.js";
 
 export const menuRendering = (menu, props) => {
   return menu.type === "success" && !menu.addAnother
@@ -65,6 +66,15 @@ export function getMenuSelectionPayload({
   if (!buildPayload) return null;
 
   const payload = buildPayload();
+
+  // Stamp authorship on every newly created node
+  const meStamp = getMeStamp();
+  if (meStamp && payload.nodesToAdd?.length) {
+    payload.nodesToAdd = payload.nodesToAdd.map((n) => ({
+      ...n,
+      data: { ...n.data, createdBy: meStamp, lastUpdatedBy: meStamp },
+    }));
+  }
 
   const directTargets = payload.edgesToAdd
     .filter((edge) => edge.source === sourceNode.id)

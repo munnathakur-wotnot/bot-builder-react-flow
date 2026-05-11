@@ -46,6 +46,9 @@ const dragLocks = {};
 // nodeId -> { socketId, name, color }
 const menuLocks = {};
 
+// `${nodeId}::${field}` -> { socketId, name, color, nodeId, field }
+const typingLocks = {};
+
 const flows = {};
 
 const randomColor = () => {
@@ -75,6 +78,13 @@ function releaseLocksForSocket(socket, roomId) {
     if (lock.socketId === socket.id) {
       delete menuLocks[nodeId];
       socket.to(roomId).emit("node-menu-close", { nodeId });
+    }
+  }
+  // typing locks
+  for (const [key, lock] of Object.entries(typingLocks)) {
+    if (lock.socketId === socket.id) {
+      delete typingLocks[key];
+      socket.to(roomId).emit("node-typing-end", { nodeId: lock.nodeId, field: lock.field });
     }
   }
 }
@@ -113,16 +123,22 @@ io.on("connection", (socket) => {
       .filter(([, l]) => users[l.socketId]?.roomId === roomId)
       .map(([nodeId, l]) => ({ nodeId, name: l.name, color: l.color }));
 
+    const activeTypings = Object.values(typingLocks)
+      .filter((l) => users[l.socketId]?.roomId === roomId)
+      .map((l) => ({ nodeId: l.nodeId, field: l.field, name: l.name, color: l.color }));
+
     if (activeDrags.length) socket.emit("active-drag-locks", activeDrags);
     if (activeMenus.length) socket.emit("active-menu-locks", activeMenus);
+    if (activeTypings.length) socket.emit("active-typing-locks", activeTypings);
   });
 
   // ── Cursor ───────────────────────────────────────────────────
-  socket.on("cursor-move", ({ x, y }) => {
+  socket.on("cursor-move", ({ x, y, isFlow }) => {
     const user = users[socket.id];
     if (!user) return;
     user.x = x;
     user.y = y;
+    user.isFlow = isFlow ?? false;
     socket.to(user.roomId).emit("cursor-move", user);
   });
 
@@ -150,6 +166,14 @@ io.on("connection", (socket) => {
   socket.on("node-drag-start", ({ nodeId }) => {
     const user = users[socket.id];
     if (!user) return;
+
+    // Release any stale drag lock this user holds on a different node
+    for (const [lockedNodeId, lock] of Object.entries(dragLocks)) {
+      if (lock.socketId === socket.id && lockedNodeId !== nodeId) {
+        delete dragLocks[lockedNodeId];
+        socket.to(user.roomId).emit("node-drag-end", { nodeId: lockedNodeId });
+      }
+    }
 
     // Already locked by someone else — reject silently (client checks too)
     if (dragLocks[nodeId] && dragLocks[nodeId].socketId !== socket.id) return;
@@ -182,6 +206,14 @@ io.on("connection", (socket) => {
     const user = users[socket.id];
     if (!user) return;
 
+    // Release any stale menu lock this user holds on a different node
+    for (const [lockedNodeId, lock] of Object.entries(menuLocks)) {
+      if (lock.socketId === socket.id && lockedNodeId !== nodeId) {
+        delete menuLocks[lockedNodeId];
+        socket.to(user.roomId).emit("node-menu-close", { nodeId: lockedNodeId });
+      }
+    }
+
     menuLocks[nodeId] = {
       socketId: socket.id,
       name: user.name,
@@ -204,6 +236,40 @@ io.on("connection", (socket) => {
 
     socket.to(user.roomId).emit("node-menu-close", { nodeId });
   });
+
+  // ── Typing lock (title / description fields) ─────────────────
+  socket.on("node-typing-start", ({ nodeId, field }) => {
+    const user = users[socket.id];
+    if (!user) return;
+
+    const key = `${nodeId}::${field}`;
+    typingLocks[key] = {
+      socketId: socket.id,
+      name: user.name,
+      color: user.color,
+      nodeId,
+      field,
+    };
+
+    socket.to(user.roomId).emit("node-typing-start", {
+      nodeId,
+      field,
+      name: user.name,
+      color: user.color,
+    });
+  });
+
+  socket.on("node-typing-end", ({ nodeId, field }) => {
+    const user = users[socket.id];
+    if (!user) return;
+
+    const key = `${nodeId}::${field}`;
+    if (typingLocks[key]?.socketId !== socket.id) return;
+    delete typingLocks[key];
+
+    socket.to(user.roomId).emit("node-typing-end", { nodeId, field });
+  });
+
   socket.on("save-flow", ({ roomId, nodes, edges, currentId }) => {
     let startNode = nodes.find((n) => n.id === INITIAL_NODE_ID);
 
@@ -263,6 +329,10 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     const user = users[socket.id];
     if (user) {
+      // Notify peers that this user's selected node is no longer selected
+      if (user.selectedNodeId) {
+        socket.to(user.roomId).emit("node-unselected", { userId: user.id });
+      }
       releaseLocksForSocket(socket, user.roomId);
 
       // send full user details

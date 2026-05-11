@@ -7,6 +7,18 @@ import NodeTooltips from "./NodeTooltips.jsx";
 import { useSimulationStatus } from "../../shared/hooks/useSimulationStatus";
 import { isEqual } from "lodash";
 
+/** Format a unix-ms timestamp into a short relative string */
+function formatRelativeTime(ts) {
+  if (!ts) return "";
+  const diffMs = Date.now() - ts;
+  const diffMin = Math.floor(diffMs / 60000);
+  if (diffMin < 1) return "just now";
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHr = Math.floor(diffMin / 60);
+  if (diffHr < 24) return `${diffHr}h ago`;
+  return `${Math.floor(diffHr / 24)}d ago`;
+}
+
 function CustomNode({ id, data }) {
   const { openMenu, validationErrors, simulationStore, isHandleClickRef } =
     useFlowCallbacks();
@@ -254,6 +266,44 @@ function CustomNode({ id, data }) {
       )}
       {/* Hover toolbar */}
       {showToolbar && <NodeTooltips id={id} />}
+      {/* Last-updated / created-by footer */}
+      {!isSubNode && (data.lastUpdatedBy || data.createdBy) && (
+        <div className="custom-node__activity-footer">
+          {data.lastUpdatedBy ? (
+            <span
+              className="custom-node__activity-chip"
+              style={{ borderColor: data.lastUpdatedBy.color }}
+              title={`Last updated by ${data.lastUpdatedBy.name}`}
+            >
+              <span
+                className="custom-node__activity-avatar"
+                style={{ background: data.lastUpdatedBy.color }}
+              >
+                {data.lastUpdatedBy.name?.[0]?.toUpperCase()}
+              </span>
+              <span className="custom-node__activity-label">
+                {data.lastUpdatedBy.name} · {formatRelativeTime(data.lastUpdatedBy.at)}
+              </span>
+            </span>
+          ) : data.createdBy ? (
+            <span
+              className="custom-node__activity-chip"
+              style={{ borderColor: data.createdBy.color }}
+              title={`Created by ${data.createdBy.name}`}
+            >
+              <span
+                className="custom-node__activity-avatar"
+                style={{ background: data.createdBy.color }}
+              >
+                {data.createdBy.name?.[0]?.toUpperCase()}
+              </span>
+              <span className="custom-node__activity-label">
+                {data.createdBy.name} · created
+              </span>
+            </span>
+          ) : null}
+        </div>
+      )}
       {/* Source Handles */}
       {isDoubleOutport ? (
         <>
@@ -346,7 +396,9 @@ export default memo(CustomNode, (prev, next) => {
     prevData.isDraggedBy === nextData.isDraggedBy &&
     prevData.isDraggedByColor === nextData.isDraggedByColor &&
     prevData.isMenuOpenBy === nextData.isMenuOpenBy &&
-    prevData.isMenuOpenByColor === nextData.isMenuOpenByColor
+    prevData.isMenuOpenByColor === nextData.isMenuOpenByColor &&
+    prevData.lastUpdatedBy?.at === nextData.lastUpdatedBy?.at &&
+    prevData.createdBy?.id === nextData.createdBy?.id
   );
 });
 
