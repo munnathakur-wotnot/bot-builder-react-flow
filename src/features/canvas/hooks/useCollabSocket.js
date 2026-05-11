@@ -19,6 +19,7 @@ export function useCollabSocket({
 }) {
   const [userNodeSelected, setUserNodeSelected] = useState(null);
   const [remoteDragMap, setRemoteDragMap] = useState({});
+  const [remoteTypingMap, setRemoteTypingMap] = useState({});
 
   // eslint-disable-next-line no-unused-vars
   const [remoteMenuMap, setRemoteMenuMap] = useState({});
@@ -155,6 +156,47 @@ export function useCollabSocket({
       );
     };
 
+    const handleTypingStart = ({ nodeId, field, name, color }) => {
+      setRemoteTypingMap((prev) => ({
+        ...prev,
+
+        [nodeId]: {
+          ...prev[nodeId],
+
+          [field]: {
+            name,
+            color,
+          },
+        },
+      }));
+    };
+
+    const handleTypingEnd = ({ nodeId, field }) => {
+      setRemoteTypingMap((prev) => {
+        const copy = { ...prev };
+
+        if (!copy[nodeId]) return prev;
+
+        delete copy[nodeId][field];
+
+        if (Object.keys(copy[nodeId]).length === 0) {
+          delete copy[nodeId];
+        }
+
+        return copy;
+      });
+    };
+    const handleActiveTypingLocks = (locks) => {
+      locks.forEach(({ nodeId, field, name, color }) => {
+        handleTypingStart({
+          nodeId,
+          field,
+          name,
+          color,
+        });
+      });
+    };
+
     const userLeftHandler = (user) => {
       console.log(user, "User-left-the");
     };
@@ -170,6 +212,9 @@ export function useCollabSocket({
     socket.on("node-changed", handleNodeChanged);
     socket.on("active-drag-locks", handleActiveDragLocks);
     socket.on("active-menu-locks", handleActiveMenuLocks);
+    socket.on("node-typing-start", handleTypingStart);
+    socket.on("node-typing-end", handleTypingEnd);
+    socket.on("active-typing-locks", handleActiveTypingLocks);
 
     return () => {
       socket.off("user-left", userLeftHandler);
@@ -182,6 +227,9 @@ export function useCollabSocket({
       socket.off("node-changed", handleNodeChanged);
       socket.off("active-drag-locks", handleActiveDragLocks);
       socket.off("active-menu-locks", handleActiveMenuLocks);
+      socket.off("node-typing-start", handleTypingStart);
+      socket.off("node-typing-end", handleTypingEnd);
+      socket.off("active-typing-locks", handleActiveTypingLocks);
     };
   }, [updateSingleNode, setNodes]);
 
@@ -198,6 +246,20 @@ export function useCollabSocket({
     socket.emit("node-changed", { nodeId, data });
   }, []);
 
+  const emitTypingStart = useCallback((nodeId, field) => {
+    socket.emit("node-typing-start", {
+      nodeId,
+      field,
+    });
+  }, []);
+
+  const emitTypingEnd = useCallback((nodeId, field) => {
+    socket.emit("node-typing-end", {
+      nodeId,
+      field,
+    });
+  }, []);
+
   return {
     /** Remote drag-lock map ref — read synchronously inside callbacks */
     remoteDragMapRef,
@@ -207,5 +269,8 @@ export function useCollabSocket({
     emitDragEnd,
     /** Emit that a node's data changed (for sidebar updates) */
     emitNodeChanged,
+    remoteTypingMap,
+    emitTypingStart,
+    emitTypingEnd,
   };
 }

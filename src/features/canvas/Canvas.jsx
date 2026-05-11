@@ -82,7 +82,14 @@ export default function CanvasFlow() {
   const { updateSingleNode } = useUpdateNode(setNodes);
 
   // ── Collaborative socket hook ────────────────────────────────
-  const { remoteDragMapRef, emitDragStart, emitDragEnd } = useCollabSocket({
+  const {
+    remoteDragMapRef,
+    emitDragStart,
+    emitDragEnd,
+    remoteTypingMap,
+    emitTypingStart,
+    emitTypingEnd,
+  } = useCollabSocket({
     selectedNodeId,
     menuState,
     updateSingleNode,
@@ -470,6 +477,9 @@ export default function CanvasFlow() {
               edges={edges}
               setNodes={setNodes}
               setEdges={setEdges}
+              remoteTypingMap={remoteTypingMap}
+              emitTypingStart={emitTypingStart}
+              emitTypingEnd={emitTypingEnd}
               getNextNodeId={getNextNodeId}
               onClose={setSelectedNodeIdUpdate}
               onEnterFlow={handleEnterFlow}
