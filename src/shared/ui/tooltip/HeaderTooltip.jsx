@@ -16,6 +16,7 @@ import {
     ImportIcon,
     ExportIcon,
 } from "./headerTooltipIcon";
+import { importMigration } from "../../../features/canvas/migrationUtils";
 
 function HeaderTooltip(props) {
     const {
@@ -32,12 +33,14 @@ function HeaderTooltip(props) {
         onTest,
         onStopTest,
         onImport,
+        setEdges,
         onExport,
     } = props;
 
     const { fitView } = useReactFlow();
     const [errDropdownOpen, setErrDropdownOpen] = useState(false);
     const errDropdownRef = useRef(null);
+    const [valueJSON, setValueJSON] = useState("");
 
     const errorNodeIds = Object.keys(validationErrors ?? {});
     const errorCount = errorNodeIds.length;
@@ -57,6 +60,22 @@ function HeaderTooltip(props) {
         setNodes((currNodes) => layoutNodesDagre(currNodes, edges));
         requestAnimationFrame(() => fitView({ padding: 0.2, duration: 300 }));
     }, [edges, fitView, setNodes]);
+
+    const handleJSONPaste = (e) => {
+        setValueJSON(e.target.value);
+    };
+
+    const migrate = () => {
+        try {
+            const oldData = JSON.parse(valueJSON);
+
+            const data = importMigration(oldData);
+            setNodes(data?.nodes);
+            setEdges(data?.edges);
+        } catch (e) {
+            console.error(e);
+        }
+    };
 
     return (
         <div className="layout-toolbar">
@@ -139,8 +158,21 @@ function HeaderTooltip(props) {
                     <SearchIcon />
                     Search nodes
                 </button>
-
+                <button className="layout-toolbar__btn">
+                    <input
+                        placeholder="Paste JSON"
+                        onChange={handleJSONPaste}
+                        value={valueJSON}
+                    />
+                </button>
                 <div className="layout-toolbar__divider" />
+                <button
+                    className="layout-toolbar__btn"
+                    // disabled={!valueJSON}
+                    onClick={migrate}
+                >
+                    Migrate
+                </button>
 
                 <button className="layout-toolbar__btn" onClick={onImport}>
                     <ImportIcon />
@@ -195,5 +227,6 @@ HeaderTooltip.propTypes = {
     onStopTest: PropTypes.func,
     onImport: PropTypes.func,
     onExport: PropTypes.func,
+    setEdges: PropTypes.func,
 };
 export default HeaderTooltipMemo;

@@ -110,14 +110,30 @@ function CustomNode({ id, data }) {
   if (!data) return null;
 
   const typeClassName = `custom-node custom-node--${data.type ?? "default"}${data.isSearchHighlight ? " custom-node--search-highlight" : ""}${hasErrors ? " custom-node--has-errors" : ""}${isActive ? " custom-node--executing" : ""}${isExecuted ? " custom-node--executed" : ""}`;
-  const isSmallPill = data.type === "delay" || data.type === "jump" || data.type === "flow" || data.type === "flowStart";
-  const titleClassName = isSmallPill ? "custom-node__header-delay" : "custom-node__header";
-  const titleTextClassName = isSmallPill ? "small-node-title" : "custom-node__title";
+  const isSmallPill =
+    data.type === "delay" ||
+    data.type === "jump" ||
+    data.type === "flow" ||
+    data.type === "flowStart";
+  const titleClassName = isSmallPill
+    ? "custom-node__header-delay"
+    : "custom-node__header";
+  const titleTextClassName = isSmallPill
+    ? "small-node-title"
+    : "custom-node__title";
+
+  console.log(data?.selectedUser, "Selected-User");
 
   return (
     <div
       className={typeClassName}
-      style={isSubNode ? { width: "120px" } : {}}
+      style={
+        isSubNode
+          ? { width: "120px" }
+          : data?.selectedUser?.color
+            ? { border: `2px solid ${data?.selectedUser?.color}` }
+            : {}
+      }
       onClick={
         isStartNode && !isConnected
           ? (e) => handleOpenMenu({ event: e })
@@ -248,7 +264,8 @@ export default memo(CustomNode, (prev, next) => {
     prevData?.knowledgeBaseId === nextData?.knowledgeBaseId &&
     prevData?.functionIds === nextData?.functionIds &&
     prevData?.isErrorShow === nextData.isErrorShow &&
-    prevData?.isSearchHighlight === nextData?.isSearchHighlight
+    prevData?.isSearchHighlight === nextData?.isSearchHighlight &&
+    prevData?.selectedUser === nextData?.selectedUser
   );
 });
 

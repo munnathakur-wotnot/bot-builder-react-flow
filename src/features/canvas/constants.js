@@ -159,3 +159,11 @@ export const initialEdges = [
     },
   },
 ];
+
+export function getInitialValue(get) {
+  const data = get();
+  if (!data?.edges?.length || !data?.nodes?.length)
+    return { INITIAL_NODES, INITIAL_EDGES };
+
+  return { INITIAL_NODES: data.nodes, INITIAL_EDGES: data.edges };
+}
