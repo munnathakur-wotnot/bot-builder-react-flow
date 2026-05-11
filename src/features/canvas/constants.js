@@ -159,3 +159,5 @@ export const initialEdges = [
     },
   },
 ];
+
+export const INITIAL_NODE_ID_LOCAL = 2;

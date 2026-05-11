@@ -15,12 +15,12 @@ export function useFlowScope({ nodes, edges, setSelectedNodeIdUpdate }) {
 
   // Only nodes/edges belonging to the current scope
   const visibleNodes = useMemo(
-    () => nodes.filter((n) => (n.flowId ?? null) === activeFlowId),
+    () => nodes.filter((n) => (n?.flowId ?? null) === activeFlowId),
     [nodes, activeFlowId],
   );
 
   const visibleEdges = useMemo(
-    () => edges.filter((e) => (e.flowId ?? null) === activeFlowId),
+    () => edges.filter((e) => (e?.flowId ?? null) === activeFlowId),
     [edges, activeFlowId],
   );
 
@@ -28,7 +28,7 @@ export function useFlowScope({ nodes, edges, setSelectedNodeIdUpdate }) {
   const flowOptions = useMemo(
     () =>
       nodes
-        .filter((n) => n.data.type === "flow" && n.data.targetFlowId)
+        .filter((n) => n?.data?.type === "flow" && n.data.targetFlowId)
         .map((n) => ({
           id: n.data.targetFlowId,
           label: n.data.title || "Unnamed Flow",

@@ -1,4 +1,10 @@
-﻿import React, { useCallback, useMemo, useRef, useState } from "react";
+﻿import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Background,
   Controls,
@@ -30,8 +36,10 @@ import { useFlowScope } from "./hooks/useFlowScope.js";
 import { useCanvasIO } from "./hooks/useCanvasIO.js";
 // import FlowBreadcrumb from "./FlowBreadcrumb.jsx";
 import { useToast } from "../../shared/ui/feedback/Toast.jsx";
-import { useLocalStorage, getPersistedFlow } from "./hooks/useLocalStrorege.js";
 import { useCollabSocket } from "./hooks/useCollabSocket.js";
+import { useCursorStore } from "../socket/useCursorStore.js";
+import socket from "../socket/useSocket.js";
+import { viewportStore } from "../../shared/hooks/useViewportStore.js";
 
 const nodeTypes = { custom: CustomNode };
 const edgeTypes = { custom: CustomEdge };
@@ -46,16 +54,18 @@ const StaticControls = React.memo(function StaticControls() {
 
 export default function CanvasFlow() {
   // ── State ────────────────────────────────────────────────────
-  const { nodes: persistedNodes, edges: persistedEdges } = getPersistedFlow();
-  const [nodes, setNodes, onNodesChange] = useNodesState(persistedNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(persistedEdges);
-  useLocalStorage({ nodes, edges });
+
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+
   const [selectedNodeId, _setSelectedNodeId] = useState(null);
   const [selectedNodeIds, setSelectedNodeIds] = useState([]);
   const [nuberOfNodes, setNumberOfNodes] = useState(0);
   const [menuState, setMenuState] = useState(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const { ToastContainer } = useToast();
+  const { cursors, me } = useCursorStore();
+  const isRemoteUpdateRef = useRef(false);
 
   // ── Refs ─────────────────────────────────────────────────────
   const nextIdRef = useRef(2);
@@ -84,6 +94,42 @@ export default function CanvasFlow() {
     [nodes],
   );
 
+  useEffect(() => {
+    socket.emit("get-flow", { roomId: "room-1" }, (flow) => {
+      setNodes(flow.nodes || []);
+      setEdges(flow.edges || []);
+      nextIdRef.current = flow.currentId || 1;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (isRemoteUpdateRef.current) {
+      isRemoteUpdateRef.current = false;
+      return;
+    }
+
+    socket.emit("save-flow", {
+      roomId: "room-1",
+      nodes,
+      edges,
+      currentId: nextIdRef.current,
+    });
+  }, [nodes, edges]);
+
+  useEffect(() => {
+    socket.on("flow-updated", ({ nodes, edges, currentId }) => {
+      isRemoteUpdateRef.current = true;
+
+      setNodes(nodes);
+      setEdges(edges);
+
+      nextIdRef.current = currentId;
+    });
+
+    return () => {
+      socket.off("flow-updated");
+    };
+  }, []);
   // ── Helpers ──────────────────────────────────────────────────
   const getNextNodeId = useCallback(() => `node_${nextIdRef.current++}`, []);
 
@@ -227,14 +273,32 @@ export default function CanvasFlow() {
     setSelectedNodeIds(ids);
   }, []);
 
-  const onMouseMove = useCallback((event) => {
-    const bounds = flowWrapperRef.current?.getBoundingClientRect();
-    if (!bounds) return;
-    pointerRef.current = {
-      x: event.clientX - bounds.left,
-      y: event.clientY - bounds.top,
-    };
-  }, []);
+  const onMouseMove = useCallback(
+    (event) => {
+      const bounds = flowWrapperRef.current?.getBoundingClientRect();
+
+      if (!bounds) return;
+
+      // screen -> flow coordinates
+      const flowPosition = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
+
+      // local pointer ref
+      pointerRef.current = {
+        x: flowPosition.x,
+        y: flowPosition.y,
+      };
+
+      // realtime cursor sync
+      socket.emit("cursor-move", {
+        x: flowPosition.x,
+        y: flowPosition.y,
+      });
+    },
+    [screenToFlowPosition],
+  );
 
   const handlePaneClick = useCallback(() => {
     setMenuState(null);
@@ -242,10 +306,15 @@ export default function CanvasFlow() {
     setSelectedNodeIds([]);
   }, [setSelectedNodeIdUpdate]);
 
-  const onMove = useCallback(() => {
-    setMenuState(null);
-    setSelectedNodeIdUpdate();
-  }, [setSelectedNodeIdUpdate]);
+  const onMove = useCallback(
+    (event, viewport) => {
+      viewportStore.setViewport(viewport);
+
+      setMenuState(null);
+      setSelectedNodeIdUpdate();
+    },
+    [setSelectedNodeIdUpdate],
+  );
 
   const handleNodeFound = useCallback(
     (node) => {

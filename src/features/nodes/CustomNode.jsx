@@ -5,6 +5,7 @@ import "./CustomNode.css";
 import { useFlowCallbacks } from "../canvas/FlowCallbacksContext.jsx";
 import NodeTooltips from "./NodeTooltips.jsx";
 import { useSimulationStatus } from "../../shared/hooks/useSimulationStatus";
+import { isEqual } from "lodash";
 
 function CustomNode({ id, data }) {
   const { openMenu, validationErrors, simulationStore, isHandleClickRef } =
@@ -125,22 +126,37 @@ function CustomNode({ id, data }) {
     isActive ? "custom-node--executing" : "",
     isExecuted ? "custom-node--executed" : "",
     isLockedByRemote ? "custom-node--drag-locked" : "",
-  ].filter(Boolean).join(" ");
+  ]
+    .filter(Boolean)
+    .join(" ");
 
-  const isSmallPill = data.type === "delay" || data.type === "jump" || data.type === "flow" || data.type === "flowStart";
-  const titleClassName = isSmallPill ? "custom-node__header-delay" : "custom-node__header";
-  const titleTextClassName = isSmallPill ? "small-node-title" : "custom-node__title";
+  const isSmallPill =
+    data.type === "delay" ||
+    data.type === "jump" ||
+    data.type === "flow" ||
+    data.type === "flowStart";
+  const titleClassName = isSmallPill
+    ? "custom-node__header-delay"
+    : "custom-node__header";
+  const titleTextClassName = isSmallPill
+    ? "small-node-title"
+    : "custom-node__title";
 
   // Priority: drag lock > menu open > selected-by for border color
   const borderColor = isDraggedByColor || isMenuOpenByColor || selectedByColor;
   const remoteUserStyle = borderColor
-    ? { border: `2px solid ${borderColor}`, boxShadow: `0 0 0 3px ${borderColor}33` }
+    ? {
+      border: `2px solid ${borderColor}`,
+      boxShadow: `0 0 0 3px ${borderColor}33`,
+    }
     : {};
 
   return (
     <div
       className={typeClassName}
-      style={isSubNode ? { width: "120px", ...remoteUserStyle } : remoteUserStyle}
+      style={
+        isSubNode ? { width: "120px", ...remoteUserStyle } : remoteUserStyle
+      }
       data-locked={isLockedByRemote ? "true" : undefined}
       onClick={
         isStartNode && !isConnected
@@ -152,9 +168,7 @@ function CustomNode({ id, data }) {
       tabIndex={isStartNode && !isConnected ? 0 : undefined}
     >
       {/* Drag-lock overlay — blocks interaction while another user drags */}
-      {isLockedByRemote && (
-        <div className="custom-node__drag-lock-overlay" />
-      )}
+      {isLockedByRemote && <div className="custom-node__drag-lock-overlay" />}
 
       {/* Dragging badge */}
       {isDraggedBy && (
@@ -162,7 +176,10 @@ function CustomNode({ id, data }) {
           className="custom-node__remote-user-badge custom-node__remote-user-badge--dragging"
           style={{ background: isDraggedByColor }}
         >
-          <span className="custom-node__remote-user-avatar" style={{ background: isDraggedByColor }}>
+          <span
+            className="custom-node__remote-user-avatar"
+            style={{ background: isDraggedByColor }}
+          >
             {isDraggedBy[0]?.toUpperCase()}
           </span>
           ✦ {isDraggedBy} is dragging
@@ -175,7 +192,10 @@ function CustomNode({ id, data }) {
           className="custom-node__remote-user-badge custom-node__remote-user-badge--menu"
           style={{ background: isMenuOpenByColor }}
         >
-          <span className="custom-node__remote-user-avatar" style={{ background: isMenuOpenByColor }}>
+          <span
+            className="custom-node__remote-user-avatar"
+            style={{ background: isMenuOpenByColor }}
+          >
             {isMenuOpenBy[0]?.toUpperCase()}
           </span>
           ☰ {isMenuOpenBy} has menu open
@@ -188,7 +208,10 @@ function CustomNode({ id, data }) {
           className="custom-node__remote-user-badge"
           style={{ background: selectedByColor }}
         >
-          <span className="custom-node__remote-user-avatar" style={{ background: selectedByColor }}>
+          <span
+            className="custom-node__remote-user-avatar"
+            style={{ background: selectedByColor }}
+          >
             {selectedBy[0]?.toUpperCase()}
           </span>
           {selectedBy}
@@ -299,29 +322,31 @@ export default memo(CustomNode, (prev, next) => {
   const prevData = prev.data;
   const nextData = next.data;
 
-  if (!prevData || !nextData) return prevData === nextData;
+  if (!prevData || !nextData) {
+    return prevData === nextData;
+  }
 
   return (
     prevData.title === nextData.title &&
     prevData.description === nextData.description &&
     prevData.type === nextData.type &&
-    prevData.outPorts === nextData.outPorts &&
-    prevData.inPorts === nextData.inPorts &&
+    isEqual(prevData.outPorts, nextData.outPorts) &&
+    isEqual(prevData.inPorts, nextData.inPorts) &&
     prevData.delayDuration === nextData.delayDuration &&
-    prevData?.successOutport === nextData?.successOutport &&
-    prevData?.failureOutport === nextData?.failureOutport &&
-    prevData?.cards === nextData?.cards &&
-    prevData?.fields === nextData?.fields &&
-    prevData?.knowledgeBaseId === nextData?.knowledgeBaseId &&
-    prevData?.functionIds === nextData?.functionIds &&
-    prevData?.isErrorShow === nextData.isErrorShow &&
-    prevData?.isSearchHighlight === nextData?.isSearchHighlight &&
-    prevData?.selectedBy === nextData?.selectedBy &&
-    prevData?.selectedByColor === nextData?.selectedByColor &&
-    prevData?.isDraggedBy === nextData?.isDraggedBy &&
-    prevData?.isDraggedByColor === nextData?.isDraggedByColor &&
-    prevData?.isMenuOpenBy === nextData?.isMenuOpenBy &&
-    prevData?.isMenuOpenByColor === nextData?.isMenuOpenByColor
+    isEqual(prevData.successOutport, nextData.successOutport) &&
+    isEqual(prevData.failureOutport, nextData.failureOutport) &&
+    isEqual(prevData.cards, nextData.cards) &&
+    isEqual(prevData.fields, nextData.fields) &&
+    isEqual(prevData.knowledgeBaseId, nextData.knowledgeBaseId) &&
+    isEqual(prevData.functionIds, nextData.functionIds) &&
+    prevData.isErrorShow === nextData.isErrorShow &&
+    prevData.isSearchHighlight === nextData.isSearchHighlight &&
+    prevData.selectedBy === nextData.selectedBy &&
+    prevData.selectedByColor === nextData.selectedByColor &&
+    prevData.isDraggedBy === nextData.isDraggedBy &&
+    prevData.isDraggedByColor === nextData.isDraggedByColor &&
+    prevData.isMenuOpenBy === nextData.isMenuOpenBy &&
+    prevData.isMenuOpenByColor === nextData.isMenuOpenByColor
   );
 });
 

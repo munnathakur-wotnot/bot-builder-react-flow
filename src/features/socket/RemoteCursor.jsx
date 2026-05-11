@@ -1,74 +1,12 @@
-import React, { useEffect, useState } from "react";
-import socket from "./useSocket";
+import React, { useEffect } from "react";
 import "./remote-users.css";
+import { cursorStore, useCursorStore } from "./useCursorStore";
 
 export default function RemoteCursors() {
-    const [cursors, setCursors] = useState({});
-    const [me, setMe] = useState(null);
-
     useEffect(() => {
-        // current me
-        socket.on("me", (user) => {
-            setMe(user);
-
-            setCursors((prev) => ({
-                ...prev,
-                [user.id]: user,
-            }));
-        });
-
-        // existing users
-        socket.on("existing-users", (users) => {
-            const map = {};
-
-            users.forEach((user) => {
-                map[user.id] = user;
-            });
-
-            setCursors((prev) => ({
-                ...prev,
-                ...map,
-            }));
-        });
-
-        // new joined
-        socket.on("user-joined", (user) => {
-            setCursors((prev) => ({
-                ...prev,
-                [user.id]: user,
-            }));
-        });
-
-        // move
-        socket.on("cursor-move", (user) => {
-            setCursors((prev) => ({
-                ...prev,
-                [user.id]: {
-                    ...prev[user.id],
-                    ...user,
-                },
-            }));
-        });
-
-        // remove
-        socket.on("user-left", (userId) => {
-            setCursors((prev) => {
-                const copy = { ...prev };
-
-                delete copy[userId];
-
-                return copy;
-            });
-        });
-
-        return () => {
-            socket.off("me");
-            socket.off("existing-users");
-            socket.off("user-joined");
-            socket.off("cursor-move");
-            socket.off("user-left");
-        };
+        cursorStore.init();
     }, []);
+    const { cursors, me } = useCursorStore();
 
     return (
         <>

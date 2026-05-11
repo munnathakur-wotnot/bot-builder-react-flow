@@ -19,6 +19,8 @@ export function useCollabSocket({
 }) {
   const [userNodeSelected, setUserNodeSelected] = useState(null);
   const [remoteDragMap, setRemoteDragMap] = useState({});
+
+  // eslint-disable-next-line no-unused-vars
   const [remoteMenuMap, setRemoteMenuMap] = useState({});
 
   // Stable ref so drag-start handler can read latest map without closure issues
@@ -153,6 +155,12 @@ export function useCollabSocket({
       );
     };
 
+    const userLeftHandler = (user) => {
+      console.log(user, "User-left-the");
+    };
+
+    socket.on("user-left", userLeftHandler);
+
     socket.on("node-selected", handleNodeSelected);
     socket.on("node-unselected", handleNodeUnselected);
     socket.on("node-drag-start", handleNodeDragStart);
@@ -164,6 +172,7 @@ export function useCollabSocket({
     socket.on("active-menu-locks", handleActiveMenuLocks);
 
     return () => {
+      socket.off("user-left", userLeftHandler);
       socket.off("node-selected", handleNodeSelected);
       socket.off("node-unselected", handleNodeUnselected);
       socket.off("node-drag-start", handleNodeDragStart);
