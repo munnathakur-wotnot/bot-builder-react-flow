@@ -1,5 +1,6 @@
 import React, { memo } from "react";
 import PropTypes from "prop-types";
+import { isEqual } from "lodash";
 import "./CustomNode.css";
 import "./TextNode.css";
 
@@ -69,4 +70,41 @@ TextNode.propTypes = {
     data: PropTypes.object.isRequired,
 };
 
-export default memo(TextNode);
+/**
+ * Custom memo comparator — only the fields TextNode actually renders.
+ * Returning true = props are equal = skip re-render.
+ */
+function textNodeEqual(prev, next) {
+    if (prev.id !== next.id) return false;
+    const pd = prev.data;
+    const nd = next.data;
+    return (
+        pd.type === nd.type &&
+        pd.title === nd.title &&
+        pd.description === nd.description &&
+        pd.connected === nd.connected &&
+        pd.doubleHandler === nd.doubleHandler &&
+        pd.isErrorShow === nd.isErrorShow &&
+        pd.isSearchHighlight === nd.isSearchHighlight &&
+        // Collab ephemeral
+        pd.selectedBy === nd.selectedBy &&
+        pd.selectedByColor === nd.selectedByColor &&
+        pd.isDraggedBy === nd.isDraggedBy &&
+        pd.isDraggedByColor === nd.isDraggedByColor &&
+        pd.isMenuOpenBy === nd.isMenuOpenBy &&
+        pd.isMenuOpenByColor === nd.isMenuOpenByColor &&
+        // Activity footer
+        pd.lastUpdatedBy?.at === nd.lastUpdatedBy?.at &&
+        pd.createdBy?.id === nd.createdBy?.id &&
+        // Handle connection state
+        isEqual(pd.outPorts, nd.outPorts) &&
+        isEqual(pd.successOutport, nd.successOutport) &&
+        isEqual(pd.failureOutport, nd.failureOutport) &&
+        // Content-heavy arrays — deep equal
+        isEqual(pd.cards, nd.cards) &&
+        isEqual(pd.fields, nd.fields) &&
+        isEqual(pd.children, nd.children)
+    );
+}
+
+export default memo(TextNode, textNodeEqual);

@@ -1,5 +1,6 @@
 import React, { memo } from "react";
 import PropTypes from "prop-types";
+import { isEqual } from "lodash";
 import "./CustomNode.css";
 import "./CustomSubNode.css";
 
@@ -71,4 +72,31 @@ CustomSubNode.propTypes = {
     data: PropTypes.object.isRequired,
 };
 
-export default memo(CustomSubNode);
+/**
+ * Custom memo comparator — only the fields CustomSubNode actually renders.
+ * Returning true = props are equal = skip re-render.
+ */
+function subNodeEqual(prev, next) {
+    if (prev.id !== next.id) return false;
+    const pd = prev.data;
+    const nd = next.data;
+    return (
+        pd.type === nd.type &&
+        pd.title === nd.title &&
+        pd.icon === nd.icon &&
+        pd.conditionType === nd.conditionType &&
+        pd.isErrorShow === nd.isErrorShow &&
+        pd.isSearchHighlight === nd.isSearchHighlight &&
+        // Collab ephemeral
+        pd.selectedBy === nd.selectedBy &&
+        pd.selectedByColor === nd.selectedByColor &&
+        pd.isDraggedBy === nd.isDraggedBy &&
+        pd.isDraggedByColor === nd.isDraggedByColor &&
+        pd.isMenuOpenBy === nd.isMenuOpenBy &&
+        pd.isMenuOpenByColor === nd.isMenuOpenByColor &&
+        // Handle connection state
+        isEqual(pd.outPorts, nd.outPorts)
+    );
+}
+
+export default memo(CustomSubNode, subNodeEqual);
