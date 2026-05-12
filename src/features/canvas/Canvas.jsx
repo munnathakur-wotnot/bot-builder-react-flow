@@ -43,6 +43,7 @@ import socket from "../socket/useSocket.js";
 import { viewportStore } from "../../shared/hooks/useViewportStore.js";
 import { EPHEMERAL_NODE_KEYS } from "./constants.js";
 import { useAutoSave } from "./hooks/useAutoSave.js";
+import { useSyncCompressed } from "./hooks/useSyncCompressed.js";
 
 const nodeTypes = { custom: CustomNode };
 const edgeTypes = { custom: CustomEdge };
@@ -95,6 +96,7 @@ export default function CanvasFlow() {
   // ── React Flow ───────────────────────────────────────────────
   const { fitView, screenToFlowPosition } = useReactFlow();
   const { updateSingleNode } = useUpdateNode(setNodes);
+  const isCompressed = useSyncCompressed();
 
   // ── Collaborative socket hook ────────────────────────────────
   const {
@@ -490,6 +492,18 @@ export default function CanvasFlow() {
     },
     [fitView, setNodes, setSelectedNodeId],
   );
+
+  useEffect(() => {
+    setNodes((nds) =>
+      nds.map((node, index) => ({
+        ...node,
+        position: {
+          ...node.position,
+          y: index * (isCompressed ? 120 : 220),
+        },
+      })),
+    );
+  }, [isCompressed, setNodes]);
 
   const flowCallbacks = useMemo(
     () => ({

@@ -6,6 +6,7 @@ import { useFlowCallbacks } from "../canvas/FlowCallbacksContext.jsx";
 import NodeTooltips from "./NodeTooltips.jsx";
 import { useSimulationStatus } from "../../shared/hooks/useSimulationStatus";
 import { isEqual } from "lodash";
+import { useSyncCompressed } from "../canvas/hooks/useSyncCompressed.js";
 
 /** Format a unix-ms timestamp into a short relative string */
 function formatRelativeTime(ts) {
@@ -19,11 +20,14 @@ function formatRelativeTime(ts) {
   return `${Math.floor(diffHr / 24)}d ago`;
 }
 
-function CustomNode({ id, data }) {
+function CustomNode(props) {
+  const { id, data } = props;
+
   const { openMenu, validationErrors, simulationStore, isHandleClickRef } =
     useFlowCallbacks();
-
+  const isCompressed = useSyncCompressed();
   // only this node re-renders when ITS simulation status changes
+
   const simulationStatus = useSimulationStatus(simulationStore, id);
   const isActive = simulationStatus === "active";
   const isExecuted = simulationStatus === "executed";
@@ -270,7 +274,7 @@ function CustomNode({ id, data }) {
         </p>
       </div>
       {/* Description */}
-      {!isSmallPill && !isSubNode && (
+      {!isCompressed && !isSmallPill && !isSubNode && (
         <p className="custom-node__description">{data.description || ""}</p>
       )}
       {/* Hover toolbar */}
