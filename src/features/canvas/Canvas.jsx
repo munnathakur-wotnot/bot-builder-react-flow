@@ -168,7 +168,7 @@ export default function CanvasFlow() {
       edges,
       currentId: nextIdRef.current,
     });
-  }, [nodes, edges]);
+  }, [nodes, edges, nextIdRef]);
 
   useEffect(() => {
     socket.on(

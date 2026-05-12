@@ -73,7 +73,6 @@ export function useNodeActions({
 
       if (!node) return;
 
-      // carousel ho to uske members bhi copy karo
       let nodesToCopy = [node];
 
       if (node.data?.type === "carousel") {
@@ -90,7 +89,7 @@ export function useNodeActions({
 
       const payload = {
         type: "flow/nodes",
-        mousePosition: null, // paste time pe overwrite hoga
+        mousePosition: null, //
         nodes: nodesToCopy.map((n) => ({ ...n, data: stripEphemeral(n.data) })),
         edges: copiedEdges,
       };
