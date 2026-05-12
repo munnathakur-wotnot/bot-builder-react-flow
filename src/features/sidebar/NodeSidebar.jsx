@@ -16,6 +16,9 @@ export default function NodeSidebar({
   selectedNode,
   updateNode,
   onClose,
+  remoteTypingMap,
+  emitTypingStart,
+  emitTypingEnd,
 }) {
   const { width, isResizing, startResizing } = useResizable({
     initialWidth: 360,
@@ -72,7 +75,13 @@ export default function NodeSidebar({
       <div className="node-sidebar__body">
         {/* Title/description only on root layer  */}
         {layerIndex === 0 && (
-          <TitleDescriptionFields nodeData={nodeData} updateNode={updateNode} />
+          <TitleDescriptionFields
+            nodeData={nodeData}
+            updateNode={updateNode}
+            remoteTypingMap={remoteTypingMap}
+            emitTypingStart={emitTypingStart}
+            emitTypingEnd={emitTypingEnd}
+          />
         )}
 
         {/* Single DynamicRenderer — adapts to any layer depth via layerIndex */}
@@ -106,6 +115,9 @@ NodeSidebar.propTypes = {
   onClose: PropTypes.func.isRequired,
   selectedNode: PropTypes.object.isRequired,
   updateNode: PropTypes.func.isRequired,
+  remoteTypingMap: PropTypes.object.isRequired,
+  emitTypingStart: PropTypes.func.isRequired,
+  emitTypingEnd: PropTypes.func.isRequired,
 };
 
 NodeSidebar.defaultProps = {

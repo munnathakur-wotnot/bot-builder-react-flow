@@ -1,6 +1,15 @@
 import { useCallback, useRef } from "react";
 import { removeNodeConnectionsForEdges } from "../utils";
 import { pushToastGlobal } from "../../../shared/ui/feedback/Toast.jsx";
+import { EPHEMERAL_NODE_KEYS } from "../constants.js";
+import { getMeStamp } from "../../socket/useCursorStore.js";
+
+/** Strip ephemeral collab fields from a node's data before copy/clone */
+function stripEphemeral(data) {
+  const clean = { ...data };
+  EPHEMERAL_NODE_KEYS.forEach((k) => delete clean[k]);
+  return clean;
+}
 
 /**
  * Encapsulates delete / copy / clone logic for canvas nodes.
@@ -82,7 +91,7 @@ export function useNodeActions({
       const payload = {
         type: "flow/nodes",
         mousePosition: null, // paste time pe overwrite hoga
-        nodes: nodesToCopy,
+        nodes: nodesToCopy.map((n) => ({ ...n, data: stripEphemeral(n.data) })),
         edges: copiedEdges,
       };
 
@@ -127,7 +136,7 @@ export function useNodeActions({
             selected: false,
             dragging: false,
             data: {
-              ...node.data,
+              ...stripEphemeral(node.data),
               id: newId,
               inPorts: [],
               outPorts: [],
@@ -135,6 +144,8 @@ export function useNodeActions({
               failureOutport: [],
               connected: false,
               groupId: undefined,
+              createdBy: getMeStamp() ?? node.data.createdBy,
+              lastUpdatedBy: getMeStamp(),
             },
           },
         ]);
@@ -160,7 +171,7 @@ export function useNodeActions({
         selected: false,
         dragging: false,
         data: {
-          ...node.data,
+          ...stripEphemeral(node.data),
           id: newCarouselId,
           inPorts: [],
           outPorts: (node.data.outPorts ?? []).map((id) => idMap.get(id) ?? id),
@@ -176,6 +187,8 @@ export function useNodeActions({
               id: idMap.get(b.id) ?? b.id,
             })),
           })),
+          createdBy: getMeStamp() ?? node.data.createdBy,
+          lastUpdatedBy: getMeStamp(),
         },
       };
 
@@ -186,7 +199,7 @@ export function useNodeActions({
         selected: false,
         dragging: false,
         data: {
-          ...m.data,
+          ...stripEphemeral(m.data),
           id: idMap.get(m.id),
           groupId: newCarouselId,
           inPorts: (m.data.inPorts ?? []).map((id) => idMap.get(id) ?? id),
@@ -200,6 +213,8 @@ export function useNodeActions({
                 })),
               }
             : {}),
+          createdBy: getMeStamp() ?? m.data.createdBy,
+          lastUpdatedBy: getMeStamp(),
         },
       }));
 
@@ -257,7 +272,7 @@ export function useNodeActions({
       const payload = {
         type: "flow/nodes",
         mousePosition: null,
-        nodes: nodesToCopy,
+        nodes: nodesToCopy.map((n) => ({ ...n, data: stripEphemeral(n.data) })),
         edges: copiedEdges,
       };
 
@@ -322,7 +337,7 @@ export function useNodeActions({
           selected: false,
           dragging: false,
           data: {
-            ...node.data,
+            ...stripEphemeral(node.data),
             id: newId,
             groupId: newGroupId,
             // Remap ports that point to other selected nodes; drop external connections
@@ -365,6 +380,8 @@ export function useNodeActions({
                   })),
                 }
               : {}),
+            createdBy: getMeStamp() ?? node.data.createdBy,
+            lastUpdatedBy: getMeStamp(),
           },
         });
       });
@@ -385,6 +402,21 @@ export function useNodeActions({
     [nodesRef, getNextNodeId, setNodes, setEdges],
   );
 
+  // Returns the lock owner name if the node is being dragged / has menu open / is selected by a remote user
+  const getNodeLockOwner = useCallback(
+    (nodeId) => {
+      const node = nodesRef.current.find((n) => n.id === nodeId);
+      if (!node) return null;
+      return (
+        node.data?.isDraggedBy ??
+        node.data?.isMenuOpenBy ??
+        node.data?.selectedBy ??
+        null
+      );
+    },
+    [nodesRef],
+  );
+
   return {
     deleteNode,
     copyNode,
@@ -392,5 +424,6 @@ export function useNodeActions({
     deleteNodes,
     copyNodes,
     cloneNodes,
+    getNodeLockOwner,
   };
 }

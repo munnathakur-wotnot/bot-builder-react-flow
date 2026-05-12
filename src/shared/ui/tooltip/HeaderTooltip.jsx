@@ -68,12 +68,9 @@ function HeaderTooltip(props) {
     const migrate = () => {
         try {
             const oldData = JSON.parse(valueJSON);
-            console.log("Hello", oldData);
-
             const data = importMigration(oldData);
             setNodes(data?.nodes);
             setEdges(data?.edges);
-            console.log(data, "Hello");
         } catch (e) {
             console.error(e);
         }
