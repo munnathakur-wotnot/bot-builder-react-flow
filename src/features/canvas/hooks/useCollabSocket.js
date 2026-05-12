@@ -17,13 +17,18 @@ export function useCollabSocket({
   updateSingleNode,
   setNodes,
 }) {
-  const [userNodeSelected, setUserNodeSelected] = useState(null);
   const [remoteDragMap, setRemoteDragMap] = useState({});
+  const [remoteTypingMap, setRemoteTypingMap] = useState({});
+
+  // eslint-disable-next-line no-unused-vars
   const [remoteMenuMap, setRemoteMenuMap] = useState({});
 
   // Stable ref so drag-start handler can read latest map without closure issues
   const remoteDragMapRef = useRef({});
   remoteDragMapRef.current = remoteDragMap;
+
+  // userId -> { nodeId, name, color } — tracks every remote user's selected node
+  const remoteSelectionMapRef = useRef({});
 
   // ── Emit: node selected / unselected ─────────────────────────
   useEffect(() => {
@@ -50,37 +55,49 @@ export function useCollabSocket({
     prevMenuNodeIdRef.current = curr;
   }, [menuState]);
 
-  // ── Highlight remote-selected node ────────────────────────────
+  // ── Socket listeners ──────────────────────────────────────────
   useEffect(() => {
-    if (!userNodeSelected?.nodeId) return;
-
-    updateSingleNode(userNodeSelected.nodeId, (node) => ({
-      ...node,
-      data: {
-        ...node.data,
-        isSearchHighlight: true,
-        selectedBy: userNodeSelected.name,
-        selectedByColor: userNodeSelected.color,
-      },
-    }));
-
-    return () => {
-      updateSingleNode(userNodeSelected.nodeId, (node) => ({
-        ...node,
+    const handleNodeSelected = ({ userId, name, color, nodeId }) => {
+      // Clear the previous node this user had selected (if different)
+      const prev = remoteSelectionMapRef.current[userId];
+      if (prev?.nodeId && prev.nodeId !== nodeId) {
+        updateSingleNode(prev.nodeId, (n) => ({
+          ...n,
+          data: {
+            ...n.data,
+            isSearchHighlight: false,
+            selectedBy: null,
+            selectedByColor: null,
+          },
+        }));
+      }
+      remoteSelectionMapRef.current[userId] = { nodeId, name, color };
+      updateSingleNode(nodeId, (n) => ({
+        ...n,
         data: {
-          ...node.data,
-          isSearchHighlight: false,
-          selectedBy: null,
-          selectedByColor: null,
+          ...n.data,
+          isSearchHighlight: true,
+          selectedBy: name,
+          selectedByColor: color,
         },
       }));
     };
-  }, [userNodeSelected, updateSingleNode]);
 
-  // ── Socket listeners ──────────────────────────────────────────
-  useEffect(() => {
-    const handleNodeSelected = (data) => setUserNodeSelected(data);
-    const handleNodeUnselected = () => setUserNodeSelected(null);
+    const handleNodeUnselected = ({ userId }) => {
+      const prev = remoteSelectionMapRef.current[userId];
+      if (prev?.nodeId) {
+        updateSingleNode(prev.nodeId, (n) => ({
+          ...n,
+          data: {
+            ...n.data,
+            isSearchHighlight: false,
+            selectedBy: null,
+            selectedByColor: null,
+          },
+        }));
+      }
+      delete remoteSelectionMapRef.current[userId];
+    };
 
     const handleNodeDragStart = ({ nodeId, name, color }) => {
       setRemoteDragMap((prev) => ({ ...prev, [nodeId]: { name, color } }));
@@ -153,6 +170,56 @@ export function useCollabSocket({
       );
     };
 
+    const handleTypingStart = ({ nodeId, field, name, color }) => {
+      setRemoteTypingMap((prev) => ({
+        ...prev,
+
+        [nodeId]: {
+          ...prev[nodeId],
+
+          [field]: {
+            name,
+            color,
+          },
+        },
+      }));
+    };
+
+    const handleTypingEnd = ({ nodeId, field }) => {
+      setRemoteTypingMap((prev) => {
+        const copy = { ...prev };
+
+        if (!copy[nodeId]) return prev;
+
+        delete copy[nodeId][field];
+
+        if (Object.keys(copy[nodeId]).length === 0) {
+          delete copy[nodeId];
+        }
+
+        return copy;
+      });
+    };
+    const handleActiveTypingLocks = (locks) => {
+      locks.forEach(({ nodeId, field, name, color }) => {
+        handleTypingStart({
+          nodeId,
+          field,
+          name,
+          color,
+        });
+      });
+    };
+
+    const userLeftHandler = (user) => {
+      // Clear the departing user's node selection highlight
+      handleNodeUnselected({ userId: user.id });
+      // drag/menu/typing locks are cleaned up via node-drag-end / node-menu-close / node-typing-end
+      // which the server emits from releaseLocksForSocket before user-left fires
+    };
+
+    socket.on("user-left", userLeftHandler);
+
     socket.on("node-selected", handleNodeSelected);
     socket.on("node-unselected", handleNodeUnselected);
     socket.on("node-drag-start", handleNodeDragStart);
@@ -162,8 +229,12 @@ export function useCollabSocket({
     socket.on("node-changed", handleNodeChanged);
     socket.on("active-drag-locks", handleActiveDragLocks);
     socket.on("active-menu-locks", handleActiveMenuLocks);
+    socket.on("node-typing-start", handleTypingStart);
+    socket.on("node-typing-end", handleTypingEnd);
+    socket.on("active-typing-locks", handleActiveTypingLocks);
 
     return () => {
+      socket.off("user-left", userLeftHandler);
       socket.off("node-selected", handleNodeSelected);
       socket.off("node-unselected", handleNodeUnselected);
       socket.off("node-drag-start", handleNodeDragStart);
@@ -173,6 +244,9 @@ export function useCollabSocket({
       socket.off("node-changed", handleNodeChanged);
       socket.off("active-drag-locks", handleActiveDragLocks);
       socket.off("active-menu-locks", handleActiveMenuLocks);
+      socket.off("node-typing-start", handleTypingStart);
+      socket.off("node-typing-end", handleTypingEnd);
+      socket.off("active-typing-locks", handleActiveTypingLocks);
     };
   }, [updateSingleNode, setNodes]);
 
@@ -189,6 +263,20 @@ export function useCollabSocket({
     socket.emit("node-changed", { nodeId, data });
   }, []);
 
+  const emitTypingStart = useCallback((nodeId, field) => {
+    socket.emit("node-typing-start", {
+      nodeId,
+      field,
+    });
+  }, []);
+
+  const emitTypingEnd = useCallback((nodeId, field) => {
+    socket.emit("node-typing-end", {
+      nodeId,
+      field,
+    });
+  }, []);
+
   return {
     /** Remote drag-lock map ref — read synchronously inside callbacks */
     remoteDragMapRef,
@@ -198,5 +286,8 @@ export function useCollabSocket({
     emitDragEnd,
     /** Emit that a node's data changed (for sidebar updates) */
     emitNodeChanged,
+    remoteTypingMap,
+    emitTypingStart,
+    emitTypingEnd,
   };
 }

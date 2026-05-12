@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { pushToastGlobal } from "../../../shared/ui/feedback/Toast.jsx";
+import { getMeStamp } from "../../socket/useCursorStore.js";
 
 export function useFlowPaste({
   setNodes,
@@ -87,6 +88,8 @@ export function useFlowPaste({
               : undefined,
             isSearchHighlight: false,
             isErrorShow: false,
+            createdBy: getMeStamp() ?? node.data.createdBy,
+            lastUpdatedBy: getMeStamp(),
           },
           selected: false,
         };

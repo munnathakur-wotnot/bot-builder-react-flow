@@ -11,6 +11,7 @@ export default function AppTextarea({
     className = "",
     id,
     error,
+    ...rest
 }) {
     const handleChange = (e) => {
         onChange(e);
@@ -31,6 +32,7 @@ export default function AppTextarea({
                 style={{ minHeight: "100px" }}
                 onChange={handleChange}
                 placeholder={placeholder}
+                {...rest}
             />
             {error && <span className="app-textarea__error">{error}</span>}
         </div>

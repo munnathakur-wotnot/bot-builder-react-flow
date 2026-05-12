@@ -1,74 +1,40 @@
-import React, { useEffect, useState } from "react";
-import socket from "./useSocket";
+import React, { useEffect } from "react";
 import "./remote-users.css";
+import { cursorStore, useCursorStore } from "./useCursorStore";
+import { useSyncExternalStore } from "react";
+import { viewportStore } from "../../shared/hooks/useViewportStore";
+
+/** Convert a flow-space coordinate to absolute screen pixels.
+ *  viewport = { x, y, zoom } from React Flow's onMove (relative to canvas container).
+ *  canvasRect = getBoundingClientRect() of the .react-flow element. */
+function flowToScreen(fx, fy, viewport, canvasRect) {
+    return {
+        x: fx * viewport.zoom + viewport.x + canvasRect.left,
+        y: fy * viewport.zoom + viewport.y + canvasRect.top,
+    };
+}
 
 export default function RemoteCursors() {
-    const [cursors, setCursors] = useState({});
-    const [me, setMe] = useState(null);
-
     useEffect(() => {
-        // current me
-        socket.on("me", (user) => {
-            setMe(user);
-
-            setCursors((prev) => ({
-                ...prev,
-                [user.id]: user,
-            }));
-        });
-
-        // existing users
-        socket.on("existing-users", (users) => {
-            const map = {};
-
-            users.forEach((user) => {
-                map[user.id] = user;
-            });
-
-            setCursors((prev) => ({
-                ...prev,
-                ...map,
-            }));
-        });
-
-        // new joined
-        socket.on("user-joined", (user) => {
-            setCursors((prev) => ({
-                ...prev,
-                [user.id]: user,
-            }));
-        });
-
-        // move
-        socket.on("cursor-move", (user) => {
-            setCursors((prev) => ({
-                ...prev,
-                [user.id]: {
-                    ...prev[user.id],
-                    ...user,
-                },
-            }));
-        });
-
-        // remove
-        socket.on("user-left", (userId) => {
-            setCursors((prev) => {
-                const copy = { ...prev };
-
-                delete copy[userId];
-
-                return copy;
-            });
-        });
-
-        return () => {
-            socket.off("me");
-            socket.off("existing-users");
-            socket.off("user-joined");
-            socket.off("cursor-move");
-            socket.off("user-left");
-        };
+        cursorStore.init();
     }, []);
+    const { cursors, me } = useCursorStore();
+    const viewport = useSyncExternalStore(
+        viewportStore.subscribe,
+        viewportStore.getSnapshot,
+    );
+
+    // Resolve screen position for a cursor, handling both flow and screen coords
+    const resolveScreenPos = (cursor) => {
+        if (!cursor.isFlow) {
+            // Screen coordinates from outside-canvas areas — use directly
+            return { x: cursor.x, y: cursor.y };
+        }
+        // Flow coordinates from inside canvas — convert using receiver's viewport
+        const canvasEl = document.querySelector(".react-flow");
+        const rect = canvasEl?.getBoundingClientRect() ?? { left: 0, top: 0 };
+        return flowToScreen(cursor.x, cursor.y, viewport, rect);
+    };
 
     return (
         <>
@@ -93,53 +59,56 @@ export default function RemoteCursors() {
             {/* CURSORS */}
             {Object.values(cursors)
                 .filter((u) => u.id !== me?.id)
-                .map((cursor) => (
-                    <div
-                        key={cursor.id}
-                        style={{
-                            position: "fixed",
-                            left: cursor.x,
-                            top: cursor.y,
-                            pointerEvents: "none",
-                            zIndex: 999999,
-                            transition: "all 0.05s linear",
-                            transform: "translate(-2px, -2px)",
-                        }}
-                    >
-                        {/* cursor */}
-                        <svg
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            style={{
-                                filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.25))",
-                            }}
-                        >
-                            <path
-                                d="M5 3L19 12L12 14L14 21L10.5 22L8.5 15.5L5 18V3Z"
-                                fill={cursor.color}
-                                stroke="white"
-                                strokeWidth="1.5"
-                                strokeLinejoin="round"
-                            />
-                        </svg>
-
-                        {/* label */}
+                .map((cursor) => {
+                    const pos = resolveScreenPos(cursor);
+                    return (
                         <div
-                            className="cursor-user-label"
+                            key={cursor.id}
                             style={{
-                                background: cursor.color,
+                                position: "fixed",
+                                left: pos.x,
+                                top: pos.y,
+                                pointerEvents: "none",
+                                zIndex: 999999,
+                                transition: "all 0.05s linear",
+                                transform: "translate(-2px, -2px)",
                             }}
                         >
-                            <div className="cursor-avatar">
-                                {cursor.name?.charAt(0)?.toUpperCase()}
-                            </div>
+                            {/* cursor */}
+                            <svg
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                style={{
+                                    filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.25))",
+                                }}
+                            >
+                                <path
+                                    d="M5 3L19 12L12 14L14 21L10.5 22L8.5 15.5L5 18V3Z"
+                                    fill={cursor.color}
+                                    stroke="white"
+                                    strokeWidth="1.5"
+                                    strokeLinejoin="round"
+                                />
+                            </svg>
 
-                            <span>{cursor.name}</span>
+                            {/* label */}
+                            <div
+                                className="cursor-user-label"
+                                style={{
+                                    background: cursor.color,
+                                }}
+                            >
+                                <div className="cursor-avatar">
+                                    {cursor.name?.charAt(0)?.toUpperCase()}
+                                </div>
+
+                                <span>{cursor.name}</span>
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
         </>
     );
 }

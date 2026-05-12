@@ -27,3 +27,5 @@ docs
 
 .env
 .env.*
+
+.SERVER.js
