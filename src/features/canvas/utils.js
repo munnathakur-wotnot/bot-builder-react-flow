@@ -7,6 +7,29 @@ const HORIZONTAL_GAP = 80;
 const VERTICAL_GAP = 100;
 
 /* =========================================================
+   NODE TYPE RESOLUTION
+   Maps data.type (metaType) → React Flow node type key
+========================================================= */
+
+const ACTION_META_TYPES = new Set(["start", "flowStart", "delay", "jump"]);
+const SUBNODE_META_TYPES = new Set([
+  "carouselCard",
+  "carouselButton",
+  "condition",
+  "defaultCondition",
+]);
+
+/**
+ * Given a node's metaType (data.type), returns the React Flow
+ * nodeTypes key: "action" | "subnode" | "text"
+ */
+export function resolveNodeType(metaType) {
+  if (ACTION_META_TYPES.has(metaType)) return "action";
+  if (SUBNODE_META_TYPES.has(metaType)) return "subnode";
+  return "text";
+}
+
+/* =========================================================
    CORE HELPERS
 ========================================================= */
 
@@ -14,7 +37,7 @@ export function createFlowNode({
   id,
   x,
   y,
-  type = "custom",
+  type,
   inPorts = [],
   outPorts = [],
   connected = false,
@@ -29,7 +52,7 @@ export function createFlowNode({
 }) {
   const node = {
     id,
-    type,
+    type: type ?? resolveNodeType(metaType),
     position: { x, y },
     flowId,          // top-level — used by canvas filter, not inside data
     data: {

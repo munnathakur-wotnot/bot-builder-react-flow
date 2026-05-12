@@ -1,6 +1,7 @@
 import React, { memo } from "react";
 import PropTypes from "prop-types";
 import "./CustomNode.css";
+import "./CustomSubNode.css";
 
 import NodeHandles from "./NodeHandles";
 import NodeBadges from "./NodeBadges";
@@ -22,16 +23,16 @@ function CustomSubNode({ id, data }) {
         hasSuccessOutport,
         hasFailureOutport,
 
+        isLockedByRemote,
+
         handleMouseDown,
     } = useNodeInteractions({ id, data });
 
     return (
         <div
             className={`${typeClassName} custom-node--subnode`}
-            style={{
-                width: "120px",
-                ...remoteUserStyle,
-            }}
+            style={remoteUserStyle}
+            data-locked={isLockedByRemote ? "true" : undefined}
         >
             <NodeBadges data={data} />
 

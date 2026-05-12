@@ -1,4 +1,11 @@
-﻿/* ── Base node ───────────────────────────────────────────────── */
+﻿/* ================================================================
+   CustomNode.css  --  SHARED base styles
+   Used by NodeBadges, NodeHandles, NodeFooter, NodeTooltips
+   and imported by all node components alongside their own CSS.
+   Per-type styles live in ActionNode.css / TextNode.css / CustomSubNode.css.
+================================================================ */
+
+/* -- Base node -------------------------------------------------- */
 .custom-node {
   position: relative;
   width: 220px;
@@ -11,7 +18,12 @@
   cursor: default;
 }
 
-/* ── Remote user selection badge ─────────────────────────────── */
+.custom-node:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-border-hover);
+}
+
+/* -- Remote user selection badge -------------------------------- */
 .custom-node__remote-user-badge {
   position: absolute;
   top: -28px;
@@ -50,12 +62,7 @@
   flex-shrink: 0;
 }
 
-.custom-node:hover {
-  box-shadow: var(--shadow-md);
-  border-color: var(--color-border-hover);
-}
-
-/* ── Activity footer (lastUpdatedBy / createdBy) ─────────────── */
+/* -- Activity footer (lastUpdatedBy / createdBy) ---------------- */
 .custom-node__activity-footer {
   padding: 4px 8px 5px;
   border-top: 1px solid var(--color-border, #e5e7eb);
@@ -72,7 +79,7 @@
   padding: 1px 6px 1px 2px;
   border-radius: 10px;
   border: 1.5px solid transparent;
-  background: rgba(0,0,0,0.04);
+  background: rgba(0, 0, 0, 0.04);
   font-size: 10px;
   color: #555;
   max-width: 100%;
@@ -99,7 +106,7 @@
   font-weight: 500;
 }
 
-/* ── Drag-locked node (another user is dragging it) ──────────── */
+/* -- Drag-locked node (another user is dragging it) ------------- */
 .custom-node--drag-locked {
   cursor: not-allowed !important;
 }
@@ -114,19 +121,18 @@
   pointer-events: all;
 }
 
-/* ── Dragging badge variant ───────────────────────────────────── */
+/* -- Badge variants --------------------------------------------- */
 .custom-node__remote-user-badge--dragging {
   top: -32px;
   animation: remote-badge-in 0.12s ease-out;
 }
 
-/* ── Menu-open badge variant ─────────────────────────────────── */
 .custom-node__remote-user-badge--menu {
   top: -32px;
   opacity: 0.9;
 }
 
-/* ── Node hover toolbar ──────────────────────────────────────── */
+/* -- Node hover toolbar ----------------------------------------- */
 .node-toolbar {
   position: absolute;
   top: 50%;
@@ -141,8 +147,6 @@
   z-index: 10;
 }
 
-/* Invisible bridge that fills the gap between node edge and toolbar,
-   so the cursor stays within .custom-node's hover area while crossing. */
 .node-toolbar::before {
   content: "";
   position: absolute;
@@ -186,7 +190,7 @@
   color: var(--color-danger);
 }
 
-/* ── Simulation: executing (active) node ─────────────────────── */
+/* -- Simulation: executing (active) node ------------------------ */
 @keyframes node-execute-pulse {
   0%   { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
   50%  { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
@@ -200,25 +204,14 @@
   z-index: 10;
 }
 
-.custom-node--executing .custom-node__header,
-.custom-node--executing .custom-node__header-delay {
-  background: #416950 !important;
-}
-
-/* ── Simulation: already-executed node ───────────────────────── */
+/* -- Simulation: already-executed node -------------------------- */
 .custom-node--executed {
   border-color: #3e9c61 !important;
   background: #f0fdf4 !important;
   opacity: 0.85;
 }
 
-
-.custom-node--executed .custom-node__header,
-.custom-node--executed .custom-node__header-delay {
-  background: #dcfce7 !important;
-}
-
-/* ── Error badge ──────────────────────────────────────────────── */
+/* -- Error badge ------------------------------------------------- */
 .custom-node__error-badge {
   position: absolute;
   top: -8px;
@@ -234,7 +227,7 @@
   gap: 3px;
   pointer-events: none;
   z-index: 20;
-  box-shadow: 0 1px 4px rgba(239,68,68,0.4);
+  box-shadow: 0 1px 4px rgba(239, 68, 68, 0.4);
   line-height: 1.4;
 }
 
@@ -246,11 +239,11 @@
   border-color: #ef4444 !important;
 }
 
-/* ── Search highlight ─────────────────────────────────────────── */
+/* -- Search highlight -------------------------------------------- */
 @keyframes node-search-pulse {
   0%   { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.55); border-color: #2563eb; }
-  60%  { box-shadow: 0 0 0 8px rgba(37, 99, 235, 0); border-color: #2563eb; }
-  100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); border-color: #2563eb; }
+  60%  { box-shadow: 0 0 0 8px rgba(37, 99, 235, 0);  border-color: #2563eb; }
+  100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);  border-color: #2563eb; }
 }
 
 .custom-node--search-highlight {
@@ -259,248 +252,7 @@
   animation: node-search-pulse 0.8s ease-out 2;
 }
 
-/* ── Start node ───────────────────────────────────────────────── */
-.custom-node--start {
-  width: auto;
-  min-width: 120px;
-  border: none;
-  border-radius: var(--radius-full);
-  background: var(--color-accent-start);
-  box-shadow: 0 4px 14px rgba(31, 178, 106, 0.35);
-  cursor: pointer;
-}
-
-.custom-node--start:hover {
-  box-shadow: 0 6px 20px rgba(31, 178, 106, 0.45);
-  border: none;
-}
-
-.custom-node--start .custom-node__header {
-  padding: 10px 20px;
-  background: transparent;
-  gap: 8px;
-}
-
-.custom-node--start .custom-node__icon {
-  width: 14px;
-  height: 14px;
-  border-radius: 0;
-  background: rgba(255,255,255,0.9);
-  clip-path: polygon(0 0, 80% 0, 60% 50%, 80% 100%, 0 100%);
-}
-
-.custom-node--start .custom-node__icon::before { content: none; }
-
-.custom-node--start .custom-node__title {
-  color: #fff;
-  font-size: 14px;
-  line-clamp: 1;
-  overflow: hidden;
-  font-weight: 600;
-  min-height: 20px;
-}
-
-.custom-node--start .custom-node__description { display: none; }
-
-/* ── Delay node ───────────────────────────────────────────────── */
-.custom-node--delay {
-  width: auto;
-  min-width: 140px;
-  border-radius: var(--radius-full);
-  border-color: #fde68a;
-  background: #fffbeb;
-  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
-}
-
-.custom-node--delay:hover {
-  border-color: var(--color-accent-delay);
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-}
-
-.custom-node__header-delay {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 9px 18px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #92400e;
-}
-
-/* //jump */
-
-.small-node-title{
-  display: flex;
-  justify-content: space-around;
-  width: 80px;
-  line-clamp: 1;
-  overflow: hidden;
-  align-items: center;
-
-}
-.custom-node--jump {
-  width: auto;
-  min-width: 140px;
-  border-radius: var(--radius-full);
-  border-color: #968440;
-  background: #b8b099;
-  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
-}
-
-.custom-node--jump:hover {
-  border-color: var(--color-accent-delay);
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-}
-
-.custom-node__header-jump {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 9px 18px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #e6a379;
-}
-
-/* ── Flow node (pill on main canvas) ──────────────────────────── */
-.custom-node--flow {
-  width: auto;
-  min-width: 140px;
-  border-radius: var(--radius-full);
-  background: var(--color-bg-dark, #1e293b);
-  border-color: transparent;
-  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.25);
-}
-
-.custom-node--flow:hover {
-  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
-}
-
-/* ── Flow starts node (pill inside sub-flow canvas) ───────────── */
-.custom-node--flowStart {
-  width: auto;
-  min-width: 160px;
-  border-radius: var(--radius-full);
-  background: var(--color-bg-dark, #1e293b);
-  border-color: transparent;
-  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.25);
-}
-
-.custom-node--flowStart:hover {
-  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
-}
-
-/* ── Carousel sub-nodes ───────────────────────────────────────── */
-.custom-node--carouselCard,
-.custom-node--carouselButton {
-  width: 120px;
-  background: var(--color-bg-white);
-}
-
-.custom-node--carouselCard .custom-node__header,
-.custom-node--carouselButton .custom-node__header {
-  background: var(--color-bg-white);
-  padding: 9px 10px;
-}
-
-.custom-node--carouselCard .custom-node__icon,
-.custom-node--carouselButton .custom-node__icon { display: none; }
-
-.custom-node--carouselCard .custom-node__title,
-.custom-node--carouselButton .custom-node__title {
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.custom-node--carouselCard .custom-node__add-button { display: none; }
-
-/* ── AI Answer node ───────────────────────────────────────────── */
-.custom-node--ai_answer {
-  border-color: #e9d5ff;
-  background: #faf5ff;
-}
-
-.custom-node--ai_answer:hover {
-  border-color: #c084fc;
-}
-
-.custom-node--ai_answer .custom-node__header {
-  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
-}
-
-/* ── Header ───────────────────────────────────────────────────── */
-.custom-node__header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 11px 12px 9px;
-  background: linear-gradient(135deg, var(--color-bg-subtle) 0%, var(--color-bg-white) 100%);
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-}
-
-/* Per-type header accent stripe */
-.custom-node--collectInput .custom-node__header { background: linear-gradient(135deg, #eff6ff 0%, var(--color-bg-white) 60%); }
-.custom-node--form        .custom-node__header { background: linear-gradient(135deg, #ecfeff 0%, var(--color-bg-white) 60%); }
-.custom-node--carousel    .custom-node__header { background: linear-gradient(135deg, #f5f3ff 0%, var(--color-bg-white) 60%); }
-
-/* ── Icon ─────────────────────────────────────────────────────── */
-.custom-node__icon {
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-sm);
-  background: var(--color-accent-collect);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  position: relative;
-}
-
-.custom-node__icon::before {
-  content: "";
-  position: absolute;
-  inset: 6px;
-  border: 2px solid rgba(255,255,255,0.85);
-  border-radius: 2px;
-}
-
-.custom-node--form        .custom-node__icon { background: var(--color-accent-form); }
-.custom-node--carousel    .custom-node__icon { background: var(--color-accent-carousel); }
-.custom-node--ai_answer   .custom-node__icon { background: var(--color-accent-ai); }
-.custom-node--collectInput .custom-node__icon { background: var(--color-accent-collect); }
-
-/* ── Title ────────────────────────────────────────────────────── */
-.custom-node__title {
-  margin: 0;
-  color: var(--color-text-primary);
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.3;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  word-break: break-word;
-}
-
-/* ── Description ──────────────────────────────────────────────── */
-.custom-node__description {
-  margin: 0;
-  padding: 8px 12px 10px;
-  color: var(--color-text-tertiary);
-  font-size: 12px;
-  line-height: 1.4;
-  min-height: 40px;
-  border-top: 1px solid var(--color-border);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* ── Handles ──────────────────────────────────────────────────── */
+/* -- Handles ----------------------------------------------------- */
 .custom-node__handle {
   width: 10px;
   height: 10px;
@@ -536,10 +288,7 @@
   background: rgba(31, 178, 106, 0.08);
 }
 
-/* ── Source handle (+) button ─────────────────────────────────── */
-/* ReactFlow default applies transform: translate(-50%, 50%) which shifts the
-   handle down by half its own height. With bottom: 0 the centre lands exactly
-   on the node's bottom edge — 50 % inside, 50 % outside.               */
+/* -- Source handle (+) button ------------------------------------ */
 .custom-node__handle--source {
   bottom: 0;
   width: 28px;
@@ -552,7 +301,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: border-color var(--transition-base), background var(--transition-base), box-shadow var(--transition-base);
+  transition: border-color var(--transition-base), background var(--transition-base),
+    box-shadow var(--transition-base);
 }
 
 .custom-node__handle--source::after {
@@ -603,7 +353,7 @@
 
 .custom-node__handle--source-hidden::after { display: none !important; }
 
-/* ── Double outport (AI Answer) ───────────────────────────────── */
+/* -- Double outport (AI Answer success / failure) ---------------- */
 .success-node-handler {
   background: #dcfce7;
   color: #15803d;
@@ -624,7 +374,7 @@
   font-weight: 600;
 }
 
-/* ── Self-loop handle ─────────────────────────────────────────── */
+/* -- Self-loop handle -------------------------------------------- */
 .custom-node__handle--self-loop {
   position: absolute;
 }
@@ -644,32 +394,4 @@
   justify-content: center;
   box-shadow: var(--shadow-sm);
   border: 1px solid #a7f3d0;
-}
-
-.custom-node--executing .custom-node__description {
-  color: #e5e7eb ;
-}
-
-.custom-node--executed .custom-node__description {
-  color: #374151 ;
-}
-
-/* Executed node → title black */
-.custom-node--executed .custom-node__title {
-  color: #000 !important;
-}
-
-/* Active (executing) node → title white (better contrast on green bg) */
-.custom-node--executing .custom-node__title {
-  color: #fff !important;
-}
-
-/* Executed node → title black */
-.custom-node--executed .custom-node__icon {
-  background: #000 !important;
-}
-
-/* Active (executing) node → title white (better contrast on green bg) */
-.custom-node--executing .custom-node__icon {
-  background: #fff !important;
 }

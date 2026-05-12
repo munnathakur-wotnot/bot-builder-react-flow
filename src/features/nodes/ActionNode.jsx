@@ -1,6 +1,7 @@
 import React, { memo } from "react";
 import PropTypes from "prop-types";
 import "./CustomNode.css";
+import "./ActionNode.css";
 
 import NodeHandles from "./NodeHandles";
 import NodeBadges from "./NodeBadges";
@@ -23,11 +24,11 @@ function ActionNode({ id, data }) {
         hasSuccessOutport,
         hasFailureOutport,
 
+        isLockedByRemote,
+
         handleMouseDown,
         handleOpenMenu,
     } = useNodeInteractions({ id, data });
-
-    console.log(data, "datais");
 
     const isStartNode = data.type === "start" || data.type === "flowStart";
 
@@ -37,6 +38,7 @@ function ActionNode({ id, data }) {
         <div
             className={`${typeClassName} custom-node--action`}
             style={remoteUserStyle}
+            data-locked={isLockedByRemote ? "true" : undefined}
             onClick={
                 isStartNode && !isConnected
                     ? (e) => handleOpenMenu({ event: e })

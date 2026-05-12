@@ -46,8 +46,18 @@ import { useAutoSave } from "./hooks/useAutoSave.js";
 import { useSyncCompressed } from "./hooks/useSyncCompressed.js";
 import TextNode from "../nodes/TextNode.jsx";
 import ActionNode from "../nodes/ActionNode.jsx";
+import CustomSubNode from "../nodes/CustomSubNode.jsx";
 
-const nodeTypes = { custom: ActionNode };
+/**
+ * action  → ActionNode   (start, delay, jump, flowStart — small pill nodes)
+ * text    → TextNode     (ai_answer, collectInput, form, carousel, conditionRoot, flow — card nodes)
+ * subnode → CustomSubNode (carouselCard, carouselButton, condition, defaultCondition — child nodes)
+ */
+const nodeTypes = {
+  action: ActionNode,
+  text: TextNode,
+  subnode: CustomSubNode,
+};
 const edgeTypes = { custom: CustomEdge };
 
 // Fields that are managed purely by socket events and must never be persisted

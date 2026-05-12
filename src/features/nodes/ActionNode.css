@@ -1,0 +1,138 @@
+/* ================================================================
+   ActionNode.css
+   Styles for pill-shaped action nodes: start, delay, jump,
+   flow, flowStart.
+   Base/shared styles live in CustomNode.css.
+================================================================ */
+
+/* ── Shared pill header & title ───────────────────────────────── */
+.custom-node__header-delay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #92400e;
+}
+
+.small-node-title {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 80px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ── Start node ───────────────────────────────────────────────── */
+.custom-node--start {
+  width: auto;
+  min-width: 120px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--color-accent-start);
+  box-shadow: 0 4px 14px rgba(31, 178, 106, 0.35);
+  cursor: pointer;
+}
+
+.custom-node--start:hover {
+  box-shadow: 0 6px 20px rgba(31, 178, 106, 0.45);
+  border: none;
+}
+
+.custom-node--start .custom-node__header-delay {
+  padding: 10px 20px;
+  background: transparent;
+  gap: 8px;
+  color: #fff;
+}
+
+.custom-node--start .small-node-title {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ── Delay node ───────────────────────────────────────────────── */
+.custom-node--delay {
+  width: auto;
+  min-width: 140px;
+  border-radius: var(--radius-full);
+  border-color: #fde68a;
+  background: #fffbeb;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
+}
+
+.custom-node--delay:hover {
+  border-color: var(--color-accent-delay);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+/* ── Jump node ────────────────────────────────────────────────── */
+.custom-node--jump {
+  width: auto;
+  min-width: 140px;
+  border-radius: var(--radius-full);
+  border-color: #968440;
+  background: #b8b099;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
+}
+
+.custom-node--jump:hover {
+  border-color: var(--color-accent-delay);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.custom-node--jump .custom-node__header-delay {
+  color: #e6a379;
+}
+
+/* ── Flow node (pill on main canvas) ──────────────────────────── */
+.custom-node--flow {
+  width: auto;
+  min-width: 140px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-dark, #1e293b);
+  border-color: transparent;
+  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.25);
+}
+
+.custom-node--flow:hover {
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
+}
+
+.custom-node--flow .custom-node__header-delay {
+  color: #e2e8f0;
+}
+
+/* ── FlowStart node (pill inside sub-flow canvas) ─────────────── */
+.custom-node--flowStart {
+  width: auto;
+  min-width: 160px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-dark, #1e293b);
+  border-color: transparent;
+  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.25);
+}
+
+.custom-node--flowStart:hover {
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
+}
+
+.custom-node--flowStart .custom-node__header-delay {
+  color: #e2e8f0;
+}
+
+/* ── Simulation overrides for pill nodes ──────────────────────── */
+.custom-node--executing .custom-node__header-delay {
+  background: #416950 !important;
+  color: #fff !important;
+}
+
+.custom-node--executed .custom-node__header-delay {
+  background: #dcfce7 !important;
+  color: #166534 !important;
+}

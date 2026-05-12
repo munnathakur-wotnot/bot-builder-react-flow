@@ -20,7 +20,10 @@ function Source({
     hasFailureOutport,
     isSelfLoop,
     onMouseDown,
+    hidden,
 }) {
+    const hiddenStyle = hidden ? { visibility: "hidden" } : {};
+
     if (isDoubleOutport) {
         return (
             <>
@@ -28,7 +31,7 @@ function Source({
                     type="source"
                     id="success"
                     position={Position.Bottom}
-                    style={{ left: "30%" }}
+                    style={{ left: "30%", ...hiddenStyle }}
                     className={`custom-node__handle custom-node__handle--source
             ${isSelfLoop
                             ? "custom-node__handle--self-loop"
@@ -44,7 +47,7 @@ function Source({
                     type="source"
                     id="failure"
                     position={Position.Bottom}
-                    style={{ left: "70%" }}
+                    style={{ left: "70%", ...hiddenStyle }}
                     className={`custom-node__handle custom-node__handle--source
             ${hasFailureOutport
                             ? "custom-node__handle--source-connected"
@@ -62,6 +65,7 @@ function Source({
             type="source"
             id="default"
             position={Position.Bottom}
+            style={hiddenStyle}
             className={`custom-node__handle custom-node__handle--source
         ${hasOutgoing
                     ? "custom-node__handle--source-connected"
@@ -80,6 +84,7 @@ Source.propTypes = {
     hasFailureOutport: PropTypes.bool,
     isSelfLoop: PropTypes.bool,
     onMouseDown: PropTypes.func,
+    hidden: PropTypes.bool,
 };
 
 export default {

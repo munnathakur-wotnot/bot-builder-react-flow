@@ -83,6 +83,8 @@ export function useNodeInteractions({ id, data }) {
     [handleOpenMenu, hasOutgoing, isHandleClickRef],
   );
 
+  const isLockedByRemote = Boolean(data?.isDraggedBy);
+
   const typeClassName = useMemo(() => {
     return [
       `custom-node custom-node--${data.type ?? "default"}`,
@@ -90,10 +92,11 @@ export function useNodeInteractions({ id, data }) {
       hasErrors ? "custom-node--has-errors" : "",
       isActive ? "custom-node--executing" : "",
       isExecuted ? "custom-node--executed" : "",
+      data?.isDraggedBy ? "custom-node--drag-locked" : "",
     ]
       .filter(Boolean)
       .join(" ");
-  }, [data.type, data.isSearchHighlight, hasErrors, isActive, isExecuted]);
+  }, [data.type, data.isSearchHighlight, hasErrors, isActive, isExecuted, data?.isDraggedBy]);
 
   const borderColor =
     data?.isDraggedByColor || data?.isMenuOpenByColor || data?.selectedByColor;
@@ -121,6 +124,7 @@ export function useNodeInteractions({ id, data }) {
 
     isActive,
     isExecuted,
+    isLockedByRemote,
 
     handleMouseDown,
     handleOpenMenu,
