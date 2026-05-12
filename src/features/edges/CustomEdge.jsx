@@ -1,4 +1,4 @@
-﻿import React, { useCallback, useEffect, useRef, useState } from "react";
+﻿import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 import {
   BaseEdge,
   EdgeLabelRenderer,
@@ -10,7 +10,7 @@ import { useFlowCallbacks } from "../canvas/FlowCallbacksContext.jsx";
 import PropTypes from "prop-types";
 import { useSimulationStatus } from "../../shared/hooks/useSimulationStatus";
 
-export default function CustomEdge(props) {
+function CustomEdge(props) {
   const {
     id,
     source,
@@ -25,12 +25,14 @@ export default function CustomEdge(props) {
 
   const { deleteEdge, simulationStore } = useFlowCallbacks();
 
-  // Per-edge subscription — only this edge re-renders when its source status changes
+  // only re-render when this source node simulation changes
   const edgeSimStatus = useSimulationStatus(simulationStore, source);
+
   const isEdgeActive = edgeSimStatus === "active";
   const isEdgeExecuted = edgeSimStatus === "executed";
-  //Used to delay hiding the delete button (smooth UX).
+
   const hideTimeoutRef = useRef(null);
+
   const [hoverState, setHoverState] = useState({
     isVisible: false,
     x: 0,
@@ -38,7 +40,9 @@ export default function CustomEdge(props) {
   });
 
   const isDeletableEdges = data?.isNotDeletable;
+
   const isVerticalChain = Math.abs(sourceX - targetX) < 2;
+
   const [edgePath, fallbackX, fallbackY] = isVerticalChain
     ? getStraightPath({
       sourceX,
@@ -55,11 +59,14 @@ export default function CustomEdge(props) {
       offset: 30,
     });
 
-  const handleDelete = (e) => {
-    e.stopPropagation();
+  const handleDelete = useCallback(
+    (e) => {
+      e.stopPropagation();
 
-    deleteEdge?.(id, source, target, sourceHandleId);
-  };
+      deleteEdge?.(id, source, target, sourceHandleId);
+    },
+    [deleteEdge, id, source, target, sourceHandleId],
+  );
 
   const clearHideTimeout = useCallback(() => {
     if (hideTimeoutRef.current) {
@@ -71,6 +78,7 @@ export default function CustomEdge(props) {
   const showDeleteButton = useCallback(
     (event) => {
       clearHideTimeout();
+
       const svg = event.currentTarget.ownerSVGElement;
       const ctm = svg?.getScreenCTM();
 
@@ -80,10 +88,12 @@ export default function CustomEdge(props) {
           x: fallbackX,
           y: fallbackY,
         });
+
         return;
       }
 
       const point = svg.createSVGPoint();
+
       point.x = event.clientX;
       point.y = event.clientY;
 
@@ -100,17 +110,20 @@ export default function CustomEdge(props) {
 
   const hideDeleteButton = useCallback(() => {
     clearHideTimeout();
+
     hideTimeoutRef.current = window.setTimeout(() => {
-      setHoverState((prev) => ({ ...prev, isVisible: false }));
+      setHoverState((prev) => ({
+        ...prev,
+        isVisible: false,
+      }));
     }, 120);
   }, [clearHideTimeout]);
 
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    return () => {
       clearHideTimeout();
-    },
-    [clearHideTimeout],
-  );
+    };
+  }, [clearHideTimeout]);
 
   return (
     <>
@@ -125,10 +138,14 @@ export default function CustomEdge(props) {
               animation: "edge-dash 0.4s linear infinite",
             }
             : isEdgeExecuted
-              ? { stroke: "#86efac", strokeWidth: 2 }
+              ? {
+                stroke: "#86efac",
+                strokeWidth: 2,
+              }
               : undefined
         }
       />
+
       {!isDeletableEdges && (
         <path
           d={edgePath}
@@ -172,6 +189,7 @@ export default function CustomEdge(props) {
     </>
   );
 }
+
 CustomEdge.propTypes = {
   id: PropTypes.string,
   source: PropTypes.string,
@@ -183,3 +201,33 @@ CustomEdge.propTypes = {
   sourceHandleId: PropTypes.string,
   data: PropTypes.object,
 };
+
+/**
+ * Re-render ONLY when these values change
+ */
+function areEqual(prev, next) {
+  // edge identity
+  if (prev.id !== next.id) return false;
+
+  // connection change
+  if (prev.source !== next.source) return false;
+  if (prev.target !== next.target) return false;
+
+  // position/path change
+  if (prev.sourceX !== next.sourceX) return false;
+  if (prev.sourceY !== next.sourceY) return false;
+  if (prev.targetX !== next.targetX) return false;
+  if (prev.targetY !== next.targetY) return false;
+
+  // handle change
+  if (prev.sourceHandleId !== next.sourceHandleId) return false;
+
+  // only compare used data fields
+  if (prev.data?.isNotDeletable !== next.data?.isNotDeletable) {
+    return false;
+  }
+
+  return true;
+}
+
+export default memo(CustomEdge, areEqual);

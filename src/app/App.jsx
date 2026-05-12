@@ -16,9 +16,13 @@ export default function App() {
 
     // throttle = every 50ms only one emit
     const handleMove = throttle((e) => {
+      // When mouse is inside the canvas, Canvas.jsx emits flow coordinates.
+      // Only emit screen coords here for outside-canvas areas (header, sidebar).
+      if (e.target.closest?.(".flow-canvas")) return;
       socket.emit("cursor-move", {
         x: e.clientX,
         y: e.clientY,
+        isFlow: false,
       });
     }, 50);
 
