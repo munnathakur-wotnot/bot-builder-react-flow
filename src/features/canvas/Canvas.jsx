@@ -44,8 +44,10 @@ import { viewportStore } from "../../shared/hooks/useViewportStore.js";
 import { EPHEMERAL_NODE_KEYS } from "./constants.js";
 import { useAutoSave } from "./hooks/useAutoSave.js";
 import { useSyncCompressed } from "./hooks/useSyncCompressed.js";
+import TextNode from "../nodes/TextNode.jsx";
+import ActionNode from "../nodes/ActionNode.jsx";
 
-const nodeTypes = { custom: CustomNode };
+const nodeTypes = { custom: ActionNode };
 const edgeTypes = { custom: CustomEdge };
 
 // Fields that are managed purely by socket events and must never be persisted
