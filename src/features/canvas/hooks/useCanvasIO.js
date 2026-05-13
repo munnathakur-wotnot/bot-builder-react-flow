@@ -1,7 +1,6 @@
 import { useCallback, useRef } from "react";
 import { useReactFlow } from "@xyflow/react";
-import { exportMigration } from "../migrationUtils";
-import { migrateToReactFlow } from "../orliginalMigrate";
+import { migrateToReactFlow, migrateFromReactFlow } from "../orliginalMigrate";
 
 /**
  * Handles JSON import / export for the canvas.
@@ -9,7 +8,7 @@ import { migrateToReactFlow } from "../orliginalMigrate";
  *   • New format  { nodes[], edges[] }
  *   • Old format  { nodes[], links[] }  ← auto-detected, migrated on the fly
  *
- * Returns { importFileRef, handleImportChange, triggerImport, handleExport, handleExportLegacy }
+ * Returns { importFileRef, handleImportChange, triggerImport, handleExport }
  */
 export function useCanvasIO({
   nodes,
@@ -17,25 +16,41 @@ export function useCanvasIO({
   setNodes,
   setEdges,
   setStartChecking,
+  flowMetaRef,
+  getViewport,
 }) {
   const { fitView } = useReactFlow();
   const importFileRef = useRef(null);
 
-  /* ── EXPORT (new format) ──────────────────────────────────── */
+  /* ── EXPORT (old format via migrateFromReactFlow) ─────────── */
   const handleExport = useCallback(() => {
-    const json = JSON.stringify({ nodes, edges }, null, 2);
-    triggerDownload(json, "flow.json");
-  }, [nodes, edges]);
+    const viewport = getViewport?.() ?? { x: 0, y: 0, zoom: 1 };
+    const rfFlow = {
+      ...flowMetaRef.current,
+      nodes,
+      edges,
+      viewport,
+    };
 
-  /* ── EXPORT LEGACY (old port-based format) ────────────────── */
-  const handleExportLegacy = useCallback(
-    (meta = {}) => {
-      const oldJson = exportMigration(nodes, edges, meta);
-      const json = JSON.stringify(oldJson, null, 2);
-      triggerDownload(json, "flow_legacy.json");
-    },
-    [nodes, edges],
-  );
+    // ── timed: migration ──────────────────────────────────────
+    const t0migrate = performance.now();
+    const oldJson = migrateFromReactFlow(rfFlow);
+    const t1migrate = performance.now();
+    console.log(`[Export] migrateFromReactFlow: ${(t1migrate - t0migrate).toFixed(2)}ms`);
+
+    // ── timed: JSON serialise + download ──────────────────────
+    const t0serial = performance.now();
+    const jsonString = JSON.stringify(oldJson, null, 2);
+    const t1serial = performance.now();
+    console.log(`[Export] JSON.stringify (no migration): ${(t1serial - t0serial).toFixed(2)}ms`);
+
+    console.log(
+      `[Export] Total: ${(t1serial - t0migrate).toFixed(2)}ms` +
+      ` | nodes=${nodes.length} edges=${edges.length}`,
+    );
+
+    triggerDownload(jsonString, "flow.json");
+  }, [nodes, edges, flowMetaRef, getViewport]);
 
   /* ── IMPORT (auto-detects old vs new format) ──────────────── */
   const handleImportChange = useCallback(
@@ -55,6 +70,11 @@ export function useCanvasIO({
             console.log(parsed, "data-p");
 
             const start = performance.now();
+
+            // Preserve top-level metadata (id, version, gridSize, extraInfo, etc.)
+            // so it can be round-tripped back on export
+            const { nodes: _n, links: _l, offsetX: _ox, offsetY: _oy, zoom: _z, ...meta } = parsed;
+            if (flowMetaRef) flowMetaRef.current = meta;
 
             ({ nodes: nextNodes, edges: nextEdges } =
               migrateToReactFlow(parsed));
@@ -92,7 +112,7 @@ export function useCanvasIO({
       reader.readAsText(file);
       e.target.value = "";
     },
-    [setNodes, setEdges, fitView, setStartChecking],
+    [setNodes, setEdges, fitView, setStartChecking, flowMetaRef],
   );
 
   /* ── TRIGGER file picker ──────────────────────────────────── */
@@ -105,7 +125,6 @@ export function useCanvasIO({
     handleImportChange,
     triggerImport,
     handleExport,
-    handleExportLegacy,
   };
 }
 

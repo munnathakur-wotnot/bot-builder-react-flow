@@ -75,6 +75,10 @@ export default function CanvasFlow() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
+  // Stores the non-node/edge metadata from the last imported old-format JSON
+  // (id, version, gridSize, extraInfo, etc.) so export can reconstruct the same format.
+  const flowMetaRef = useRef({});
+
   const [selectedNodeId, _setSelectedNodeId] = useState(null);
   const [selectedNodeIds, setSelectedNodeIds] = useState([]);
   const [nuberOfNodes, setNumberOfNodes] = useState(0);
@@ -104,7 +108,7 @@ export default function CanvasFlow() {
   const pointerRef = useRef({ x: 100, y: 100 });
 
   // ── React Flow ───────────────────────────────────────────────
-  const { fitView, screenToFlowPosition } = useReactFlow();
+  const { fitView, screenToFlowPosition, getViewport } = useReactFlow();
   const { updateSingleNode } = useUpdateNode(setNodes);
   const isCompressed = useSyncCompressed();
 
@@ -354,6 +358,8 @@ export default function CanvasFlow() {
       setNodes,
       setEdges,
       setStartChecking: startPerformanceTest,
+      flowMetaRef,
+      getViewport,
     });
 
   const getCursorFlowPosition = () =>
@@ -372,7 +378,7 @@ export default function CanvasFlow() {
   const { isSimulating, simulationStore, startSimulation, stopSimulation } =
     useFlowSimulation();
 
-  useAutoSave({ nodes, edges, nextIdRef });
+  useAutoSave({ nodes, edges, nextIdRef, flowMetaRef, getViewport });
 
   const { onGroupNodeDragStart, onGroupNodeDrag } = useGroupDrag(
     nodesRef,
@@ -581,7 +587,7 @@ export default function CanvasFlow() {
       simulationStore,
     ],
   );
-
+  console.log(nodes ,edges)
   // ── Render ───────────────────────────────────────────────────
   return (
     <div className="canvas-layout">

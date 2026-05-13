@@ -1,5 +1,5 @@
 import { MENU_NODE_TEMPLATES } from "../canvas/constants";
-import { buildMenuActionMap } from "../canvas/utils";
+import { buildMenuActionMap } from "../canvas/newUtils";
 import AiMenu from "./AiContextCard";
 import ContextMenu from "./ContextMenu";
 import { getMeStamp } from "../socket/useCursorStore.js";

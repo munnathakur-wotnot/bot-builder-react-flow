@@ -270,12 +270,12 @@ function CustomNode(props) {
         {!data.icon && !isSubNode && <div className="custom-node__icon" />}
         <p className={titleTextClassName}>
           <span>{data.icon}</span>
-          {data.title} {data.delayDuration ? `(${data.delayDuration}s)` : ""}
+          {data.extras?.config?.title ?? data.title} {data.delayDuration ? `(${data.delayDuration}s)` : ""}
         </p>
       </div>
       {/* Description */}
       {!isCompressed && !isSmallPill && !isSubNode && (
-        <p className="custom-node__description">{data.description || ""}</p>
+        <p className="custom-node__description">{data.extras?.config?.description ?? data.description ?? ""}</p>
       )}
       {/* Hover toolbar */}
       {showToolbar && <NodeTooltips id={id} />}
@@ -394,8 +394,8 @@ export default memo(CustomNode, (prev, next) => {
   }
 
   return (
-    prevData.title === nextData.title &&
-    prevData.description === nextData.description &&
+    prevData.extras?.config?.title === nextData.extras?.config?.title &&
+    prevData.extras?.config?.description === nextData.extras?.config?.description &&
     prevData.type === nextData.type &&
     isEqual(prevData.outPorts, nextData.outPorts) &&
     isEqual(prevData.inPorts, nextData.inPorts) &&

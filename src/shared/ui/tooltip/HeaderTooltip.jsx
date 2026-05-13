@@ -159,7 +159,7 @@ function HeaderTooltip(props) {
                                                 onSelectErrorNode?.(node);
                                             }}
                                         >
-                                            <span>{node.data.title || "Untitled"}</span>
+                                            <span>{node.data.extras?.config?.title ?? node.data.title ?? "Untitled"}</span>
                                             <ArrowRightIcon />
                                         </button>
                                     );

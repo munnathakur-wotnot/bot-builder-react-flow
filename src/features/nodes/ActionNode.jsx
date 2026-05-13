@@ -100,7 +100,7 @@ function actionNodeEqual(prev, next) {
     const nd = next.data;
     return (
         pd.type === nd.type &&
-        pd.title === nd.title &&
+        pd.extras?.config?.title === nd.extras?.config?.title &&
         pd.icon === nd.icon &&
         pd.connected === nd.connected &&
         pd.delayDuration === nd.delayDuration &&

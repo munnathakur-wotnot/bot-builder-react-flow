@@ -2,7 +2,7 @@
 import {
   buildAddCarouselCardPayload,
   removeNodeConnectionsForEdges,
-} from "../canvas/utils";
+} from "../canvas/newUtils";
 import DurationSelector from "./categories/logic/DurationSelector";
 import NodeSidebar from "./NodeSidebar";
 

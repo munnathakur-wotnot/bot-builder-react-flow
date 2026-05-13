@@ -82,7 +82,7 @@ function subNodeEqual(prev, next) {
     const nd = next.data;
     return (
         pd.type === nd.type &&
-        pd.title === nd.title &&
+        pd.extras?.config?.title === nd.extras?.config?.title &&
         pd.icon === nd.icon &&
         pd.conditionType === nd.conditionType &&
         pd.isErrorShow === nd.isErrorShow &&

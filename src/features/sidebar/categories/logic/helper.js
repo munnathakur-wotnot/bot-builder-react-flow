@@ -1,5 +1,5 @@
 import { addEdge } from "@xyflow/react";
-import { buildSingleBranch } from "../../../canvas/utils";
+import { buildSingleBranch } from "../../../canvas/newUtils";
 
 export function handleAddBranch({
   selectedNode,

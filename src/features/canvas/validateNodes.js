@@ -10,19 +10,22 @@ export function validateNodeKeys(node, allNodes, callFrom = "") {
   const d = callFrom === "sidebar" ? node : node?.data;
   if (!d) return [];
 
-  const type = d.type;
+  const type = d.metaType ?? d.type;
 
   // Ignore start node and carousel sub-nodes
   if (type === "start" || d.isSubNode) return [];
 
   const errorKeys = [];
 
+  const title = d.extras?.config?.title ?? d.title;
+  const description = d.extras?.config?.description ?? d.description;
+
   // ── Common: title ──────────────────
-  if (!d.title?.trim()) errorKeys.push("title");
+  if (!title?.trim()) errorKeys.push("title");
 
   // ── Common: description ────────────
   const noDescTypes = ["delay", "jump", "conditionRoot", "flow"];
-  if (!noDescTypes.includes(type) && !d.description?.trim()) {
+  if (!noDescTypes.includes(type) && !description?.trim()) {
     errorKeys.push("description");
   }
 

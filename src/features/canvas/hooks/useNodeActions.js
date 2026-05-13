@@ -1,5 +1,5 @@
 import { useCallback, useRef } from "react";
-import { removeNodeConnectionsForEdges } from "../utils";
+import { removeNodeConnectionsForEdges } from "../newUtils";
 import { pushToastGlobal } from "../../../shared/ui/feedback/Toast.jsx";
 import { EPHEMERAL_NODE_KEYS } from "../constants.js";
 import { getMeStamp } from "../../socket/useCursorStore.js";
@@ -97,7 +97,7 @@ export function useNodeActions({
       navigator.clipboard
         ?.writeText(JSON.stringify(payload, null, 2))
         .then(() => {
-          const label = node.data?.title ?? "Node";
+          const label = node.data?.extras?.config?.title ?? node.data?.title ?? "Node";
           const extra =
             nodesToCopy.length > 1
               ? ` (+${nodesToCopy.length - 1} sub-nodes)`

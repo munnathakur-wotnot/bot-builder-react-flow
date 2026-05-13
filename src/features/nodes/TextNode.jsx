@@ -89,8 +89,8 @@ function textNodeEqual(prev, next) {
     const nd = next.data;
     return (
         pd.type === nd.type &&
-        pd.title === nd.title &&
-        pd.description === nd.description &&
+        pd.extras?.config?.title === nd.extras?.config?.title &&
+        pd.extras?.config?.description === nd.extras?.config?.description &&
         pd.connected === nd.connected &&
         pd.doubleHandler === nd.doubleHandler &&
         pd.isErrorShow === nd.isErrorShow &&

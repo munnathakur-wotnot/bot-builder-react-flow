@@ -129,8 +129,11 @@ export function convertFromReactFlowNode(rfNode) {
   const oldNode = {
     id: rfNode.id,
 
-    // RF type -> dialogType
-    dialogType: rfNode.type,
+    // Restore original dialogType (stored as data.oldType during import)
+    dialogType: rfNode.data?.oldType ?? rfNode.type,
+
+    // Restore original node type (e.g. "text") stored as data.originalType
+    type: rfNode.data?.originalType ?? "text",
 
     x: rfNode.position?.x ?? 0,
     y: rfNode.position?.y ?? 0,
@@ -146,15 +149,10 @@ export function convertFromReactFlowNode(rfNode) {
     }
   });
 
-  // restore data
+  // restore data — skip reconstruction-only artifacts
   if (rfNode.data) {
     Object.entries(rfNode.data).forEach(([key, value]) => {
-      // restore original old type
-      if (key === "type" || key === "originalType") {
-        oldNode.type = value;
-        return;
-      }
-
+      if (["type", "originalType", "oldType"].includes(key)) return;
       oldNode[key] = value;
     });
   }

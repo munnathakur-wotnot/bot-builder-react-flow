@@ -12,12 +12,12 @@ export default function TitleDescriptionFields({
   emitTypingStart,
   emitTypingEnd,
 }) {
-  const [title, setTitle] = useState(nodeData.title ?? "");
-  const [description, setDescription] = useState(nodeData.description ?? "");
+  const [title, setTitle] = useState(nodeData.extras?.config?.title ?? nodeData.title ?? "");
+  const [description, setDescription] = useState(nodeData.extras?.config?.description ?? nodeData.description ?? "");
 
   const lastCommittedRef = useRef({
-    title: nodeData.title ?? "",
-    description: nodeData.description ?? "",
+    title: nodeData.extras?.config?.title ?? nodeData.title ?? "",
+    description: nodeData.extras?.config?.description ?? nodeData.description ?? "",
   });
 
   const { debounced: debouncedUpdateNode, cancel: cancelDebouncedUpdateNode } =
@@ -39,8 +39,8 @@ export default function TitleDescriptionFields({
   // ─────────────────────────────────────────────
 
   useEffect(() => {
-    const nextTitle = nodeData.title ?? "";
-    const nextDescription = nodeData.description ?? "";
+    const nextTitle = nodeData.extras?.config?.title ?? nodeData.title ?? "";
+    const nextDescription = nodeData.extras?.config?.description ?? nodeData.description ?? "";
 
     setTitle(nextTitle);
     setDescription(nextDescription);
@@ -51,7 +51,7 @@ export default function TitleDescriptionFields({
     };
 
     cancelDebouncedUpdateNode();
-  }, [nodeData.title, nodeData.description, cancelDebouncedUpdateNode]);
+  }, [nodeData.extras?.config?.title, nodeData.extras?.config?.description, cancelDebouncedUpdateNode]);
 
   // ─────────────────────────────────────────────
   // Debounced graph update
@@ -60,27 +60,25 @@ export default function TitleDescriptionFields({
   useEffect(() => {
     const last = lastCommittedRef.current;
 
-    const patch = {};
+    const configPatch = {};
 
     if (title !== last.title) {
-      patch.title = title;
+      configPatch.title = title;
     }
 
     if (description !== last.description) {
-      patch.description = description;
+      configPatch.description = description;
     }
 
-    if (Object.keys(patch).length === 0) {
+    if (Object.keys(configPatch).length === 0) {
       return;
     }
 
-    patch.lastUpdatedBy = getMeStamp();
-
-    debouncedUpdateNode(patch);
+    debouncedUpdateNode({ extras: { config: configPatch }, lastUpdatedBy: getMeStamp() });
 
     lastCommittedRef.current = {
       ...lastCommittedRef.current,
-      ...patch,
+      ...configPatch,
     };
   }, [title, description, debouncedUpdateNode]);
 
