@@ -14,7 +14,7 @@ export const EPHEMERAL_NODE_KEYS = [
 export const INITIAL_NODES = [
   {
     id: INITIAL_NODE_ID,
-    type: "custom",
+    type: "action",
     position: { x: 120, y: 120 },
     deletable: false,
     selectable: false,

@@ -7,6 +7,29 @@ const HORIZONTAL_GAP = 80;
 const VERTICAL_GAP = 100;
 
 /* =========================================================
+   NODE TYPE RESOLUTION
+   Maps data.type (metaType) → React Flow node type key
+========================================================= */
+
+const ACTION_META_TYPES = new Set(["start", "flowStart", "delay", "jump"]);
+const SUBNODE_META_TYPES = new Set([
+  "carouselCard",
+  "carouselButton",
+  "condition",
+  "defaultCondition",
+]);
+
+/**
+ * Given a node's metaType (data.type), returns the React Flow
+ * nodeTypes key: "action" | "subnode" | "text"
+ */
+export function resolveNodeType(metaType) {
+  if (ACTION_META_TYPES.has(metaType)) return "action";
+  if (SUBNODE_META_TYPES.has(metaType)) return "subnode";
+  return "text";
+}
+
+/* =========================================================
    CORE HELPERS
 ========================================================= */
 
@@ -14,7 +37,7 @@ export function createFlowNode({
   id,
   x,
   y,
-  type = "custom",
+  type,
   inPorts = [],
   outPorts = [],
   connected = false,
@@ -29,9 +52,9 @@ export function createFlowNode({
 }) {
   const node = {
     id,
-    type,
+    type: type ?? resolveNodeType(metaType),
     position: { x, y },
-    flowId,          // top-level — used by canvas filter, not inside data
+    flowId, // top-level — used by canvas filter, not inside data
     data: {
       id,
       inPorts,
@@ -70,7 +93,7 @@ export function createEdge(
     hidden,
     sourceHandle: handle,
     type: "custom",
-    flowId,          // top-level — used by canvas filter
+    flowId, // top-level — used by canvas filter
     data: { isNotDeletable },
   };
 }
@@ -181,7 +204,16 @@ export function buildSingleNodePayload({
 
   return {
     nodesToAdd: [newNode],
-    edgesToAdd: [createEdge(sourceNodeId, newNodeId, false, sourceHandle, undefined, activeFlowId)],
+    edgesToAdd: [
+      createEdge(
+        sourceNodeId,
+        newNodeId,
+        false,
+        sourceHandle,
+        undefined,
+        activeFlowId,
+      ),
+    ],
     dataPatch: {
       [newNodeId]: {
         ...nodeData,
@@ -251,7 +283,16 @@ export function buildCarouselPayload({
   carouselNode.data.connected = true;
 
   const nodes = [carouselNode];
-  const edges = [createEdge(sourceNodeId, carouselId, false, sourceHandle, undefined, activeFlowId)];
+  const edges = [
+    createEdge(
+      sourceNodeId,
+      carouselId,
+      false,
+      sourceHandle,
+      undefined,
+      activeFlowId,
+    ),
+  ];
 
   cards.forEach((card, index) => {
     const x = startX + index * (NODE_WIDTH + HORIZONTAL_GAP);
@@ -289,8 +330,12 @@ export function buildCarouselPayload({
     buttonNode.data.isSubNode = true;
     nodes.push(cardNode, buttonNode);
 
-    edges.push(createEdge(carouselId, card.id, true, "", undefined, activeFlowId));
-    edges.push(createEdge(card.id, buttonId, true, "", undefined, activeFlowId));
+    edges.push(
+      createEdge(carouselId, card.id, true, "", undefined, activeFlowId),
+    );
+    edges.push(
+      createEdge(card.id, buttonId, true, "", undefined, activeFlowId),
+    );
   });
 
   return {
@@ -340,7 +385,16 @@ export function buildFormPayload({
 
   return {
     nodesToAdd: [newNode],
-    edgesToAdd: [createEdge(sourceNodeId, newNodeId, false, sourceHandle, undefined, activeFlowId)],
+    edgesToAdd: [
+      createEdge(
+        sourceNodeId,
+        newNodeId,
+        false,
+        sourceHandle,
+        undefined,
+        activeFlowId,
+      ),
+    ],
     selectedNodeId: newNodeId,
   };
 }
@@ -358,7 +412,12 @@ export function buildMenuActionMap({
 }) {
   return {
     carousel: () =>
-      buildCarouselPayload({ ...context, getNextNodeId, sourceHandle, activeFlowId }),
+      buildCarouselPayload({
+        ...context,
+        getNextNodeId,
+        sourceHandle,
+        activeFlowId,
+      }),
 
     condition: () =>
       buildConditionPayload({
@@ -478,7 +537,14 @@ export function buildFlowNodePayload({
   return {
     nodesToAdd: [flowNode, flowStartNode],
     edgesToAdd: [
-      createEdge(sourceNodeId, flowNodeId, false, sourceHandle, undefined, activeFlowId),
+      createEdge(
+        sourceNodeId,
+        flowNodeId,
+        false,
+        sourceHandle,
+        undefined,
+        activeFlowId,
+      ),
     ],
     selectedNodeId: flowNodeId,
   };
@@ -770,7 +836,14 @@ export function buildConditionPayload({
 
   const nodes = [rootNode];
   const edges = [
-    createEdge(sourceNodeId, conditionRootId, false, sourceHandle, undefined, activeFlowId),
+    createEdge(
+      sourceNodeId,
+      conditionRootId,
+      false,
+      sourceHandle,
+      undefined,
+      activeFlowId,
+    ),
   ];
 
   // Create only ONE LEVEL children
@@ -795,7 +868,9 @@ export function buildConditionPayload({
 
     nodes.push(childNode);
 
-    edges.push(createEdge(conditionRootId, child.id, true, "", undefined, activeFlowId));
+    edges.push(
+      createEdge(conditionRootId, child.id, true, "", undefined, activeFlowId),
+    );
   });
 
   return {
@@ -886,4 +961,71 @@ export function buildSingleBranch({
       },
     },
   };
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Reference-preserving merge helpers
+   ─────────────────────────────────────────────────────────────────────────
+   When a `flow-updated` socket event arrives, the incoming payload contains
+   freshly-parsed JSON objects — so every node is a new object reference even
+   when nothing about it changed.  Passing new references to React Flow causes
+   it to re-render the wrapper AND the custom node component for every single
+   node on the canvas, not just the one that actually changed.
+
+   `nodesStructurallyEqual` compares only the fields that determine what a
+   node renders.  When the fields are identical we return the EXISTING node
+   object so React (and React Flow's internal NodeWrapper) sees the same
+   reference → skips re-render entirely.
+   ───────────────────────────────────────────────────────────────────────── */
+function shallowArrayEq(a, b) {
+  if (a === b) return true;
+  if (!a || !b || a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+  return true;
+}
+
+export function nodesStructurallyEqual(existing, incoming) {
+  // Position change → definitely different
+  if (
+    existing.position.x !== incoming.position.x ||
+    existing.position.y !== incoming.position.y
+  )
+    return false;
+
+  const a = existing.data;
+  const b = incoming.data;
+  if (a === b) return true;
+
+  // Scalar fields that affect rendering
+  if (
+    a.type !== b.type ||
+    a.title !== b.title ||
+    a.description !== b.description ||
+    a.icon !== b.icon ||
+    a.connected !== b.connected ||
+    a.delayDuration !== b.delayDuration ||
+    a.delayUnit !== b.delayUnit ||
+    a.doubleHandler !== b.doubleHandler ||
+    a.isErrorShow !== b.isErrorShow ||
+    a.knowledgeBaseId !== b.knowledgeBaseId ||
+    a.conditionType !== b.conditionType
+  )
+    return false;
+
+  // Array / object fields — JSON for correctness, short-circuit on length first
+  if (!shallowArrayEq(a.outPorts, b.outPorts)) return false;
+  if (!shallowArrayEq(a.inPorts, b.inPorts)) return false;
+  if (!shallowArrayEq(a.successOutport, b.successOutport)) return false;
+  if (!shallowArrayEq(a.failureOutport, b.failureOutport)) return false;
+  // cards / fields / children / conditions are less frequent — stringify only
+  // if the cheaper checks above all passed
+  if (JSON.stringify(a.cards) !== JSON.stringify(b.cards)) return false;
+  if (JSON.stringify(a.fields) !== JSON.stringify(b.fields)) return false;
+  if (JSON.stringify(a.children) !== JSON.stringify(b.children)) return false;
+  if (JSON.stringify(a.conditions) !== JSON.stringify(b.conditions))
+    return false;
+  if (JSON.stringify(a.functionIds) !== JSON.stringify(b.functionIds))
+    return false;
+
+  return true;
 }

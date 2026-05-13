@@ -17,6 +17,7 @@ import {
     ExportIcon,
 } from "./headerTooltipIcon";
 import { importMigration } from "../../../features/canvas/migrationUtils";
+import { toggleCompressed } from "../../../features/canvas/hooks/useSyncCompressed";
 
 function HeaderTooltip(props) {
     const {
@@ -76,6 +77,11 @@ function HeaderTooltip(props) {
         }
     };
 
+    const handletoggleCompressed = () => {
+        onAutoLayout();
+        toggleCompressed();
+    };
+
     return (
         <div className="layout-toolbar">
             {/* Brand */}
@@ -91,6 +97,12 @@ function HeaderTooltip(props) {
                 <button className="layout-toolbar__btn" onClick={onAutoLayout}>
                     <AutoLayoutIcon />
                     Auto Layout
+                </button>
+                <button
+                    className="layout-toolbar__btn"
+                    onClick={handletoggleCompressed}
+                >
+                    Compressed
                 </button>
 
                 <div className="layout-toolbar__divider" />
@@ -112,7 +124,6 @@ function HeaderTooltip(props) {
                     <span className="layout-toolbar__count-dot" />
                     {totalNodes} nodes
                 </span>
-
                 {/* Errors */}
                 {errorCount > 0 && (
                     <div className="layout-toolbar__error-wrap" ref={errDropdownRef}>
