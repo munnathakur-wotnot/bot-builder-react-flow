@@ -977,55 +977,55 @@ export function buildSingleBranch({
    object so React (and React Flow's internal NodeWrapper) sees the same
    reference → skips re-render entirely.
    ───────────────────────────────────────────────────────────────────────── */
-function shallowArrayEq(a, b) {
-  if (a === b) return true;
-  if (!a || !b || a.length !== b.length) return false;
-  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
-  return true;
-}
+// function shallowArrayEq(a, b) {
+//   if (a === b) return true;
+//   if (!a || !b || a.length !== b.length) return false;
+//   for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+//   return true;
+// }
 
-export function nodesStructurallyEqual(existing, incoming) {
-  // Position change → definitely different
-  if (
-    existing.position.x !== incoming.position.x ||
-    existing.position.y !== incoming.position.y
-  )
-    return false;
+// export function nodesStructurallyEqual(existing, incoming) {
+//   // Position change → definitely different
+//   if (
+//     existing.position.x !== incoming.position.x ||
+//     existing.position.y !== incoming.position.y
+//   )
+//     return false;
 
-  const a = existing.data;
-  const b = incoming.data;
-  if (a === b) return true;
+//   const a = existing.data;
+//   const b = incoming.data;
+//   if (a === b) return true;
 
-  // Scalar fields that affect rendering
-  if (
-    a.type !== b.type ||
-    a.title !== b.title ||
-    a.description !== b.description ||
-    a.icon !== b.icon ||
-    a.connected !== b.connected ||
-    a.delayDuration !== b.delayDuration ||
-    a.delayUnit !== b.delayUnit ||
-    a.doubleHandler !== b.doubleHandler ||
-    a.isErrorShow !== b.isErrorShow ||
-    a.knowledgeBaseId !== b.knowledgeBaseId ||
-    a.conditionType !== b.conditionType
-  )
-    return false;
+//   // Scalar fields that affect rendering
+//   if (
+//     a.type !== b.type ||
+//     a.title !== b.title ||
+//     a.description !== b.description ||
+//     a.icon !== b.icon ||
+//     a.connected !== b.connected ||
+//     a.delayDuration !== b.delayDuration ||
+//     a.delayUnit !== b.delayUnit ||
+//     a.doubleHandler !== b.doubleHandler ||
+//     a.isErrorShow !== b.isErrorShow ||
+//     a.knowledgeBaseId !== b.knowledgeBaseId ||
+//     a.conditionType !== b.conditionType
+//   )
+//     return false;
 
-  // Array / object fields — JSON for correctness, short-circuit on length first
-  if (!shallowArrayEq(a.outPorts, b.outPorts)) return false;
-  if (!shallowArrayEq(a.inPorts, b.inPorts)) return false;
-  if (!shallowArrayEq(a.successOutport, b.successOutport)) return false;
-  if (!shallowArrayEq(a.failureOutport, b.failureOutport)) return false;
-  // cards / fields / children / conditions are less frequent — stringify only
-  // if the cheaper checks above all passed
-  if (JSON.stringify(a.cards) !== JSON.stringify(b.cards)) return false;
-  if (JSON.stringify(a.fields) !== JSON.stringify(b.fields)) return false;
-  if (JSON.stringify(a.children) !== JSON.stringify(b.children)) return false;
-  if (JSON.stringify(a.conditions) !== JSON.stringify(b.conditions))
-    return false;
-  if (JSON.stringify(a.functionIds) !== JSON.stringify(b.functionIds))
-    return false;
+//   // Array / object fields — JSON for correctness, short-circuit on length first
+//   if (!shallowArrayEq(a.outPorts, b.outPorts)) return false;
+//   if (!shallowArrayEq(a.inPorts, b.inPorts)) return false;
+//   if (!shallowArrayEq(a.successOutport, b.successOutport)) return false;
+//   if (!shallowArrayEq(a.failureOutport, b.failureOutport)) return false;
+//   // cards / fields / children / conditions are less frequent — stringify only
+//   // if the cheaper checks above all passed
+//   if (JSON.stringify(a.cards) !== JSON.stringify(b.cards)) return false;
+//   if (JSON.stringify(a.fields) !== JSON.stringify(b.fields)) return false;
+//   if (JSON.stringify(a.children) !== JSON.stringify(b.children)) return false;
+//   if (JSON.stringify(a.conditions) !== JSON.stringify(b.conditions))
+//     return false;
+//   if (JSON.stringify(a.functionIds) !== JSON.stringify(b.functionIds))
+//     return false;
 
-  return true;
-}
+//   return true;
+// }

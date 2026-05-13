@@ -59,6 +59,8 @@ export function useCanvasIO({
             ({ nodes: nextNodes, edges: nextEdges } =
               migrateToReactFlow(parsed));
 
+            console.log(nextEdges, nextNodes, "Vlaue");
+
             const end = performance.now();
 
             console.log(
