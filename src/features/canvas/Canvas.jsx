@@ -46,7 +46,6 @@ import { useSyncCompressed } from "./hooks/useSyncCompressed.js";
 import TextNode from "../nodes/TextNode.jsx";
 import ActionNode from "../nodes/ActionNode.jsx";
 import CustomSubNode from "../nodes/CustomSubNode.jsx";
-import { nodesStructurallyEqual } from "./utils.js";
 
 /**
  * action  → ActionNode   (start, delay, jump, flowStart — small pill nodes)
@@ -208,9 +207,6 @@ export default function CanvasFlow() {
         // Preserve any live ephemeral collab state (drag/selection/menu labels)
         // so an unrelated remote change doesn't wipe an active label
         setNodes((curr) => {
-          // O(1) lookup for existing nodes and their ephemeral overlays
-          const currMap = new Map(curr.map((n) => [n.id, n]));
-
           const ephemeralById = {};
           curr.forEach((n) => {
             const patch = {};
@@ -222,35 +218,19 @@ export default function CanvasFlow() {
 
           const incomingMap = new Map(incomingNodes.map((n) => [n.id, n]));
 
-          const result = incomingNodes.map((incoming) => {
-            const existing = currMap.get(incoming.id);
-            const ep = ephemeralById[incoming.id];
-
-            if (existing) {
-              // ── Reference-preserving fast-path ────────────────────
-              // If the node's structural content hasn't changed, reuse
-              // the existing object reference so React / React Flow
-              // skips the re-render for this node entirely.
-              if (nodesStructurallyEqual(existing, incoming)) {
-                if (!ep) return existing; // nothing changed at all ✓
-
-                // Only ephemeral fields need updating — check if they
-                // actually differ before allocating a new object
-                const ephemeralAlreadyCurrent = EPHEMERAL_NODE_KEYS.every(
-                  (k) => existing.data[k] === ep[k],
-                );
-                if (ephemeralAlreadyCurrent) return existing;
-
-                return { ...existing, data: { ...existing.data, ...ep } };
-              }
-            }
-
-            // Structural change or brand-new node
-            if (!ep) return incoming;
-            return { ...incoming, data: { ...incoming.data, ...ep } };
+          // Start result with all server-confirmed nodes (ephemeral state preserved)
+          const result = incomingNodes.map((n) => {
+            const ep = ephemeralById[n.id];
+            if (!ep) return n;
+            return { ...n, data: { ...n.data, ...ep } };
           });
 
-          // Keep locally-added nodes the server hasn't confirmed yet
+          // Also keep any locally-added node that the server hasn't confirmed yet.
+          // A node is "locally pending" when it is:
+          //   • in our current local state (curr), AND
+          //   • NOT in this flow-updated's incomingNodes (server doesn't have it yet), AND
+          //   • NOT in the previous flow-updated (if it was there before and is now gone,
+          //     a peer deleted it intentionally — so we should NOT keep it).
           curr.forEach((localNode) => {
             if (
               !incomingMap.has(localNode.id) &&
@@ -266,23 +246,10 @@ export default function CanvasFlow() {
         // Merge edges with the same logic: keep locally-added edges that the server
         // hasn't confirmed yet, remove edges a peer explicitly deleted.
         setEdges((currEdges) => {
-          const currEdgeMap = new Map(currEdges.map((e) => [e.id, e]));
           const incomingEdgeMap = new Map(incomingEdges.map((e) => [e.id, e]));
 
-          // Prefer existing reference if the edge data is identical
-          const result = incomingEdges.map((incoming) => {
-            const existing = currEdgeMap.get(incoming.id);
-            if (
-              existing &&
-              existing.source === incoming.source &&
-              existing.target === incoming.target &&
-              existing.sourceHandle === incoming.sourceHandle &&
-              existing.type === incoming.type
-            ) {
-              return existing;
-            }
-            return incoming;
-          });
+          // Start with all server-confirmed edges
+          const result = [...incomingEdges];
 
           // Keep locally-added edges (in currEdges, not in incomingEdges, not in prevIncomingEdgeIds)
           // If an edge was in prevIncomingEdgeIds but missing now → peer deleted it → don't keep.
