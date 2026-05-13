@@ -8,6 +8,8 @@
  *  exportMigration(nodes, edges, meta) → oldJson
  */
 
+import { resolveNodeType } from "./utils";
+
 /* =========================================================
    CONSTANTS & MAPS
 ========================================================= */
@@ -23,6 +25,7 @@ const DIALOG_TYPE_TO_META_TYPE = {
   flow_start: "flowStart",
   jump_to: "jump",
   delay: "delay",
+  branch: "conditionRoot",
   file: "file",
   buttons: "buttons",
 };
@@ -35,7 +38,8 @@ const META_TYPE_TO_DIALOG_TYPE = Object.fromEntries(
 META_TYPE_TO_DIALOG_TYPE.carouselCard = "custom";
 META_TYPE_TO_DIALOG_TYPE.carouselButton = "custom";
 META_TYPE_TO_DIALOG_TYPE.condition = "custom";
-META_TYPE_TO_DIALOG_TYPE.conditionRoot = "custom";
+META_TYPE_TO_DIALOG_TYPE.defaultCondition = "custom";
+META_TYPE_TO_DIALOG_TYPE.conditionRoot = "branch";
 
 /** Icons used when converting old → new */
 const META_TYPE_ICONS = {
@@ -50,6 +54,9 @@ const META_TYPE_ICONS = {
   file: "📁",
   buttons: "🔘",
   delay: "◔",
+  conditionRoot: "⑂",
+  condition: "↗",
+  defaultCondition: "↗",
 };
 
 const META_TYPE_CATEGORY = {
@@ -66,6 +73,9 @@ const META_TYPE_CATEGORY = {
   file: "collect",
   buttons: "collect",
   delay: "logic",
+  conditionRoot: "logic",
+  condition: "logic",
+  defaultCondition: "logic",
 };
 
 /* =========================================================
@@ -105,7 +115,29 @@ function findPortId(ports, portName) {
  * @returns {{ nodes: object[], edges: object[] }}
  */
 export function importMigration(oldJson) {
+  const t0 = performance.now();
   const { nodes: oldNodes = [], links: oldLinks = [] } = oldJson;
+
+  /* ── 0. Pre-pass: map condition child IDs → metaType & data ─ */
+  // Scan branch (conditionRoot) nodes to know which children are
+  // "condition" vs "defaultCondition" and capture their condition data.
+  const conditionChildTypeMap = new Map(); // nodeId → "condition"|"defaultCondition"
+  const conditionChildDataMap = new Map(); // nodeId → { conditionType, conditions }
+  for (const node of oldNodes) {
+    if (node.dialogType !== "branch") continue;
+    for (const branch of (node.extras?.config?.branch ?? [])) {
+      const childId = branch.custom_node_id;
+      if (!childId) continue;
+      conditionChildTypeMap.set(
+        childId,
+        branch.type === "default" ? "defaultCondition" : "condition",
+      );
+      conditionChildDataMap.set(childId, {
+        conditionType: branch.operator === "any" ? "ANY" : "ALL",
+        conditions: branch.conditions ?? [],
+      });
+    }
+  }
 
   /* ── 1. Build portId → { nodeId, portName, isIn } ─────────── */
   const portMap = new Map(); // portId → { nodeId, portName, isIn }
@@ -186,6 +218,9 @@ export function importMigration(oldJson) {
       if (config.parentType === "cardview") metaType = "carouselCard";
       else if (config.parentType === "cardview_branch")
         metaType = "carouselButton";
+      else if (config.parentType === "branch")
+        // Use the pre-built map so type is exact (condition vs defaultCondition)
+        metaType = conditionChildTypeMap.get(oldNode.id) ?? "condition";
       else metaType = "custom";
     }
 
@@ -198,7 +233,7 @@ export function importMigration(oldJson) {
     /* Base node */
     const newNode = {
       id: oldNode.id,
-      type: "custom",
+      type: resolveNodeType(metaType),
       position: { x: oldNode.x, y: oldNode.y },
       flowId: oldNode.flowId ?? null,
       data: {
@@ -347,8 +382,34 @@ export function importMigration(oldJson) {
 
       case "delay":
         newNode.data.delayDuration =
-          config.delay_duration ?? config.delayDuration ?? 1;
+          config.delay_time?.value ?? config.delay_duration ?? config.delayDuration ?? 1;
+        newNode.data.delayUnit = config.delay_time?.unit ?? "seconds";
         break;
+
+      case "conditionRoot": {
+        // Rebuild children list from the branch[] array in config
+        const branchArr = config.branch ?? [];
+        const childIds = branchArr.map((b) => b.custom_node_id).filter(Boolean);
+        newNode.data.children = branchArr.map((b) => ({
+          id: b.custom_node_id,
+          type: b.type === "default" ? "defaultCondition" : "condition",
+          title: "", // back-filled in post-processing
+        }));
+        // Prefer branch-config order; fall back to accumulated outPorts
+        newNode.data.outPorts = childIds.length ? childIds : (outPorts ?? []);
+        newNode.data.connected = true;
+        break;
+      }
+
+      case "condition":
+      case "defaultCondition": {
+        newNode.data.isSubNode = true;
+        newNode.data.groupId = inPorts?.[0] ?? null; // parent conditionRoot id
+        const condData = conditionChildDataMap.get(oldNode.id);
+        newNode.data.conditionType = condData?.conditionType ?? "ALL";
+        newNode.data.conditions = condData?.conditions ?? [];
+        break;
+      }
 
       default:
         break;
@@ -358,27 +419,42 @@ export function importMigration(oldJson) {
   }
 
   /* ── 5. Post-processing: fix sub-node back-references ─────── */
+  // Build O(1) lookup map to avoid nested O(n) .find() calls
+  const nodeMap = new Map(newNodes.map((n) => [n.id, n]));
+
   for (const node of newNodes) {
-    if (node.data.type !== "carousel") continue;
+    if (node.data.type === "carousel") {
+      for (const card of node.data.cards ?? []) {
+        const cardNode = nodeMap.get(card.id);
+        if (cardNode) {
+          cardNode.data.title = card.title;
+          cardNode.data.description = card.description;
+          cardNode.data.groupId = node.id;
+          cardNode.data.buttons = card.buttons;
 
-    for (const card of node.data.cards ?? []) {
-      const cardNode = newNodes.find((n) => n.id === card.id);
-      if (cardNode) {
-        cardNode.data.title = card.title;
-        cardNode.data.description = card.description;
-        cardNode.data.groupId = node.id;
-        cardNode.data.buttons = card.buttons;
-
-        for (const btn of card.buttons ?? []) {
-          const btnNode = newNodes.find((n) => n.id === btn.id);
-          if (btnNode) {
-            btnNode.data.title = btn.title;
-            btnNode.data.groupId = node.id; // carousel is the group owner
+          for (const btn of card.buttons ?? []) {
+            const btnNode = nodeMap.get(btn.id);
+            if (btnNode) {
+              btnNode.data.title = btn.title;
+              btnNode.data.groupId = node.id; // carousel is the group owner
+            }
           }
         }
       }
     }
+
+    if (node.data.type === "conditionRoot") {
+      for (const child of node.data.children ?? []) {
+        const childNode = nodeMap.get(child.id);
+        if (childNode) child.title = childNode.data.title;
+      }
+    }
   }
+
+  const t1 = performance.now();
+  console.debug(
+    `[importMigration] ${newNodes.length} nodes, ${newEdges.length} edges — ${(t1 - t0).toFixed(1)}ms`,
+  );
 
   return { nodes: newNodes, edges: newEdges };
 }
@@ -768,8 +844,59 @@ export function exportMigration(nodes, edges, meta = {}) {
       case "delay":
         config = {
           ...config,
+          id: node.id,
           dialog_type: "delay",
+          version: legacy.version ?? 1,
+          delay_time: {
+            unit: d.delayUnit ?? legacy.delay_time?.unit ?? "seconds",
+            label: `${d.delayDuration ?? 1}${(d.delayUnit ?? legacy.delay_time?.unit ?? "seconds").charAt(0)}`,
+            value: d.delayDuration ?? 1,
+          },
           delay_duration: d.delayDuration ?? 1,
+        };
+        break;
+
+      case "conditionRoot": {
+        // Rebuild the branch[] from the condition children stored on this node
+        const branchArr = (d.children ?? []).map((child) => {
+          const childNode = nodeById.get(child.id);
+          const cd = childNode?.data ?? {};
+          return {
+            type: child.type === "defaultCondition" ? "default" : "normal",
+            operator: cd.conditionType === "ANY" ? "any" : "all",
+            conditions: cd.conditions ?? [],
+            is_accessed: false,
+            source_port: "",
+            custom_node_id: child.id,
+          };
+        });
+        config = {
+          ...config,
+          dialog_type: "branch",
+          branch: branchArr,
+        };
+        break;
+      }
+
+      case "condition":
+        config = {
+          text: "",
+          title: d.title ?? "",
+          parentType: "branch",
+          dialog_type: "custom",
+          is_supported: true,
+          is_valid_dialog_title: true,
+        };
+        break;
+
+      case "defaultCondition":
+        config = {
+          text: "",
+          title: d.title ?? "",
+          parentType: "branch",
+          dialog_type: "custom",
+          is_supported: true,
+          is_valid_dialog_title: true,
         };
         break;
 

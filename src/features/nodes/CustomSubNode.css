@@ -1,0 +1,87 @@
+/* ================================================================
+   CustomSubNode.css
+   Styles for child / sub-nodes: carouselCard, carouselButton,
+   condition, defaultCondition.
+   Base/shared styles live in CustomNode.css.
+================================================================ */
+
+/* ── Subnode shared header & title ───────────────────────────── */
+.custom-node__subnode-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 10px;
+  border-radius: var(--radius-lg);
+}
+
+.custom-node__subnode-title {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+/* ── Carousel card ────────────────────────────────────────────── */
+.custom-node--carouselCard {
+  width: 120px;
+  background: var(--color-bg-white);
+  border-color: #c4b5fd;
+}
+
+.custom-node--carouselCard:hover {
+  border-color: #8b5cf6;
+}
+
+.custom-node--carouselCard .custom-node__subnode-header {
+  background: linear-gradient(135deg, #f5f3ff 0%, var(--color-bg-white) 80%);
+}
+
+/* ── Carousel button ──────────────────────────────────────────── */
+.custom-node--carouselButton {
+  width: 120px;
+  background: var(--color-bg-white);
+  border-color: #a5b4fc;
+}
+
+.custom-node--carouselButton:hover {
+  border-color: #6366f1;
+}
+
+.custom-node--carouselButton .custom-node__subnode-header {
+  background: linear-gradient(135deg, #eef2ff 0%, var(--color-bg-white) 80%);
+}
+
+/* ── Condition branch ─────────────────────────────────────────── */
+.custom-node--condition {
+  width: 120px;
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
+.custom-node--condition:hover {
+  border-color: #3b82f6;
+}
+
+.custom-node--condition .custom-node__subnode-header {
+  background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 80%);
+}
+
+/* ── Default condition branch ─────────────────────────────────── */
+.custom-node--defaultCondition {
+  width: 120px;
+  border-color: #d1d5db;
+  background: #f9fafb;
+}
+
+.custom-node--defaultCondition:hover {
+  border-color: #6b7280;
+}
+
+.custom-node--defaultCondition .custom-node__subnode-header {
+  background: linear-gradient(135deg, #f3f4f6 0%, #f9fafb 80%);
+}
