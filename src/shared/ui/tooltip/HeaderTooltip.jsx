@@ -16,8 +16,9 @@ import {
     ImportIcon,
     ExportIcon,
 } from "./headerTooltipIcon";
-import { importMigration } from "../../../features/canvas/migrationUtils";
+// import { importMigration } from "../../../features/canvas/migrationUtils";
 import { toggleCompressed } from "../../../features/canvas/hooks/useSyncCompressed";
+import { migrateToReactFlow } from "../../../features/canvas/orliginalMigrate";
 
 function HeaderTooltip(props) {
     const {
@@ -36,6 +37,7 @@ function HeaderTooltip(props) {
         onImport,
         setEdges,
         onExport,
+        setStartChecking,
     } = props;
 
     const { fitView } = useReactFlow();
@@ -68,8 +70,11 @@ function HeaderTooltip(props) {
 
     const migrate = () => {
         try {
-            const oldData = JSON.parse(valueJSON);
-            const data = importMigration(oldData);
+            const oldData = JSON?.parse(valueJSON || {});
+            console.log(oldData, "oldData");
+            setStartChecking(true);
+            const data = migrateToReactFlow(oldData);
+            console.log(data, "data-is-data");
             setNodes(data?.nodes);
             setEdges(data?.edges);
         } catch (e) {
@@ -238,5 +243,6 @@ HeaderTooltip.propTypes = {
     onImport: PropTypes.func,
     onExport: PropTypes.func,
     setEdges: PropTypes.func,
+    setStartChecking: PropTypes.bool,
 };
 export default HeaderTooltipMemo;

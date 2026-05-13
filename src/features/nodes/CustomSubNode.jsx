@@ -49,8 +49,8 @@ function CustomSubNode({ id, data }) {
             {/* Sub node header */}
             <div className="custom-node__subnode-header">
                 <p className="custom-node__subnode-title">
-                    <span>{data.icon}</span>
-                    {data.title}
+                    <span>{data?.icon}</span>
+                    {data?.extras?.config?.title || data.title}
                 </p>
             </div>
 

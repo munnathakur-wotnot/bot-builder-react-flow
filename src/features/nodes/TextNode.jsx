@@ -31,7 +31,11 @@ function TextNode({ id, data }) {
     const isCompressed = useSyncCompressed();
 
     return (
-        <div className={typeClassName} style={remoteUserStyle} data-locked={isLockedByRemote ? "true" : undefined}>
+        <div
+            className={typeClassName}
+            style={remoteUserStyle}
+            data-locked={isLockedByRemote ? "true" : undefined}
+        >
             <NodeBadges data={data} />
 
             {hasErrors && (
@@ -43,11 +47,16 @@ function TextNode({ id, data }) {
             <NodeHandles.Target />
 
             <div className="custom-node__header">
-                <p className="custom-node__title">{data.title}</p>
+                <p className="custom-node__title">
+                    {" "}
+                    {data?.extras?.config?.title || data.title}
+                </p>
             </div>
 
             {!isCompressed && (
-                <p className="custom-node__description">{data.description}</p>
+                <p className="custom-node__description">
+                    {data?.extras?.config?.title}
+                </p>
             )}
             <NodeTooltips id={id} />
 

@@ -1,6 +1,7 @@
 import { useCallback, useRef } from "react";
 import { useReactFlow } from "@xyflow/react";
-import { importMigration, exportMigration } from "../migrationUtils";
+import { exportMigration } from "../migrationUtils";
+import { migrateToReactFlow } from "../orliginalMigrate";
 
 /**
  * Handles JSON import / export for the canvas.
@@ -10,7 +11,13 @@ import { importMigration, exportMigration } from "../migrationUtils";
  *
  * Returns { importFileRef, handleImportChange, triggerImport, handleExport, handleExportLegacy }
  */
-export function useCanvasIO({ nodes, edges, setNodes, setEdges }) {
+export function useCanvasIO({
+  nodes,
+  edges,
+  setNodes,
+  setEdges,
+  setStartChecking,
+}) {
   const { fitView } = useReactFlow();
   const importFileRef = useRef(null);
 
@@ -44,8 +51,19 @@ export function useCanvasIO({ nodes, edges, setNodes, setEdges }) {
           let nextNodes, nextEdges;
 
           if (Array.isArray(parsed.links)) {
-            // ── OLD FORMAT: has "links" array → migrate it
-            ({ nodes: nextNodes, edges: nextEdges } = importMigration(parsed));
+            setStartChecking(true);
+            console.log(parsed, "data-p");
+
+            const start = performance.now();
+
+            ({ nodes: nextNodes, edges: nextEdges } =
+              migrateToReactFlow(parsed));
+
+            const end = performance.now();
+
+            console.log(
+              `migrateToReactFlow took ${(end - start).toFixed(2)}ms`,
+            );
           } else if (
             Array.isArray(parsed.nodes) &&
             Array.isArray(parsed.edges)
@@ -72,7 +90,7 @@ export function useCanvasIO({ nodes, edges, setNodes, setEdges }) {
       reader.readAsText(file);
       e.target.value = "";
     },
-    [setNodes, setEdges, fitView],
+    [setNodes, setEdges, fitView, setStartChecking],
   );
 
   /* ── TRIGGER file picker ──────────────────────────────────── */

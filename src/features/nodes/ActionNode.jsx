@@ -65,7 +65,7 @@ function ActionNode({ id, data }) {
                 <p className="small-node-title">
                     <span>{data.icon}</span>
 
-                    {data.title}
+                    {data?.extras?.config?.title || data?.title}
 
                     {data.delayDuration ? ` (${data.delayDuration}s)` : ""}
                 </p>

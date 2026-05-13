@@ -118,6 +118,8 @@ export function importMigration(oldJson) {
   const t0 = performance.now();
   const { nodes: oldNodes = [], links: oldLinks = [] } = oldJson;
 
+  console.log(oldJson, "Hello-old-json");
+
   /* ── 0. Pre-pass: map condition child IDs → metaType & data ─ */
   // Scan branch (conditionRoot) nodes to know which children are
   // "condition" vs "defaultCondition" and capture their condition data.
@@ -125,7 +127,7 @@ export function importMigration(oldJson) {
   const conditionChildDataMap = new Map(); // nodeId → { conditionType, conditions }
   for (const node of oldNodes) {
     if (node.dialogType !== "branch") continue;
-    for (const branch of (node.extras?.config?.branch ?? [])) {
+    for (const branch of node.extras?.config?.branch ?? []) {
       const childId = branch.custom_node_id;
       if (!childId) continue;
       conditionChildTypeMap.set(
@@ -382,7 +384,10 @@ export function importMigration(oldJson) {
 
       case "delay":
         newNode.data.delayDuration =
-          config.delay_time?.value ?? config.delay_duration ?? config.delayDuration ?? 1;
+          config.delay_time?.value ??
+          config.delay_duration ??
+          config.delayDuration ??
+          1;
         newNode.data.delayUnit = config.delay_time?.unit ?? "seconds";
         break;
 
@@ -455,6 +460,8 @@ export function importMigration(oldJson) {
   console.debug(
     `[importMigration] ${newNodes.length} nodes, ${newEdges.length} edges — ${(t1 - t0).toFixed(1)}ms`,
   );
+
+  console.log(newNodes, newEdges, "Hello New");
 
   return { nodes: newNodes, edges: newEdges };
 }
