@@ -3,15 +3,20 @@ import PropTypes from "prop-types";
 import { Handle, Position } from "@xyflow/react";
 import "./CustomNode.css";
 
-function Target() {
+function Target({ isNotConnectable }) {
     return (
         <Handle
             type="target"
             position={Position.Top}
+            isConnectable={!isNotConnectable}
             className="custom-node__handle custom-node__handle--target"
         />
     );
 }
+
+Target.propTypes = {
+    isNotConnectable: PropTypes.bool,
+};
 
 function Source({
     isDoubleOutport,
@@ -21,15 +26,19 @@ function Source({
     isSelfLoop,
     onMouseDown,
     hidden,
+    outPorts,
 }) {
     const hiddenStyle = hidden ? { visibility: "hidden" } : {};
+
+    const success = outPorts?.find((port) => (port.name = "bottomLeft"));
+    const falied = outPorts?.find((port) => (port.name = "bottomRight"));
 
     if (isDoubleOutport) {
         return (
             <>
                 <Handle
                     type="source"
-                    id="success"
+                    id={success?.id}
                     position={Position.Bottom}
                     style={{ left: "30%", ...hiddenStyle }}
                     className={`custom-node__handle custom-node__handle--source
@@ -45,7 +54,7 @@ function Source({
 
                 <Handle
                     type="source"
-                    id="failure"
+                    id={falied?.id}
                     position={Position.Bottom}
                     style={{ left: "70%", ...hiddenStyle }}
                     className={`custom-node__handle custom-node__handle--source
@@ -85,6 +94,7 @@ Source.propTypes = {
     isSelfLoop: PropTypes.bool,
     onMouseDown: PropTypes.func,
     hidden: PropTypes.bool,
+    outPorts: PropTypes.array,
 };
 
 export default {

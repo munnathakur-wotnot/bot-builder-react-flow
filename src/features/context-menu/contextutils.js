@@ -48,6 +48,7 @@ export function getMenuSelectionPayload({
   if (!menuState?.nodeId) return null;
 
   const sourceNode = nodes.find((n) => n.id === menuState.nodeId);
+
   if (!sourceNode) return null;
 
   const actionByOption = buildMenuActionMap({
@@ -63,49 +64,106 @@ export function getMenuSelectionPayload({
   });
 
   const buildPayload = actionByOption[optionId];
+
   if (!buildPayload) return null;
 
   const payload = buildPayload();
 
-  // Stamp authorship on every newly created node
+  /*
+   * Stamp authorship
+   */
   const meStamp = getMeStamp();
+
   if (meStamp && payload.nodesToAdd?.length) {
     payload.nodesToAdd = payload.nodesToAdd.map((n) => ({
       ...n,
-      data: { ...n.data, createdBy: meStamp, lastUpdatedBy: meStamp },
+      data: {
+        ...n.data,
+        createdBy: meStamp,
+        lastUpdatedBy: meStamp,
+      },
     }));
   }
 
+  /*
+   * Direct targets
+   */
   const directTargets = payload.edgesToAdd
     .filter((edge) => edge.source === sourceNode.id)
     .map((edge) => edge.target);
 
+  /*
+   * Update source node
+   */
   const updatedNodes = nodes.map((node) => {
     if (node.id !== sourceNode.id) return node;
 
-    let updatedData = { ...node.data };
+    let updatedData = {
+      ...node.data,
+    };
 
+    /*
+     * Legacy outport tracking
+     */
     if (menuState.type === "success") {
       const existing = node.data.successOutport || [];
+
       updatedData.successOutport = Array.from(
         new Set([...existing, ...directTargets]),
       );
     } else if (menuState.type === "failure") {
       const existing = node.data.failureOutport || [];
+
       updatedData.failureOutport = Array.from(
         new Set([...existing, ...directTargets]),
       );
     } else {
       const existing = node.data.outPorts || [];
+
       updatedData.outPorts = Array.from(
         new Set([...existing, ...directTargets]),
       );
     }
 
+    /*
+     * NEW: update ports with edge ids
+     */
+    let updatedPorts = [...(node.data.ports || [])];
+
+    payload.edgesToAdd.forEach((edge) => {
+      if (edge.source !== node.id) return;
+
+      const handleName = edge.sourceHandle || "default";
+
+      const existingPortIndex = updatedPorts.findIndex(
+        (p) => p.in === false && p.name === handleName,
+      );
+
+      if (existingPortIndex >= 0) {
+        const existingPort = updatedPorts[existingPortIndex];
+
+        updatedPorts[existingPortIndex] = {
+          ...existingPort,
+          id: edge.id,
+          links: Array.from(
+            new Set([...(existingPort.links || []), edge.target]),
+          ),
+        };
+      } else {
+        updatedPorts.push({
+          id: edge.id,
+          in: false,
+          name: handleName,
+          links: [edge.target],
+        });
+      }
+    });
+
     return {
       ...node,
       data: {
         ...updatedData,
+        ports: updatedPorts,
         connected:
           (updatedData.outPorts?.length || 0) > 0 ||
           (updatedData.successOutport?.length || 0) > 0 ||
@@ -134,10 +192,12 @@ export function bulkCreateFromSource({
   activeFlowId = null,
 }) {
   const sourceNodeId = menuState?.nodeId;
+
   if (!sourceNodeId) return;
 
   let workingNodes = nodes;
   let workingEdges = edges;
+
   let created = 0;
   let finalSelectedNodeId = null;
   let aborted = false;
@@ -147,61 +207,144 @@ export function bulkCreateFromSource({
 
     for (let i = 0; i < batchLimit; i++) {
       const sourceNode = workingNodes.find((n) => n.id === sourceNodeId);
+
       if (!sourceNode) {
         aborted = true;
         break;
       }
 
       const actionByOption = buildMenuActionMap({
-        context: { sourceNode, sourceNodeId, allNodes: workingNodes },
+        context: {
+          sourceNode,
+          sourceNodeId,
+          allNodes: workingNodes,
+        },
         templates: MENU_NODE_TEMPLATES,
         getNextNodeId,
+        sourceHandle: menuState.type,
         activeFlowId,
       });
 
       const buildPayload = actionByOption[optionId];
+
       if (!buildPayload) {
         aborted = true;
         break;
       }
 
       const payload = buildPayload();
+
       if (!payload) {
         aborted = true;
         break;
       }
 
+      /*
+       * Direct targets
+       */
       const directTargets = (payload.edgesToAdd || [])
         .filter((edge) => edge.source === sourceNodeId)
         .map((edge) => edge.target);
 
+      /*
+       * Update source node
+       */
       const nextNodes = workingNodes.map((node) => {
         if (node.id !== sourceNodeId) return node;
 
-        const existingOutPorts = node.data?.outPorts || [];
-        const mergedOutPorts = Array.from(
-          new Set([...existingOutPorts, ...directTargets]),
-        );
+        const updatedData = {
+          ...node.data,
+        };
+
+        /*
+         * Legacy outport tracking
+         */
+        if (menuState.type === "success") {
+          const existing = node.data.successOutport || [];
+
+          updatedData.successOutport = Array.from(
+            new Set([...existing, ...directTargets]),
+          );
+        } else if (menuState.type === "failure") {
+          const existing = node.data.failureOutport || [];
+
+          updatedData.failureOutport = Array.from(
+            new Set([...existing, ...directTargets]),
+          );
+        } else {
+          const existing = node.data.outPorts || [];
+
+          updatedData.outPorts = Array.from(
+            new Set([...existing, ...directTargets]),
+          );
+        }
+
+        /*
+         * NEW: update ports
+         */
+        let updatedPorts = [...(node.data.ports || [])];
+
+        (payload.edgesToAdd || []).forEach((edge) => {
+          if (edge.source !== node.id) return;
+
+          const handleName = edge.sourceHandle || "default";
+
+          const existingPortIndex = updatedPorts.findIndex(
+            (p) => p.in === false && p.name === handleName,
+          );
+
+          if (existingPortIndex >= 0) {
+            const existingPort = updatedPorts[existingPortIndex];
+
+            updatedPorts[existingPortIndex] = {
+              ...existingPort,
+              id: edge.id,
+              links: Array.from(
+                new Set([...(existingPort.links || []), edge.target]),
+              ),
+            };
+          } else {
+            updatedPorts.push({
+              id: edge.id,
+              in: false,
+              name: handleName,
+              links: [edge.target],
+            });
+          }
+        });
 
         return {
           ...node,
           data: {
-            ...node.data,
-            outPorts: mergedOutPorts,
-            connected: mergedOutPorts.length > 0,
+            ...updatedData,
+            ports: updatedPorts,
+            connected:
+              (updatedData.outPorts?.length || 0) > 0 ||
+              (updatedData.successOutport?.length || 0) > 0 ||
+              (updatedData.failureOutport?.length || 0) > 0,
           },
         };
       });
 
-      const NODE_STRIDE = 320; // NODE_WIDTH (240) + HORIZONTAL_GAP (80)
+      /*
+       * Shift created nodes
+       */
+      const NODE_STRIDE = 320;
+
       const xOffset = created * NODE_STRIDE;
+
       const shiftedNodes = (payload.nodesToAdd || []).map((n) => ({
         ...n,
-        position: { x: n.position.x + xOffset, y: n.position.y },
+        position: {
+          x: n.position.x + xOffset,
+          y: n.position.y,
+        },
       }));
 
       workingNodes = [...nextNodes, ...shiftedNodes];
+
       workingEdges = [...workingEdges, ...(payload.edgesToAdd || [])];
+
       finalSelectedNodeId = payload.selectedNodeId || finalSelectedNodeId;
 
       created++;

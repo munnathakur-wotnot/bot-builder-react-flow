@@ -14,8 +14,8 @@ export function useNodeInteractions({ id, data }) {
   const nodeErrors = validationErrors?.current?.[id] ?? [];
 
   const hasErrors = data.isErrorShow && nodeErrors.length > 0;
-
-  const isDoubleOutport = data?.doubleHandler ?? false;
+  const outPorts = data?.ports?.filter((port) => !port.in);
+  const isDoubleOutport = outPorts.length > 1;
 
   const isSelfLoop = data?.successOutport?.[0] === id;
 
@@ -25,7 +25,7 @@ export function useNodeInteractions({ id, data }) {
 
   const hasOutgoing = isDoubleOutport
     ? hasSuccessOutport && hasFailureOutport
-    : data.outPorts?.length > 0;
+    : data?.ports?.find((item) => !item.in)?.links?.length > 0;
 
   const handleOpenMenu = useCallback(
     ({ event, type, isMenuOpen }) => {
@@ -96,7 +96,14 @@ export function useNodeInteractions({ id, data }) {
     ]
       .filter(Boolean)
       .join(" ");
-  }, [data.type, data.isSearchHighlight, hasErrors, isActive, isExecuted, data?.isDraggedBy]);
+  }, [
+    data.type,
+    data.isSearchHighlight,
+    hasErrors,
+    isActive,
+    isExecuted,
+    data?.isDraggedBy,
+  ]);
 
   const borderColor =
     data?.isDraggedByColor || data?.isMenuOpenByColor || data?.selectedByColor;
@@ -114,7 +121,7 @@ export function useNodeInteractions({ id, data }) {
 
     nodeErrors,
     hasErrors,
-
+    outPorts,
     isDoubleOutport,
     isSelfLoop,
 

@@ -587,7 +587,6 @@ export default function CanvasFlow() {
       simulationStore,
     ],
   );
-  console.log(nodes ,edges)
   // ── Render ───────────────────────────────────────────────────
   return (
     <div className="canvas-layout">

@@ -13,19 +13,8 @@ function CustomSubNode({ id, data }) {
     const {
         typeClassName,
         remoteUserStyle,
-
-        hasErrors,
-        nodeErrors,
-
-        isDoubleOutport,
-        isSelfLoop,
-
         hasOutgoing,
-        hasSuccessOutport,
-        hasFailureOutport,
-
         isLockedByRemote,
-
         handleMouseDown,
     } = useNodeInteractions({ id, data });
 
@@ -37,14 +26,14 @@ function CustomSubNode({ id, data }) {
         >
             <NodeBadges data={data} />
 
-            {hasErrors && (
+            {/* {hasErrors && (
                 <div className="custom-node__error-badge" title={nodeErrors.join("\n")}>
                     {nodeErrors.length}
                 </div>
-            )}
+            )} */}
 
             {/* Target Handle */}
-            <NodeHandles.Target />
+            <NodeHandles.Target isNotConnectable />
 
             {/* Sub node header */}
             <div className="custom-node__subnode-header">
@@ -56,11 +45,11 @@ function CustomSubNode({ id, data }) {
 
             {/* Source Handles */}
             <NodeHandles.Source
-                isDoubleOutport={isDoubleOutport}
+                // isDoubleOutport={isDoubleOutport}
                 hasOutgoing={hasOutgoing}
-                hasSuccessOutport={hasSuccessOutport}
-                hasFailureOutport={hasFailureOutport}
-                isSelfLoop={isSelfLoop}
+                // hasSuccessOutport={hasSuccessOutport}
+                // hasFailureOutport={hasFailureOutport}
+                // isSelfLoop={isSelfLoop}
                 onMouseDown={handleMouseDown}
             />
         </div>
@@ -95,7 +84,7 @@ function subNodeEqual(prev, next) {
         pd.isMenuOpenBy === nd.isMenuOpenBy &&
         pd.isMenuOpenByColor === nd.isMenuOpenByColor &&
         // Handle connection state
-        isEqual(pd.outPorts, nd.outPorts)
+        isEqual(pd.ports, nd.ports)
     );
 }
 

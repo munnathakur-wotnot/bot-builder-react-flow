@@ -70,10 +70,12 @@ function HeaderTooltip(props) {
 
     const migrate = () => {
         try {
-            const oldData = JSON?.parse(valueJSON || {});
-            console.log(oldData, "oldData");
+            const oldData = JSON.parse(valueJSON || {});
+            const clonedData = structuredClone(oldData);
+
+            console.log(clonedData, "before migrate");
             setStartChecking(true);
-            const data = migrateToReactFlow(oldData);
+            const data = migrateToReactFlow(clonedData);
             console.log(data, "data-is-data");
             setNodes(data?.nodes);
             setEdges(data?.edges);
@@ -159,7 +161,11 @@ function HeaderTooltip(props) {
                                                 onSelectErrorNode?.(node);
                                             }}
                                         >
-                                            <span>{node.data.extras?.config?.title ?? node.data.title ?? "Untitled"}</span>
+                                            <span>
+                                                {node.data.extras?.config?.title ??
+                                                    node.data.title ??
+                                                    "Untitled"}
+                                            </span>
                                             <ArrowRightIcon />
                                         </button>
                                     );

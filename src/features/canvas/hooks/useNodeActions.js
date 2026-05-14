@@ -38,8 +38,15 @@ export function useNodeActions({
 
       const idsToRemove = new Set([nodeId]);
       if (isCarousel) {
-        allNodes.forEach((n) => {
-          if (n.data?.groupId === nodeId) idsToRemove.add(n.id);
+        target?.data?.extras?.config?.cardview?.forEach((card) => {
+          if (card?.custom_node_id) {
+            idsToRemove.add(card.custom_node_id);
+          }
+          card?.buttons?.forEach((button) => {
+            if (button?.custom_node_id) {
+              idsToRemove.add(button.custom_node_id);
+            }
+          });
         });
       }
 
@@ -97,7 +104,8 @@ export function useNodeActions({
       navigator.clipboard
         ?.writeText(JSON.stringify(payload, null, 2))
         .then(() => {
-          const label = node.data?.extras?.config?.title ?? node.data?.title ?? "Node";
+          const label =
+            node.data?.extras?.config?.title ?? node.data?.title ?? "Node";
           const extra =
             nodesToCopy.length > 1
               ? ` (+${nodesToCopy.length - 1} sub-nodes)`
