@@ -31,7 +31,7 @@ export function useFlowScope({ nodes, edges, setSelectedNodeIdUpdate }) {
         .filter((n) => n?.data?.type === "flow" && n.data.targetFlowId)
         .map((n) => ({
           id: n.data.targetFlowId,
-          label: n.data.title || "Unnamed Flow",
+          label: n.data?.extras?.config?.title ?? n.data?.title ?? "Unnamed Flow",
         })),
     [nodes],
   );

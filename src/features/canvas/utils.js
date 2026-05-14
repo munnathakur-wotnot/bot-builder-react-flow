@@ -38,14 +38,12 @@ export function createFlowNode({
   x,
   y,
   type,
-  inPorts = [],
-  outPorts = [],
   connected = false,
   title = "",
   description = "",
   metaType = "",
-  iCategory = "",
   icon = "",
+  ports = [],
   groupId,
   isValidDragConn = true,
   flowId = null,
@@ -54,17 +52,18 @@ export function createFlowNode({
     id,
     type: type ?? resolveNodeType(metaType),
     position: { x, y },
-    flowId, // top-level — used by canvas filter, not inside data
     data: {
-      id,
-      inPorts,
-      outPorts,
-      icon,
+      extras: {
+        config: {
+          title,
+          description,
+        },
+      },
+      metaType,
       connected,
-      title,
-      description,
-      type: metaType,
-      iCategory,
+      ports,
+      icon,
+      flowId,
       isValidDragConn,
       isErrorShow: false,
       isSearchHighlight: false,
@@ -76,14 +75,14 @@ export function createFlowNode({
   return node;
 }
 
-export function createEdge(
+export function createEdge({
   source,
   target,
-  isNotDeletable = false,
+  deletable = false,
   sourceHandle = "",
   hidden,
   flowId = null,
-) {
+}) {
   const handle = sourceHandle || "default";
 
   return {
@@ -91,11 +90,41 @@ export function createEdge(
     source,
     target,
     hidden,
+    deletable,
     sourceHandle: handle,
     type: "custom",
-    flowId, // top-level — used by canvas filter
-    data: { isNotDeletable },
+    data: { flowId },
   };
+}
+
+/* =========================================================
+   PORT HELPERS
+   ports: [{ in: bool, name: string, links: string[] }]
+   links stores connected node IDs.
+========================================================= */
+
+/**
+ * Get the links array for a specific port.
+ * isIn=true → input port, isIn=false → output port
+ * name: "in" for input, "default" / "success" / "failure" for output
+ */
+export function getPortLinks(ports, isIn, name) {
+  return ports?.find((p) => p.in === isIn && p.name === name)?.links ?? [];
+}
+
+/**
+ * Return a new ports array with the specified port's links replaced.
+ * Creates the port entry if it doesn't exist.
+ */
+export function setPortLinks(ports, isIn, name, links) {
+  const arr = ports ?? [];
+  const idx = arr.findIndex((p) => p.in === isIn && p.name === name);
+  if (idx >= 0) {
+    const updated = [...arr];
+    updated[idx] = { ...updated[idx], links };
+    return updated;
+  }
+  return [...arr, { in: isIn, name, links }];
 }
 
 function getIncrementalTitle({ allNodes = [], metaType, baseTitle }) {
@@ -110,6 +139,7 @@ function getIncrementalTitle({ allNodes = [], metaType, baseTitle }) {
 function getNodeConfig(type, allNodes) {
   const configs = {
     delay: {
+      nodeType: "action",
       metaType: "delay",
       baseTitle: "Delay",
       icon: "◔",
@@ -117,6 +147,7 @@ function getNodeConfig(type, allNodes) {
       extraData: { delayDuration: 1 },
     },
     ai_answer: {
+      nodeType: "text",
       metaType: "ai_answer",
       baseTitle: "Ai Answer",
       icon: "🤖",
@@ -129,6 +160,7 @@ function getNodeConfig(type, allNodes) {
       },
     },
     jump: {
+      nodeType: "action",
       metaType: "jump",
       baseTitle: "Jump",
       icon: Icons.jump,
@@ -139,6 +171,7 @@ function getNodeConfig(type, allNodes) {
       },
     },
     default: {
+      nodeType: "text",
       metaType: "collectInput",
       baseTitle: "Enter Input",
       description: "Enter Description",
@@ -179,6 +212,7 @@ export function buildSingleNodePayload({
 
   const newNode = createFlowNode({
     id: newNodeId,
+    type: config.nodeType,
     x: sourceNode.position.x,
     y: sourceNode.position.y + 220,
     inPorts: [sourceNodeId],
@@ -268,6 +302,7 @@ export function buildCarouselPayload({
 
   const carouselNode = createFlowNode({
     id: carouselId,
+    type: "text",
     x: baseX,
     y: carouselY,
     inPorts: [sourceNodeId],
@@ -300,6 +335,7 @@ export function buildCarouselPayload({
 
     const cardNode = createFlowNode({
       id: card.id,
+      type: "subnode",
       x,
       y: cardY,
       inPorts: [carouselId],
@@ -318,6 +354,7 @@ export function buildCarouselPayload({
 
     const buttonNode = createFlowNode({
       id: buttonId,
+      type: "subnode",
       x,
       y: buttonY,
       inPorts: [card.id],
@@ -371,6 +408,7 @@ export function buildFormPayload({
 
   const newNode = createFlowNode({
     id: newNodeId,
+    type: "text",
     x: sourceNode.position.x,
     y: sourceNode.position.y + 220,
     inPorts: [sourceNodeId],
@@ -512,6 +550,7 @@ export function buildFlowNodePayload({
   // The "flow" node visible on the current canvas scope
   const flowNode = createFlowNode({
     id: flowNodeId,
+    type: "text",
     x: sourceNode.position.x,
     y: sourceNode.position.y + 220,
     inPorts: [sourceNodeId],
@@ -525,6 +564,7 @@ export function buildFlowNodePayload({
   // Auto-seeded "Flow starts" node inside the new sub-flow
   const flowStartNode = createFlowNode({
     id: flowStartId,
+    type: "action",
     x: 600,
     y: 200,
     title: `${title} - Flow starts`,
@@ -599,6 +639,7 @@ export function buildAddCarouselCardPayload({
   // New card node — stores its own buttons array
   const cardNode = createFlowNode({
     id: newCardId,
+    type: "subnode",
     x: newCardX,
     isValidDragConn: false,
     y: cardY,
@@ -618,6 +659,7 @@ export function buildAddCarouselCardPayload({
   // New button node
   const newButton = createFlowNode({
     id: newButtonId,
+    type: "subnode",
     x: newCardX,
     isValidDragConn: false,
     y: buttonY,
@@ -820,6 +862,7 @@ export function buildConditionPayload({
   // Root Node
   const rootNode = createFlowNode({
     id: conditionRootId,
+    type: "text",
     x: baseX,
     y: rootY,
     inPorts: [sourceNodeId],
@@ -852,6 +895,7 @@ export function buildConditionPayload({
 
     const childNode = createFlowNode({
       id: child.id,
+      type: "subnode",
       x,
       y: childY,
       inPorts: [conditionRootId],
@@ -930,6 +974,7 @@ export function buildSingleBranch({
 
   const childNode = createFlowNode({
     id: newChildId,
+    type: "subnode",
     x: newX,
     y: childY,
     inPorts: [selectedNodeId],
@@ -977,55 +1022,55 @@ export function buildSingleBranch({
    object so React (and React Flow's internal NodeWrapper) sees the same
    reference → skips re-render entirely.
    ───────────────────────────────────────────────────────────────────────── */
-function shallowArrayEq(a, b) {
-  if (a === b) return true;
-  if (!a || !b || a.length !== b.length) return false;
-  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
-  return true;
-}
+// function shallowArrayEq(a, b) {
+//   if (a === b) return true;
+//   if (!a || !b || a.length !== b.length) return false;
+//   for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+//   return true;
+// }
 
-export function nodesStructurallyEqual(existing, incoming) {
-  // Position change → definitely different
-  if (
-    existing.position.x !== incoming.position.x ||
-    existing.position.y !== incoming.position.y
-  )
-    return false;
+// export function nodesStructurallyEqual(existing, incoming) {
+//   // Position change → definitely different
+//   if (
+//     existing.position.x !== incoming.position.x ||
+//     existing.position.y !== incoming.position.y
+//   )
+//     return false;
 
-  const a = existing.data;
-  const b = incoming.data;
-  if (a === b) return true;
+//   const a = existing.data;
+//   const b = incoming.data;
+//   if (a === b) return true;
 
-  // Scalar fields that affect rendering
-  if (
-    a.type !== b.type ||
-    a.title !== b.title ||
-    a.description !== b.description ||
-    a.icon !== b.icon ||
-    a.connected !== b.connected ||
-    a.delayDuration !== b.delayDuration ||
-    a.delayUnit !== b.delayUnit ||
-    a.doubleHandler !== b.doubleHandler ||
-    a.isErrorShow !== b.isErrorShow ||
-    a.knowledgeBaseId !== b.knowledgeBaseId ||
-    a.conditionType !== b.conditionType
-  )
-    return false;
+//   // Scalar fields that affect rendering
+//   if (
+//     a.type !== b.type ||
+//     a.title !== b.title ||
+//     a.description !== b.description ||
+//     a.icon !== b.icon ||
+//     a.connected !== b.connected ||
+//     a.delayDuration !== b.delayDuration ||
+//     a.delayUnit !== b.delayUnit ||
+//     a.doubleHandler !== b.doubleHandler ||
+//     a.isErrorShow !== b.isErrorShow ||
+//     a.knowledgeBaseId !== b.knowledgeBaseId ||
+//     a.conditionType !== b.conditionType
+//   )
+//     return false;
 
-  // Array / object fields — JSON for correctness, short-circuit on length first
-  if (!shallowArrayEq(a.outPorts, b.outPorts)) return false;
-  if (!shallowArrayEq(a.inPorts, b.inPorts)) return false;
-  if (!shallowArrayEq(a.successOutport, b.successOutport)) return false;
-  if (!shallowArrayEq(a.failureOutport, b.failureOutport)) return false;
-  // cards / fields / children / conditions are less frequent — stringify only
-  // if the cheaper checks above all passed
-  if (JSON.stringify(a.cards) !== JSON.stringify(b.cards)) return false;
-  if (JSON.stringify(a.fields) !== JSON.stringify(b.fields)) return false;
-  if (JSON.stringify(a.children) !== JSON.stringify(b.children)) return false;
-  if (JSON.stringify(a.conditions) !== JSON.stringify(b.conditions))
-    return false;
-  if (JSON.stringify(a.functionIds) !== JSON.stringify(b.functionIds))
-    return false;
+//   // Array / object fields — JSON for correctness, short-circuit on length first
+//   if (!shallowArrayEq(a.outPorts, b.outPorts)) return false;
+//   if (!shallowArrayEq(a.inPorts, b.inPorts)) return false;
+//   if (!shallowArrayEq(a.successOutport, b.successOutport)) return false;
+//   if (!shallowArrayEq(a.failureOutport, b.failureOutport)) return false;
+//   // cards / fields / children / conditions are less frequent — stringify only
+//   // if the cheaper checks above all passed
+//   if (JSON.stringify(a.cards) !== JSON.stringify(b.cards)) return false;
+//   if (JSON.stringify(a.fields) !== JSON.stringify(b.fields)) return false;
+//   if (JSON.stringify(a.children) !== JSON.stringify(b.children)) return false;
+//   if (JSON.stringify(a.conditions) !== JSON.stringify(b.conditions))
+//     return false;
+//   if (JSON.stringify(a.functionIds) !== JSON.stringify(b.functionIds))
+//     return false;
 
-  return true;
-}
+//   return true;
+// }

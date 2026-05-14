@@ -75,14 +75,14 @@ export default function NodeSearchModal({ open, nodes, onSelect, onClose }) {
 
             <Command.Group heading="Nodes">
               {nodes
-                .filter((n) => n.data?.title)
+                .filter((n) => n.data?.extras?.config?.title ?? n.data?.title)
                 .map((node) => {
                   const cat = CATEGORY_MAP[node.data.iCategory];
 
                   return (
                     <Command.Item
                       key={node.id}
-                      value={`${node.data.title} ${node.data.iCategory || ""}`}
+                      value={`${node.data.extras?.config?.title ?? node.data.title ?? ""} ${node.data.iCategory || ""}`}
                       onSelect={() => onSelect(node)}
                       className="node-search-item"
                     >
@@ -96,7 +96,7 @@ export default function NodeSearchModal({ open, nodes, onSelect, onClose }) {
                       </span>
 
                       <span className="node-search-item-title">
-                        {node.data.title}
+                        {node.data.extras?.config?.title ?? node.data.title}
                       </span>
 
                       {cat && (

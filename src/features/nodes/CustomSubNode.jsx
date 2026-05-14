@@ -49,8 +49,8 @@ function CustomSubNode({ id, data }) {
             {/* Sub node header */}
             <div className="custom-node__subnode-header">
                 <p className="custom-node__subnode-title">
-                    <span>{data.icon}</span>
-                    {data.title}
+                    <span>{data?.icon}</span>
+                    {data?.extras?.config?.title || data.title}
                 </p>
             </div>
 
@@ -82,7 +82,7 @@ function subNodeEqual(prev, next) {
     const nd = next.data;
     return (
         pd.type === nd.type &&
-        pd.title === nd.title &&
+        pd.extras?.config?.title === nd.extras?.config?.title &&
         pd.icon === nd.icon &&
         pd.conditionType === nd.conditionType &&
         pd.isErrorShow === nd.isErrorShow &&

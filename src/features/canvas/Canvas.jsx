@@ -8,7 +8,6 @@
 import {
   Background,
   Controls,
-  MiniMap,
   ReactFlow,
   SelectionMode,
   useEdgesState,
@@ -57,7 +56,7 @@ const nodeTypes = {
   text: TextNode,
   subnode: CustomSubNode,
 };
-const edgeTypes = { custom: CustomEdge };
+const edgeTypes = { advanced: CustomEdge, custom: CustomEdge };
 
 // Fields that are managed purely by socket events and must never be persisted
 // (defined in constants.js — imported above)
@@ -75,6 +74,10 @@ export default function CanvasFlow() {
 
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+
+  // Stores the non-node/edge metadata from the last imported old-format JSON
+  // (id, version, gridSize, extraInfo, etc.) so export can reconstruct the same format.
+  const flowMetaRef = useRef({});
 
   const [selectedNodeId, _setSelectedNodeId] = useState(null);
   const [selectedNodeIds, setSelectedNodeIds] = useState([]);
@@ -105,9 +108,45 @@ export default function CanvasFlow() {
   const pointerRef = useRef({ x: 100, y: 100 });
 
   // ── React Flow ───────────────────────────────────────────────
-  const { fitView, screenToFlowPosition } = useReactFlow();
+  const { fitView, screenToFlowPosition, getViewport } = useReactFlow();
   const { updateSingleNode } = useUpdateNode(setNodes);
   const isCompressed = useSyncCompressed();
+
+  //performance Testing
+
+  const [startChecking, setStartChecking] = useState(false);
+
+  const hasMeasuredInitialRender = useRef(false);
+  const appStartTimeRef = useRef(0);
+
+  const startPerformanceTest = () => {
+    hasMeasuredInitialRender.current = false;
+
+    // reset exact start time HERE
+    appStartTimeRef.current = performance.now();
+
+    setStartChecking(true);
+  };
+
+  useEffect(() => {
+    if (!startChecking) return;
+
+    if (hasMeasuredInitialRender.current) return;
+
+    if (!nodes.length && !edges.length) return;
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const renderTime = performance.now() - appStartTimeRef.current;
+
+        console.log(`Initial Canvas Render: ${renderTime.toFixed(2)}ms`);
+
+        hasMeasuredInitialRender.current = true;
+
+        setStartChecking(false);
+      });
+    });
+  }, [startChecking, nodes, edges]);
 
   // ── Collaborative socket hook ────────────────────────────────
   const {
@@ -133,6 +172,9 @@ export default function CanvasFlow() {
     socket.emit("get-flow", { roomId: "room-1" }, (flow) => {
       // Mark as remote update so the save-flow effect doesn't re-broadcast
       // the just-loaded state back to the server
+      // START TIMER HERE
+      appStartTimeRef.current = performance.now();
+
       isRemoteUpdateRef.current = true;
       const loadedNodes = flow.nodes || [];
       const loadedEdges = flow.edges || [];
@@ -310,7 +352,15 @@ export default function CanvasFlow() {
   } = useFlowScope({ nodes, edges, setSelectedNodeIdUpdate });
 
   const { importFileRef, handleImportChange, triggerImport, handleExport } =
-    useCanvasIO({ nodes, edges, setNodes, setEdges });
+    useCanvasIO({
+      nodes,
+      edges,
+      setNodes,
+      setEdges,
+      setStartChecking: startPerformanceTest,
+      flowMetaRef,
+      getViewport,
+    });
 
   const getCursorFlowPosition = () =>
     screenToFlowPosition({ x: pointerRef.current.x, y: pointerRef.current.y });
@@ -328,7 +378,7 @@ export default function CanvasFlow() {
   const { isSimulating, simulationStore, startSimulation, stopSimulation } =
     useFlowSimulation();
 
-  useAutoSave({ nodes, edges, nextIdRef });
+  useAutoSave({ nodes, edges, nextIdRef, flowMetaRef, getViewport });
 
   const { onGroupNodeDragStart, onGroupNodeDrag } = useGroupDrag(
     nodesRef,
@@ -537,7 +587,7 @@ export default function CanvasFlow() {
       simulationStore,
     ],
   );
-
+  console.log(nodes ,edges)
   // ── Render ───────────────────────────────────────────────────
   return (
     <div className="canvas-layout">
@@ -555,6 +605,7 @@ export default function CanvasFlow() {
           edges={edges}
           setEdges={setEdges}
           totalNodes={nodes.length}
+          setStartChecking={startPerformanceTest}
           nuberOfNodes={nuberOfNodes}
           setNumberOfNodes={setNumberOfNodes}
           onOpenSearch={() => setSearchOpen(true)}
@@ -597,7 +648,7 @@ export default function CanvasFlow() {
             minZoom={0.1}
           >
             <StaticBackground />
-            <MiniMap />
+            {/* <MiniMap /> */}
             <StaticControls />
 
             {/* <FlowBreadcrumb

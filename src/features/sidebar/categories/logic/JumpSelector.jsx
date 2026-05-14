@@ -4,11 +4,11 @@ import CustomSelect from "../../../../shared/ui/atoms/CustumSelect";
 import PropTypes from "prop-types";
 export default function JumpSelector({ nodes, selectedNode, updateNode }) {
     const filterOptions = nodes?.filter(
-        (node) => node.data.type !== "start" && node.id !== selectedNode.id,
+        (node) => (node.data.metaType ?? node.data.type) !== "start" && node.id !== selectedNode.id,
     );
 
     const options = filterOptions.map((node) => ({
-        label: node.data.title,
+        label: node.data.extras?.config?.title ?? node.data.title,
         value: node.id,
     }));
 

@@ -3,7 +3,7 @@ import "./JumpCard.css";
 import PropTypes from "prop-types";
 
 export default function FlowSelector({ selectedNode, updateNode, onEnterFlow }) {
-  const title = selectedNode.data?.title ?? "";
+  const title = selectedNode.data?.extras?.config?.title ?? selectedNode.data?.title ?? "";
   const targetFlowId = selectedNode.data?.targetFlowId;
 
   return (
@@ -18,7 +18,7 @@ export default function FlowSelector({ selectedNode, updateNode, onEnterFlow }) 
         <input
           type="text"
           value={title}
-          onChange={(e) => updateNode({ title: e.target.value })}
+          onChange={(e) => updateNode({ extras: { config: { title: e.target.value } } })}
           placeholder="Flow name"
         />
       </div>
