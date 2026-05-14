@@ -4,7 +4,7 @@ import {
   applyConnectionToNodes,
   isConnectionAllowed,
   removeNodeConnectionsForEdges,
-} from "../utils";
+} from "../newUtils";
 
 /**
  * Encapsulates all edge/connection logic for the canvas:

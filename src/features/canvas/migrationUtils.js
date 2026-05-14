@@ -8,7 +8,7 @@
  *  exportMigration(nodes, edges, meta) → oldJson
  */
 
-import { resolveNodeType } from "./utils";
+import { resolveNodeType } from "./newUtils";
 
 /* =========================================================
    CONSTANTS & MAPS
@@ -118,6 +118,8 @@ export function importMigration(oldJson) {
   const t0 = performance.now();
   const { nodes: oldNodes = [], links: oldLinks = [] } = oldJson;
 
+  console.log(oldJson, "Hello-old-json");
+
   /* ── 0. Pre-pass: map condition child IDs → metaType & data ─ */
   // Scan branch (conditionRoot) nodes to know which children are
   // "condition" vs "defaultCondition" and capture their condition data.
@@ -125,7 +127,7 @@ export function importMigration(oldJson) {
   const conditionChildDataMap = new Map(); // nodeId → { conditionType, conditions }
   for (const node of oldNodes) {
     if (node.dialogType !== "branch") continue;
-    for (const branch of (node.extras?.config?.branch ?? [])) {
+    for (const branch of node.extras?.config?.branch ?? []) {
       const childId = branch.custom_node_id;
       if (!childId) continue;
       conditionChildTypeMap.set(
@@ -238,14 +240,18 @@ export function importMigration(oldJson) {
       flowId: oldNode.flowId ?? null,
       data: {
         id: oldNode.id,
-        title: config.title ?? "",
-        description:
-          config.content ??
-          config.text ??
-          config.plain_text ??
-          config.description ??
-          "",
-        type: metaType,
+        extras: {
+          config: {
+            title: config.title ?? "",
+            description:
+              config.content ??
+              config.text ??
+              config.plain_text ??
+              config.description ??
+              "",
+          },
+        },
+        metaType,
         icon: META_TYPE_ICONS[metaType] ?? "",
         iCategory: META_TYPE_CATEGORY[metaType] ?? "",
         inPorts: inPorts ?? [],
@@ -382,7 +388,10 @@ export function importMigration(oldJson) {
 
       case "delay":
         newNode.data.delayDuration =
-          config.delay_time?.value ?? config.delay_duration ?? config.delayDuration ?? 1;
+          config.delay_time?.value ??
+          config.delay_duration ??
+          config.delayDuration ??
+          1;
         newNode.data.delayUnit = config.delay_time?.unit ?? "seconds";
         break;
 
@@ -423,19 +432,19 @@ export function importMigration(oldJson) {
   const nodeMap = new Map(newNodes.map((n) => [n.id, n]));
 
   for (const node of newNodes) {
-    if (node.data.type === "carousel") {
+    if (node.data.metaType === "carousel") {
       for (const card of node.data.cards ?? []) {
         const cardNode = nodeMap.get(card.id);
         if (cardNode) {
-          cardNode.data.title = card.title;
-          cardNode.data.description = card.description;
+          cardNode.data.extras.config.title = card.title;
+          cardNode.data.extras.config.description = card.description;
           cardNode.data.groupId = node.id;
           cardNode.data.buttons = card.buttons;
 
           for (const btn of card.buttons ?? []) {
             const btnNode = nodeMap.get(btn.id);
             if (btnNode) {
-              btnNode.data.title = btn.title;
+              btnNode.data.extras.config.title = btn.title;
               btnNode.data.groupId = node.id; // carousel is the group owner
             }
           }
@@ -443,10 +452,10 @@ export function importMigration(oldJson) {
       }
     }
 
-    if (node.data.type === "conditionRoot") {
+    if (node.data.metaType === "conditionRoot") {
       for (const child of node.data.children ?? []) {
         const childNode = nodeMap.get(child.id);
-        if (childNode) child.title = childNode.data.title;
+        if (childNode) child.title = childNode.data.extras?.config?.title ?? "";
       }
     }
   }
@@ -455,6 +464,8 @@ export function importMigration(oldJson) {
   console.debug(
     `[importMigration] ${newNodes.length} nodes, ${newEdges.length} edges — ${(t1 - t0).toFixed(1)}ms`,
   );
+
+  console.log(newNodes, newEdges, "Hello New");
 
   return { nodes: newNodes, edges: newEdges };
 }
@@ -564,7 +575,7 @@ export function exportMigration(nodes, edges, meta = {}) {
 
   for (const node of nodes) {
     const d = node.data ?? {};
-    const metaType = d.type ?? "";
+    const metaType = d.metaType ?? d.type ?? "";
     const dialogType = META_TYPE_TO_DIALOG_TYPE[metaType] ?? metaType;
     const legacy = d._legacy ?? {};
     const ports = portBook.get(node.id) ?? {};
@@ -629,7 +640,7 @@ export function exportMigration(nodes, edges, meta = {}) {
      */
     let config = {
       ...legacy,
-      title: d.title ?? "",
+      title: d.extras?.config?.title ?? d.title ?? "",
       dialog_type: dialogType,
       is_supported: true,
       is_valid_dialog_title: true,
@@ -713,8 +724,8 @@ export function exportMigration(nodes, edges, meta = {}) {
 
       case "carouselCard":
         config = {
-          text: d.description ?? "",
-          title: d.title ?? "",
+          text: d.extras?.config?.description ?? d.description ?? "",
+          title: d.extras?.config?.title ?? d.title ?? "",
           parentType: "cardview",
           dialog_type: "custom",
           is_supported: true,
@@ -725,7 +736,7 @@ export function exportMigration(nodes, edges, meta = {}) {
       case "carouselButton":
         config = {
           text: "",
-          title: d.title ?? "",
+          title: d.extras?.config?.title ?? d.title ?? "",
           parentType: "cardview_branch",
           dialog_type: "custom",
           is_supported: true,
@@ -881,7 +892,7 @@ export function exportMigration(nodes, edges, meta = {}) {
       case "condition":
         config = {
           text: "",
-          title: d.title ?? "",
+          title: d.extras?.config?.title ?? d.title ?? "",
           parentType: "branch",
           dialog_type: "custom",
           is_supported: true,
@@ -892,7 +903,7 @@ export function exportMigration(nodes, edges, meta = {}) {
       case "defaultCondition":
         config = {
           text: "",
-          title: d.title ?? "",
+          title: d.extras?.config?.title ?? d.title ?? "",
           parentType: "branch",
           dialog_type: "custom",
           is_supported: true,

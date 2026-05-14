@@ -1,7 +1,7 @@
 ﻿import React from "react";
 import "./ActionCard.css";
 import PropTypes from "prop-types";
-import { createEdge } from "../canvas/utils";
+import { createEdge } from "../canvas/newUtils";
 import useNodeUpdater from "../../shared/hooks/useNodeUpdater";
 import { useFlowCallbacks } from "../canvas/FlowCallbacksContext";
 
