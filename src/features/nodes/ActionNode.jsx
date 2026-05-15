@@ -32,8 +32,7 @@ function ActionNode({ id, data }) {
     } = useNodeInteractions({ id, data });
 
     const isStartNode = data.type === "start" || data.type === "flowStart";
-
-    const isConnected = data?.connected;
+    const isConnected = !!data?.ports?.find((item) => !item.in);
 
     return (
         <div

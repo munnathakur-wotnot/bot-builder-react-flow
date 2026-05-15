@@ -16,8 +16,6 @@ const subscribe = (listener) => {
   };
 };
 
-console.log(listeners);
-
 const getSnapshot = () => isCompressed;
 
 export const setCompressed = (value) => {

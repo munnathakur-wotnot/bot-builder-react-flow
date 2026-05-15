@@ -19,11 +19,13 @@ function CustomEdge(props) {
     sourceY,
     targetX,
     targetY,
-    data,
+    deletable,
     sourceHandleId,
   } = props;
 
   const { deleteEdge, simulationStore } = useFlowCallbacks();
+
+  console.log(props, "Edges");
 
   // only re-render when this source node simulation changes
   const edgeSimStatus = useSimulationStatus(simulationStore, source);
@@ -38,8 +40,6 @@ function CustomEdge(props) {
     x: 0,
     y: 0,
   });
-
-  const isDeletableEdges = data?.isNotDeletable;
 
   const isVerticalChain = Math.abs(sourceX - targetX) < 2;
 
@@ -125,6 +125,10 @@ function CustomEdge(props) {
     };
   }, [clearHideTimeout]);
 
+  if (source === target) {
+    return null;
+  }
+
   return (
     <>
       <BaseEdge
@@ -146,7 +150,7 @@ function CustomEdge(props) {
         }
       />
 
-      {!isDeletableEdges && (
+      {deletable && (
         <path
           d={edgePath}
           fill="none"
@@ -160,7 +164,7 @@ function CustomEdge(props) {
         />
       )}
 
-      {!isDeletableEdges && hoverState.isVisible && (
+      {deletable && hoverState.isVisible && (
         <EdgeLabelRenderer>
           <div
             className="edge-icon-wrapper nodrag nopan"
@@ -199,6 +203,7 @@ CustomEdge.propTypes = {
   targetX: PropTypes.number,
   targetY: PropTypes.number,
   sourceHandleId: PropTypes.string,
+  deletable: PropTypes.bool,
   data: PropTypes.object,
 };
 
@@ -212,6 +217,7 @@ function areEqual(prev, next) {
   // connection change
   if (prev.source !== next.source) return false;
   if (prev.target !== next.target) return false;
+  if (prev.deletable !== next.deletable) return false;
 
   // position/path change
   if (prev.sourceX !== next.sourceX) return false;

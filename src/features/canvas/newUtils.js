@@ -35,19 +35,36 @@ export function resolveNodeType(metaType) {
      data.flowId                                 ← sub-flow scope
 ========================================================= */
 
+const DEFAULT_PORTS = [
+  { in: true, links: [], name: "top", type: "default" },
+  { in: false, links: [], name: "bottom", type: "default" },
+];
+
+const DEFAULT_PORTS_AI_ANSWER = [
+  { in: true, links: [], name: "top", type: "default" },
+  { in: false, links: [], name: "bottomLeft", type: "default" },
+  { in: false, links: [], name: "bottomRight", type: "default" },
+];
+
+function getDefaultPorts(metaType) {
+  if (metaType === "ai_answer") {
+    return structuredClone(DEFAULT_PORTS_AI_ANSWER);
+  }
+
+  return structuredClone(DEFAULT_PORTS);
+}
+
 export function createFlowNode({
   id,
   x,
   y,
   type,
-  connected = false,
   title = "",
   description = "",
   metaType = "",
   icon = "",
-  ports = [],
+  ports,
   groupId,
-  isValidDragConn = true,
   flowId = null,
 }) {
   const node = {
@@ -61,18 +78,21 @@ export function createFlowNode({
           description,
         },
       },
-      metaType,
-      connected,
-      ports,
+      type: metaType,
+
+      // IMPORTANT
+      ports: ports ?? getDefaultPorts(metaType),
+
       icon,
       flowId,
-      isValidDragConn,
       isErrorShow: false,
       isSearchHighlight: false,
     },
   };
 
-  if (groupId) node.data.groupId = groupId;
+  if (groupId) {
+    node.data.groupId = groupId;
+  }
 
   return node;
 }
@@ -158,8 +178,8 @@ function getNodeConfig(type, allNodes) {
       extraData: { doubleHandler: true },
       // success + failure output ports for double-handler nodes
       extraPorts: [
-        { in: false, name: "success", links: [] },
-        { in: false, name: "failure", links: [] },
+        { in: false, name: "bottomLeft", links: [] },
+        { in: false, name: "bottomRight", links: [] },
       ],
     },
     jump: {
@@ -208,13 +228,7 @@ export function buildSingleNodePayload({
   const newNodeId = getNextNodeId();
   const config = getNodeConfig(type, allNodes);
 
-  // Build the ports: one input + one default output + any extra (e.g. success/failure)
-  const ports = [
-    { in: true, name: "in", links: [sourceNodeId] },
-    { in: false, name: "default", links: [] },
-    ...config.extraPorts,
-  ];
-
+  // Create node first
   const newNode = createFlowNode({
     id: newNodeId,
     type: config.nodeType,
@@ -224,28 +238,51 @@ export function buildSingleNodePayload({
     description: config.description ?? "",
     metaType: config.metaType,
     icon: config.icon ?? "",
-    ports,
-    connected: true,
+    ports: [],
     flowId: activeFlowId,
   });
 
-  const extraData = { ...config.extraData };
-  // Jump nodes store their own ID as the target sub-flow
-  if (config.metaType === "jump") extraData.targetFlowId = newNodeId;
+  // Create edge
+  const edge = createEdge({
+    source: sourceNodeId,
+    target: newNodeId,
+    deletable: true,
+    sourceHandle,
+    flowId: activeFlowId,
+  });
 
-  newNode.data = { ...newNode.data, ...extraData };
+  // Add ports after edge creation so edge.id can be stored
+  newNode.data.ports = newNode.data.ports.map((port) => {
+    // input port
+    if (port.in) {
+      return {
+        ...port,
+        links: [sourceNodeId],
+      };
+    }
+
+    // output ports
+    return {
+      ...port,
+      links: [],
+    };
+  });
+
+  const extraData = { ...config.extraData };
+
+  // Jump nodes store their own ID as the target sub-flow
+  if (config.metaType === "jump") {
+    extraData.targetFlowId = newNodeId;
+  }
+
+  newNode.data = {
+    ...newNode.data,
+    ...extraData,
+  };
 
   return {
     nodesToAdd: [newNode],
-    edgesToAdd: [
-      createEdge({
-        source: sourceNodeId,
-        target: newNodeId,
-        deletable: true,
-        sourceHandle,
-        flowId: activeFlowId,
-      }),
-    ],
+    edgesToAdd: [edge],
     selectedNodeId: newNodeId,
   };
 }
@@ -277,7 +314,14 @@ export function buildCarouselPayload({
     id,
     title: `Card ${i + 1}`,
     description: "",
-    buttons: [{ id: buttonIds[i], title: `Button ${i + 1}` }],
+    custom_node_id: id,
+    buttons: [
+      {
+        id: buttonIds[i],
+        custom_node_id: buttonIds[i],
+        title: `Button ${i + 1}`,
+      },
+    ],
   }));
 
   const baseX = sourceNode.position.x;
@@ -289,8 +333,23 @@ export function buildCarouselPayload({
 
   const totalWidth =
     cardIds.length * NODE_WIDTH + (cardIds.length - 1) * HORIZONTAL_GAP;
+
   const startX = baseX - totalWidth / 2 + NODE_WIDTH / 2;
 
+  /*
+   * Create parent edge first
+   */
+  const parentEdge = createEdge({
+    source: sourceNodeId,
+    target: carouselId,
+    deletable: true,
+    sourceHandle,
+    flowId: activeFlowId,
+  });
+
+  /*
+   * Create carousel node
+   */
   const carouselNode = createFlowNode({
     id: carouselId,
     type: "text",
@@ -302,27 +361,48 @@ export function buildCarouselPayload({
     connected: true,
     flowId: activeFlowId,
     ports: [
-      { in: true, name: "in", links: [sourceNodeId] },
-      { in: false, name: "default", links: cardIds },
+      {
+        id: parentEdge.id,
+        in: true,
+        name: "in",
+        links: [sourceNodeId],
+      },
+      {
+        in: false,
+        name: "default",
+        links: cardIds,
+      },
     ],
   });
-  carouselNode.data.cards = cards;
+
+  carouselNode.data.extras.config.cardview = cards;
 
   const nodes = [carouselNode];
-  const edges = [
-    createEdge({
-      source: sourceNodeId,
-      target: carouselId,
-      deletable: true,
-      sourceHandle,
-      flowId: activeFlowId,
-    }),
-  ];
+  const edges = [parentEdge];
 
   cards.forEach((card, index) => {
     const x = startX + index * (NODE_WIDTH + HORIZONTAL_GAP);
+
     const buttonId = card.buttons[0].id;
 
+    /*
+     * Create edges first
+     */
+    const cardEdge = createEdge({
+      source: carouselId,
+      target: card.id,
+      flowId: activeFlowId,
+    });
+
+    const buttonEdge = createEdge({
+      source: card.id,
+      target: buttonId,
+      flowId: activeFlowId,
+    });
+
+    /*
+     * Card node
+     */
     const cardNode = createFlowNode({
       id: card.id,
       type: "subnode",
@@ -335,14 +415,28 @@ export function buildCarouselPayload({
       connected: true,
       flowId: activeFlowId,
       ports: [
-        { in: true, name: "in", links: [carouselId] },
-        { in: false, name: "default", links: [buttonId] },
+        {
+          id: cardEdge.id,
+          in: true,
+          name: "in",
+          links: [carouselId],
+        },
+        {
+          id: buttonEdge.id,
+          in: false,
+          name: "default",
+          links: [buttonId],
+        },
       ],
     });
+
     cardNode.data.buttons = card.buttons;
     cardNode.data.extras.config.description = card.description;
     cardNode.data.isSubNode = true;
 
+    /*
+     * Button node
+     */
     const buttonNode = createFlowNode({
       id: buttonId,
       type: "subnode",
@@ -354,17 +448,22 @@ export function buildCarouselPayload({
       isValidDragConn: false,
       connected: true,
       flowId: activeFlowId,
-      ports: [{ in: true, name: "in", links: [card.id] }],
+      ports: [
+        {
+          id: buttonEdge.id,
+          in: true,
+          name: "in",
+          links: [card.id],
+        },
+      ],
     });
+
     buttonNode.data.isSubNode = true;
 
     nodes.push(cardNode, buttonNode);
-    edges.push(
-      createEdge({ source: carouselId, target: card.id, flowId: activeFlowId }),
-    );
-    edges.push(
-      createEdge({ source: card.id, target: buttonId, flowId: activeFlowId }),
-    );
+
+    edges.push(cardEdge);
+    edges.push(buttonEdge);
   });
 
   return {
@@ -395,6 +494,20 @@ export function buildFormPayload({
     baseTitle: nodeData?.title ?? "Form",
   });
 
+  /*
+   * Create edge first
+   */
+  const edge = createEdge({
+    source: sourceNodeId,
+    target: newNodeId,
+    deletable: true,
+    sourceHandle,
+    flowId: activeFlowId,
+  });
+
+  /*
+   * Create node
+   */
   const newNode = createFlowNode({
     id: newNodeId,
     type: "text",
@@ -406,23 +519,25 @@ export function buildFormPayload({
     connected: true,
     flowId: activeFlowId,
     ports: [
-      { in: true, name: "in", links: [sourceNodeId] },
-      { in: false, name: "default", links: [] },
+      {
+        id: edge.id,
+        in: true,
+        name: "in",
+        links: [sourceNodeId],
+      },
+      {
+        in: false,
+        name: "default",
+        links: [],
+      },
     ],
   });
+
   newNode.data.fields = nodeData?.fields ?? [];
 
   return {
     nodesToAdd: [newNode],
-    edgesToAdd: [
-      createEdge({
-        source: sourceNodeId,
-        target: newNodeId,
-        deletable: true,
-        sourceHandle,
-        flowId: activeFlowId,
-      }),
-    ],
+    edgesToAdd: [edge],
     selectedNodeId: newNodeId,
   };
 }
@@ -450,6 +565,20 @@ export function buildFlowNodePayload({
     baseTitle: "Flow",
   });
 
+  /*
+   * Create parent edge first
+   */
+  const edge = createEdge({
+    source: sourceNodeId,
+    target: flowNodeId,
+    deletable: true,
+    sourceHandle,
+    flowId: activeFlowId,
+  });
+
+  /*
+   * Flow node
+   */
   const flowNode = createFlowNode({
     id: flowNodeId,
     type: "text",
@@ -460,12 +589,25 @@ export function buildFlowNodePayload({
     connected: true,
     flowId: activeFlowId,
     ports: [
-      { in: true, name: "in", links: [sourceNodeId] },
-      { in: false, name: "default", links: [] },
+      {
+        id: edge.id,
+        in: true,
+        name: "in",
+        links: [sourceNodeId],
+      },
+      {
+        in: false,
+        name: "default",
+        links: [],
+      },
     ],
   });
+
   flowNode.data.targetFlowId = flowNodeId;
 
+  /*
+   * Flow start node
+   */
   const flowStartNode = createFlowNode({
     id: flowStartId,
     type: "action",
@@ -475,20 +617,18 @@ export function buildFlowNodePayload({
     metaType: "flowStart",
     connected: false,
     flowId: flowNodeId,
-    ports: [{ in: false, name: "default", links: [] }],
+    ports: [
+      {
+        in: false,
+        name: "default",
+        links: [],
+      },
+    ],
   });
 
   return {
     nodesToAdd: [flowNode, flowStartNode],
-    edgesToAdd: [
-      createEdge({
-        source: sourceNodeId,
-        target: flowNodeId,
-        deletable: true,
-        sourceHandle,
-        flowId: activeFlowId,
-      }),
-    ],
+    edgesToAdd: [edge],
     selectedNodeId: flowNodeId,
   };
 }
@@ -523,13 +663,29 @@ export function buildConditionPayload({
 
   const baseX = sourceNode.position.x;
   const baseY = sourceNode.position.y;
+
   const rootY = baseY + NODE_HEIGHT + VERTICAL_GAP;
   const childY = rootY + NODE_HEIGHT + VERTICAL_GAP;
 
   const totalWidth =
     childIds.length * NODE_WIDTH + (childIds.length - 1) * HORIZONTAL_GAP;
+
   const startX = baseX - totalWidth / 2 + NODE_WIDTH / 2;
 
+  /*
+   * Parent edge
+   */
+  const parentEdge = createEdge({
+    source: sourceNodeId,
+    target: conditionRootId,
+    deletable: true,
+    sourceHandle,
+    flowId: activeFlowId,
+  });
+
+  /*
+   * Root node
+   */
   const rootNode = createFlowNode({
     id: conditionRootId,
     type: "text",
@@ -541,28 +697,43 @@ export function buildConditionPayload({
     connected: true,
     flowId: activeFlowId,
     ports: [
-      { in: true, name: "in", links: [sourceNodeId] },
-      { in: false, name: "default", links: childIds },
+      {
+        id: parentEdge.id,
+        in: true,
+        name: "in",
+        links: [sourceNodeId],
+      },
+      {
+        in: false,
+        name: "default",
+        links: childIds,
+      },
     ],
   });
+
   rootNode.data.children = children;
 
   const nodes = [rootNode];
-  const edges = [
-    createEdge({
-      source: sourceNodeId,
-      target: conditionRootId,
-      deletable: true,
-      sourceHandle,
-      flowId: activeFlowId,
-    }),
-  ];
+  const edges = [parentEdge];
 
   children.forEach((child, index) => {
     const x = startX + index * (NODE_WIDTH + HORIZONTAL_GAP);
+
     const childMetaType =
       child.type === "other" ? "defaultCondition" : "condition";
 
+    /*
+     * Child edge
+     */
+    const childEdge = createEdge({
+      source: conditionRootId,
+      target: child.id,
+      flowId: activeFlowId,
+    });
+
+    /*
+     * Child node
+     */
     const childNode = createFlowNode({
       id: child.id,
       type: "subnode",
@@ -574,20 +745,22 @@ export function buildConditionPayload({
       isValidDragConn: false,
       connected: true,
       flowId: activeFlowId,
-      ports: [{ in: true, name: "in", links: [conditionRootId] }],
+      ports: [
+        {
+          id: childEdge.id,
+          in: true,
+          name: "in",
+          links: [conditionRootId],
+        },
+      ],
     });
+
     childNode.data.conditionType = "ALL";
     childNode.data.conditions = [];
     childNode.data.isSubNode = true;
 
     nodes.push(childNode);
-    edges.push(
-      createEdge({
-        source: conditionRootId,
-        target: child.id,
-        flowId: activeFlowId,
-      }),
-    );
+    edges.push(childEdge);
   });
 
   return {
@@ -608,17 +781,26 @@ export function buildAddCarouselCardPayload({
   getNextNodeId,
 }) {
   const existingCards = (carouselNode?.data?.cards ?? []).map((card, index) => {
-    if (typeof card === "string") return { id: card, title: `Card ${index + 1}` };
+    if (typeof card === "string") {
+      return { id: card, title: `Card ${index + 1}` };
+    }
+
     return card;
   });
 
   const newCardId = getNextNodeId();
   const newButtonId = getNextNodeId();
+
   const newCard = {
     id: newCardId,
     title: `Card ${existingCards.length + 1}`,
     description: "",
-    buttons: [{ id: newButtonId, title: `Button ${existingCards.length + 1}` }],
+    buttons: [
+      {
+        id: newButtonId,
+        title: `Button ${existingCards.length + 1}`,
+      },
+    ],
   };
 
   const allCards = [...existingCards, newCard];
@@ -629,15 +811,33 @@ export function buildAddCarouselCardPayload({
   const existingCardNodes = existingCards
     .map((c) => allNodes.find((n) => n.id === c.id))
     .filter(Boolean);
+
   const lastCardX =
     existingCardNodes.length > 0
       ? existingCardNodes[existingCardNodes.length - 1].position.x
       : carouselNode.position.x;
+
   const newCardX =
     existingCards.length > 0
       ? lastCardX + NODE_WIDTH + HORIZONTAL_GAP
       : lastCardX;
 
+  /*
+   * Create edges first
+   */
+  const cardEdge = createEdge({
+    source: selectedNodeId,
+    target: newCardId,
+  });
+
+  const buttonEdge = createEdge({
+    source: newCardId,
+    target: newButtonId,
+  });
+
+  /*
+   * Card node
+   */
   const cardNode = createFlowNode({
     id: newCardId,
     type: "subnode",
@@ -649,14 +849,28 @@ export function buildAddCarouselCardPayload({
     isValidDragConn: false,
     connected: true,
     ports: [
-      { in: true, name: "in", links: [selectedNodeId] },
-      { in: false, name: "default", links: [newButtonId] },
+      {
+        id: cardEdge.id,
+        in: true,
+        name: "in",
+        links: [selectedNodeId],
+      },
+      {
+        id: buttonEdge.id,
+        in: false,
+        name: "default",
+        links: [newButtonId],
+      },
     ],
   });
+
   cardNode.data.buttons = newCard.buttons;
   cardNode.data.extras.config.description = newCard.description;
   cardNode.data.isSubNode = true;
 
+  /*
+   * Button node
+   */
   const buttonNode = createFlowNode({
     id: newButtonId,
     type: "subnode",
@@ -667,11 +881,21 @@ export function buildAddCarouselCardPayload({
     groupId: selectedNodeId,
     isValidDragConn: false,
     connected: true,
-    ports: [{ in: true, name: "in", links: [newCardId] }],
+    ports: [
+      {
+        id: buttonEdge.id,
+        in: true,
+        name: "in",
+        links: [newCardId],
+      },
+    ],
   });
+
   buttonNode.data.isSubNode = true;
 
-  // Compute updated ports for the carousel node (keeps input port, updates output links)
+  /*
+   * Update carousel output links
+   */
   const updatedCarouselPorts = setPortLinks(
     carouselNode.data.ports ?? [],
     false,
@@ -681,10 +905,7 @@ export function buildAddCarouselCardPayload({
 
   return {
     nodesToAdd: [cardNode, buttonNode],
-    edgesToAdd: [
-      createEdge({ source: selectedNodeId, target: newCardId }),
-      createEdge({ source: newCardId, target: newButtonId }),
-    ],
+    edgesToAdd: [cardEdge, buttonEdge],
     dataPatch: {
       [selectedNodeId]: {
         cards: allCards,
@@ -707,12 +928,15 @@ export function buildSingleBranch({
   if (!conditionNode) return;
 
   const existingChildren = conditionNode.data?.children ?? [];
+
   const newChildId = getNextNodeId();
+
   const newChild = {
     id: newChildId,
     title: `Branch ${existingChildren.length}`,
     type: "condition",
   };
+
   const allChildren = [...existingChildren, newChild];
 
   const rootY = conditionNode.position.y;
@@ -721,15 +945,26 @@ export function buildSingleBranch({
   const existingChildNodes = existingChildren
     .map((c) => allNodes.find((n) => n.id === c.id))
     .filter(Boolean);
+
   const lastX =
     existingChildNodes.length > 0
       ? existingChildNodes[existingChildNodes.length - 1].position.x
       : conditionNode.position.x;
-  const newX =
-    existingChildNodes.length > 0
-      ? lastX + NODE_WIDTH + HORIZONTAL_GAP
-      : lastX;
 
+  const newX =
+    existingChildNodes.length > 0 ? lastX + NODE_WIDTH + HORIZONTAL_GAP : lastX;
+
+  /*
+   * Create edge first
+   */
+  const edge = createEdge({
+    source: selectedNodeId,
+    target: newChildId,
+  });
+
+  /*
+   * Child node
+   */
   const childNode = createFlowNode({
     id: newChildId,
     type: "subnode",
@@ -740,13 +975,23 @@ export function buildSingleBranch({
     groupId: selectedNodeId,
     isValidDragConn: false,
     connected: true,
-    ports: [{ in: true, name: "in", links: [selectedNodeId] }],
+    ports: [
+      {
+        id: edge.id,
+        in: true,
+        name: "in",
+        links: [selectedNodeId],
+      },
+    ],
   });
+
   childNode.data.conditionType = "ALL";
   childNode.data.conditions = [];
   childNode.data.isSubNode = true;
 
-  // Compute updated ports for the condition root (keeps input, updates output links)
+  /*
+   * Update root output ports
+   */
   const updatedRootPorts = setPortLinks(
     conditionNode.data.ports ?? [],
     false,
@@ -756,9 +1001,7 @@ export function buildSingleBranch({
 
   return {
     nodesToAdd: [childNode],
-    edgesToAdd: [
-      createEdge({ source: selectedNodeId, target: newChildId }),
-    ],
+    edgesToAdd: [edge],
     dataPatch: {
       [selectedNodeId]: {
         children: allChildren,
@@ -781,10 +1024,20 @@ export function buildMenuActionMap({
 }) {
   return {
     carousel: () =>
-      buildCarouselPayload({ ...context, getNextNodeId, sourceHandle, activeFlowId }),
+      buildCarouselPayload({
+        ...context,
+        getNextNodeId,
+        sourceHandle,
+        activeFlowId,
+      }),
 
     condition: () =>
-      buildConditionPayload({ ...context, getNextNodeId, sourceHandle, activeFlowId }),
+      buildConditionPayload({
+        ...context,
+        getNextNodeId,
+        sourceHandle,
+        activeFlowId,
+      }),
 
     collectInput: () =>
       buildSingleNodePayload({
@@ -832,7 +1085,12 @@ export function buildMenuActionMap({
       }),
 
     flow: () =>
-      buildFlowNodePayload({ ...context, getNextNodeId, sourceHandle, activeFlowId }),
+      buildFlowNodePayload({
+        ...context,
+        getNextNodeId,
+        sourceHandle,
+        activeFlowId,
+      }),
   };
 }
 
@@ -847,25 +1105,48 @@ export function buildMenuActionMap({
 export function applyConnectionToNodes(nodes, params) {
   return nodes.map((node) => {
     if (node.id === params.source) {
-      const handle = params.sourceHandle || "default";
-      const currentLinks = getPortLinks(node.data.ports ?? [], false, handle);
-      const newPorts = setPortLinks(
-        node.data.ports ?? [],
-        false,
-        handle,
-        [...new Set([...currentLinks, params.target])],
-      );
-      return { ...node, data: { ...node.data, ports: newPorts, connected: true } };
+      const outLinks = node.data.ports?.find((port) => !port.in)?.links;
+      console.log(outLinks, "Ports-qqwwee");
+
+      const newOutLinks = [...outLinks, params.target];
+
+      const updatePorts = node.data.ports?.map((port) => {
+        if (port.in) {
+          return port;
+        } else {
+          const updatedPort = {
+            ...port,
+            links: newOutLinks,
+          };
+          return updatedPort;
+        }
+      });
+
+      return {
+        ...node,
+        data: { ...node.data, ports: updatePorts },
+      };
     }
     if (node.id === params.target) {
-      const currentLinks = getPortLinks(node.data.ports ?? [], true, "in");
-      const newPorts = setPortLinks(
-        node.data.ports ?? [],
-        true,
-        "in",
-        [...new Set([...currentLinks, params.source])],
-      );
-      return { ...node, data: { ...node.data, ports: newPorts, connected: true } };
+      const outLinks = node.data.ports?.find((port) => port.in)?.links;
+      console.log(outLinks, "Ports-qqwwee");
+      const newOutLinks = [...outLinks, params.target];
+
+      const updatePorts = node.data.ports?.map((port) => {
+        if (!port.in) {
+          return port;
+        } else {
+          const updatedPort = {
+            ...port,
+            links: newOutLinks,
+          };
+          return updatedPort;
+        }
+      });
+      return {
+        ...node,
+        data: { ...node.data, ports: updatePorts },
+      };
     }
     return node;
   });
@@ -876,58 +1157,28 @@ export function applyConnectionToNodes(nodes, params) {
  * Removes the corresponding node IDs from each port's links.
  */
 export function removeNodeConnectionsForEdges(nodes, edgesToRemove) {
-  if (!Array.isArray(edgesToRemove) || edgesToRemove.length === 0) return nodes;
+  if (!Array.isArray(edgesToRemove) || edgesToRemove.length === 0) {
+    return nodes;
+  }
 
-  // Map of sourceId → [{ target, handle }] to remove from output ports
-  const removedBySource = new Map();
-  // Map of targetId → Set<sourceId> to remove from input ports
-  const removedByTarget = new Map();
-
-  edgesToRemove.forEach((edge) => {
-    if (!edge?.source || !edge?.target) return;
-    if (!removedBySource.has(edge.source)) removedBySource.set(edge.source, []);
-    removedBySource.get(edge.source).push({
-      target: edge.target,
-      handle: edge.sourceHandle || "default",
-    });
-    if (!removedByTarget.has(edge.target))
-      removedByTarget.set(edge.target, new Set());
-    removedByTarget.get(edge.target).add(edge.source);
-  });
+  const edgeIdsToRemove = new Set(edgesToRemove.map((edge) => edge.id));
 
   return nodes.map((node) => {
-    const removedTargets = removedBySource.get(node.id);
-    const removedSources = removedByTarget.get(node.id);
-    if (!removedTargets && !removedSources) return node;
+    if (!node?.data?.ports) return node;
 
-    let newPorts = node.data.ports ? [...node.data.ports] : [];
+    const updatedPorts = node.data.ports.map((port) => ({
+      ...port,
+      links: Array.isArray(port.links)
+        ? port.links.filter((linkId) => !edgeIdsToRemove.has(linkId))
+        : [],
+    }));
 
-    if (removedTargets) {
-      removedTargets.forEach(({ target, handle }) => {
-        newPorts = setPortLinks(
-          newPorts,
-          false,
-          handle,
-          getPortLinks(newPorts, false, handle).filter((id) => id !== target),
-        );
-      });
-    }
-
-    if (removedSources) {
-      newPorts = setPortLinks(
-        newPorts,
-        true,
-        "in",
-        getPortLinks(newPorts, true, "in").filter(
-          (id) => !removedSources.has(id),
-        ),
-      );
-    }
-
-    const isConnected = newPorts.some((p) => (p.links?.length ?? 0) > 0);
     return {
       ...node,
-      data: { ...node.data, ports: newPorts, connected: isConnected },
+      data: {
+        ...node.data,
+        ports: updatedPorts,
+      },
     };
   });
 }
@@ -941,4 +1192,3 @@ export function isConnectionAllowed(edges, source, sourceHandle) {
     (e) => e.source === source && e.sourceHandle === sourceHandle,
   );
 }
-

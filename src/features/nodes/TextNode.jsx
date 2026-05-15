@@ -21,6 +21,7 @@ function TextNode({ id, data }) {
         isDoubleOutport,
         isSelfLoop,
         hasOutgoing,
+        outPorts,
         hasSuccessOutport,
         hasFailureOutport,
         isLockedByRemote,
@@ -65,6 +66,7 @@ function TextNode({ id, data }) {
             <NodeHandles.Source
                 isDoubleOutport={isDoubleOutport}
                 hasOutgoing={hasOutgoing}
+                outPorts={outPorts}
                 hasSuccessOutport={hasSuccessOutport}
                 hasFailureOutport={hasFailureOutport}
                 isSelfLoop={isSelfLoop}
@@ -107,6 +109,7 @@ function textNodeEqual(prev, next) {
         pd.createdBy?.id === nd.createdBy?.id &&
         // Handle connection state
         isEqual(pd.outPorts, nd.outPorts) &&
+        isEqual(pd.ports, nd.ports) &&
         isEqual(pd.successOutport, nd.successOutport) &&
         isEqual(pd.failureOutport, nd.failureOutport) &&
         // Content-heavy arrays — deep equal

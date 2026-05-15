@@ -39,10 +39,10 @@ export function useFlowConnections({
         )
       )
         return;
-
       if (params.source === params.target) {
         params.hidden = true;
       }
+
       setEdges((eds) => addEdge({ ...params, type: "custom" }, eds));
       setNodes((nds) => applyConnectionToNodes(nds, params));
     },
@@ -63,10 +63,11 @@ export function useFlowConnections({
       if (!targetNodeId || targetNodeId === sourceNodeId) return;
 
       const targetNode = nodesRef.current.find((n) => n.id === targetNodeId);
+
       if (
         !targetNode ||
         targetNode.data?.type === "start" ||
-        !targetNode.data?.isValidDragConn
+        targetNode.type === "subnode"
       )
         return;
 
