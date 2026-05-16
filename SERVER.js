@@ -12,18 +12,20 @@ const INITIAL_NODE_ID = "node_1";
 const INITIAL_NODES = [
   {
     id: INITIAL_NODE_ID,
-    type: "custom",
+    type: "action",
     position: { x: 120, y: 120 },
     deletable: false,
     selectable: false,
     data: {
       id: INITIAL_NODE_ID,
-      inPorts: [],
-      outPorts: [],
+      ports: [
+        { in: false, name: "bottom", links: [] },
+      ],
       connected: false,
       title: "Start",
       description: "description",
       type: "start",
+      icon: "🚀",
     },
   },
 ];
@@ -300,7 +302,14 @@ io.on("connection", (socket) => {
       id: INITIAL_NODE_ID,
       type: "start",
       title: "Start",
+      // ensure legacy fields are stripped
+      inPorts: undefined,
+      outPorts: undefined,
     };
+    // ensure ports array is always present on start node
+    if (!Array.isArray(startNode.data.ports) || startNode.data.ports.length === 0) {
+      startNode.data.ports = [{ in: false, name: "bottom", links: [] }];
+    }
 
     flows[roomId] = {
       nodes: structuredClone(nodes),

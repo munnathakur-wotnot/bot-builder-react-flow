@@ -112,7 +112,7 @@ export function createEdge({
   hidden,
   flowId = null,
 }) {
-  const handle = sourceHandle || "default";
+  const handle = sourceHandle || "bottom";
 
   return {
     id: `edge_${source}_${handle}_${target}`,
@@ -130,8 +130,8 @@ export function createEdge({
    PORT HELPERS
 
    Each port: { in: bool, name: string, links: string[] }
-     in: true  → input port  (name: "in")
-     in: false → output port (name: "default" | "success" | "failure")
+     in: true  → input port  (name: "top")
+     in: false → output port (name: "bottom" | "bottomLeft" | "bottomRight")
      links     → connected node IDs
 ========================================================= */
 
@@ -228,7 +228,7 @@ export function buildSingleNodePayload({
   const newNodeId = getNextNodeId();
   const config = getNodeConfig(type, allNodes);
 
-  // Create node first
+  // Create node with default ports for its metaType
   const newNode = createFlowNode({
     id: newNodeId,
     type: config.nodeType,
@@ -238,7 +238,6 @@ export function buildSingleNodePayload({
     description: config.description ?? "",
     metaType: config.metaType,
     icon: config.icon ?? "",
-    ports: [],
     flowId: activeFlowId,
   });
 
@@ -251,21 +250,12 @@ export function buildSingleNodePayload({
     flowId: activeFlowId,
   });
 
-  // Add ports after edge creation so edge.id can be stored
+  // Set input port links to source node
   newNode.data.ports = newNode.data.ports.map((port) => {
-    // input port
     if (port.in) {
-      return {
-        ...port,
-        links: [sourceNodeId],
-      };
+      return { ...port, links: [sourceNodeId] };
     }
-
-    // output ports
-    return {
-      ...port,
-      links: [],
-    };
+    return { ...port, links: [] };
   });
 
   const extraData = { ...config.extraData };
@@ -362,14 +352,13 @@ export function buildCarouselPayload({
     flowId: activeFlowId,
     ports: [
       {
-        id: parentEdge.id,
         in: true,
-        name: "in",
+        name: "top",
         links: [sourceNodeId],
       },
       {
         in: false,
-        name: "default",
+        name: "bottom",
         links: cardIds,
       },
     ],
@@ -416,15 +405,13 @@ export function buildCarouselPayload({
       flowId: activeFlowId,
       ports: [
         {
-          id: cardEdge.id,
           in: true,
-          name: "in",
+          name: "top",
           links: [carouselId],
         },
         {
-          id: buttonEdge.id,
           in: false,
-          name: "default",
+          name: "bottom",
           links: [buttonId],
         },
       ],
@@ -450,9 +437,8 @@ export function buildCarouselPayload({
       flowId: activeFlowId,
       ports: [
         {
-          id: buttonEdge.id,
           in: true,
-          name: "in",
+          name: "top",
           links: [card.id],
         },
       ],
@@ -520,14 +506,13 @@ export function buildFormPayload({
     flowId: activeFlowId,
     ports: [
       {
-        id: edge.id,
         in: true,
-        name: "in",
+        name: "top",
         links: [sourceNodeId],
       },
       {
         in: false,
-        name: "default",
+        name: "bottom",
         links: [],
       },
     ],
@@ -590,14 +575,13 @@ export function buildFlowNodePayload({
     flowId: activeFlowId,
     ports: [
       {
-        id: edge.id,
         in: true,
-        name: "in",
+        name: "top",
         links: [sourceNodeId],
       },
       {
         in: false,
-        name: "default",
+        name: "bottom",
         links: [],
       },
     ],
@@ -620,7 +604,7 @@ export function buildFlowNodePayload({
     ports: [
       {
         in: false,
-        name: "default",
+        name: "bottom",
         links: [],
       },
     ],
@@ -698,14 +682,13 @@ export function buildConditionPayload({
     flowId: activeFlowId,
     ports: [
       {
-        id: parentEdge.id,
         in: true,
-        name: "in",
+        name: "top",
         links: [sourceNodeId],
       },
       {
         in: false,
-        name: "default",
+        name: "bottom",
         links: childIds,
       },
     ],
@@ -747,9 +730,8 @@ export function buildConditionPayload({
       flowId: activeFlowId,
       ports: [
         {
-          id: childEdge.id,
           in: true,
-          name: "in",
+          name: "top",
           links: [conditionRootId],
         },
       ],
@@ -850,15 +832,13 @@ export function buildAddCarouselCardPayload({
     connected: true,
     ports: [
       {
-        id: cardEdge.id,
         in: true,
-        name: "in",
+        name: "top",
         links: [selectedNodeId],
       },
       {
-        id: buttonEdge.id,
         in: false,
-        name: "default",
+        name: "bottom",
         links: [newButtonId],
       },
     ],
@@ -883,9 +863,8 @@ export function buildAddCarouselCardPayload({
     connected: true,
     ports: [
       {
-        id: buttonEdge.id,
         in: true,
-        name: "in",
+        name: "top",
         links: [newCardId],
       },
     ],
@@ -899,7 +878,7 @@ export function buildAddCarouselCardPayload({
   const updatedCarouselPorts = setPortLinks(
     carouselNode.data.ports ?? [],
     false,
-    "default",
+    "bottom",
     allCards.map((c) => c.id),
   );
 
@@ -977,9 +956,8 @@ export function buildSingleBranch({
     connected: true,
     ports: [
       {
-        id: edge.id,
         in: true,
-        name: "in",
+        name: "top",
         links: [selectedNodeId],
       },
     ],
@@ -995,7 +973,7 @@ export function buildSingleBranch({
   const updatedRootPorts = setPortLinks(
     conditionNode.data.ports ?? [],
     false,
-    "default",
+    "bottom",
     allChildren.map((c) => c.id),
   );
 
@@ -1103,50 +1081,33 @@ export function buildMenuActionMap({
  * Updates source node's output port links and target node's input port links.
  */
 export function applyConnectionToNodes(nodes, params) {
+  const sourceHandle = params.sourceHandle || "bottom";
   return nodes.map((node) => {
     if (node.id === params.source) {
-      const outLinks = node.data.ports?.find((port) => !port.in)?.links;
-      console.log(outLinks, "Ports-qqwwee");
-
-      const newOutLinks = [...outLinks, params.target];
-
-      const updatePorts = node.data.ports?.map((port) => {
-        if (port.in) {
-          return port;
-        } else {
-          const updatedPort = {
+      const updatedPorts = node.data.ports?.map((port) => {
+        if (!port.in && port.name === sourceHandle) {
+          const links = Array.isArray(port.links) ? port.links : [];
+          return {
             ...port,
-            links: newOutLinks,
+            links: links.includes(params.target) ? links : [...links, params.target],
           };
-          return updatedPort;
         }
+        return port;
       });
-
-      return {
-        ...node,
-        data: { ...node.data, ports: updatePorts },
-      };
+      return { ...node, data: { ...node.data, ports: updatedPorts } };
     }
     if (node.id === params.target) {
-      const outLinks = node.data.ports?.find((port) => port.in)?.links;
-      console.log(outLinks, "Ports-qqwwee");
-      const newOutLinks = [...outLinks, params.target];
-
-      const updatePorts = node.data.ports?.map((port) => {
-        if (!port.in) {
-          return port;
-        } else {
-          const updatedPort = {
+      const updatedPorts = node.data.ports?.map((port) => {
+        if (port.in) {
+          const links = Array.isArray(port.links) ? port.links : [];
+          return {
             ...port,
-            links: newOutLinks,
+            links: links.includes(params.source) ? links : [...links, params.source],
           };
-          return updatedPort;
         }
+        return port;
       });
-      return {
-        ...node,
-        data: { ...node.data, ports: updatePorts },
-      };
+      return { ...node, data: { ...node.data, ports: updatedPorts } };
     }
     return node;
   });
@@ -1161,25 +1122,35 @@ export function removeNodeConnectionsForEdges(nodes, edgesToRemove) {
     return nodes;
   }
 
-  const edgeIdsToRemove = new Set(edgesToRemove.map((edge) => edge.id));
+  // Build per-node removal sets using edge source/target node IDs
+  const removalsMap = new Map();
+  const getEntry = (nodeId) => {
+    if (!removalsMap.has(nodeId)) {
+      removalsMap.set(nodeId, { output: new Set(), input: new Set() });
+    }
+    return removalsMap.get(nodeId);
+  };
+
+  for (const edge of edgesToRemove) {
+    getEntry(edge.source).output.add(edge.target);
+    getEntry(edge.target).input.add(edge.source);
+  }
 
   return nodes.map((node) => {
     if (!node?.data?.ports) return node;
 
-    const updatedPorts = node.data.ports.map((port) => ({
-      ...port,
-      links: Array.isArray(port.links)
-        ? port.links.filter((linkId) => !edgeIdsToRemove.has(linkId))
-        : [],
-    }));
+    const removal = removalsMap.get(node.id);
+    if (!removal) return node;
 
-    return {
-      ...node,
-      data: {
-        ...node.data,
-        ports: updatedPorts,
-      },
-    };
+    const updatedPorts = node.data.ports.map((port) => {
+      if (!Array.isArray(port.links)) return port;
+      const removeSet = port.in ? removal.input : removal.output;
+      if (removeSet.size === 0) return port;
+      const newLinks = port.links.filter((id) => !removeSet.has(id));
+      return newLinks.length !== port.links.length ? { ...port, links: newLinks } : port;
+    });
+
+    return { ...node, data: { ...node.data, ports: updatedPorts } };
   });
 }
 

@@ -14,18 +14,21 @@ export function useNodeInteractions({ id, data }) {
   const nodeErrors = validationErrors?.current?.[id] ?? [];
 
   const hasErrors = data.isErrorShow && nodeErrors.length > 0;
-  const outPorts = data?.ports?.filter((port) => !port.in);
-  const isDoubleOutport = outPorts?.length > 1;
+  const outPorts = data?.ports?.filter((port) => !port.in) ?? [];
+  const isDoubleOutport = outPorts.length > 1;
 
-  const isSelfLoop = data?.successOutport?.[0] === id;
+  const bottomLeftPort = outPorts.find((p) => p.name === "bottomLeft");
+  const bottomRightPort = outPorts.find((p) => p.name === "bottomRight");
+  const singleOutPort = !isDoubleOutport ? outPorts[0] : null;
 
-  const hasSuccessOutport = data?.successOutport?.length > 0;
+  const hasSuccessOutport = (bottomLeftPort?.links?.length ?? 0) > 0;
+  const hasFailureOutport = (bottomRightPort?.links?.length ?? 0) > 0;
 
-  const hasFailureOutport = data?.failureOutport?.length > 0;
+  const isSelfLoop = outPorts.some((p) => (p.links ?? []).includes(id));
 
   const hasOutgoing = isDoubleOutport
-    ? hasSuccessOutport && hasFailureOutport
-    : data?.ports?.find((item) => !item.in)?.links?.length > 0;
+    ? hasSuccessOutport || hasFailureOutport
+    : (singleOutPort?.links?.length ?? 0) > 0;
 
   console.log(hasOutgoing, data, "HasOutgoing");
 

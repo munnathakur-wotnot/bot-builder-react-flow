@@ -5,7 +5,7 @@ import ContextMenu from "./ContextMenu";
 import { getMeStamp } from "../socket/useCursorStore.js";
 
 export const menuRendering = (menu, props) => {
-  return menu.type === "success" && !menu.addAnother
+  return menu.type === "bottomLeft" && !menu.addAnother
     ? { compoent: AiMenu, props: { ...props } }
     : { compoent: ContextMenu, props: { ...props } };
 };
@@ -105,13 +105,13 @@ export function getMenuSelectionPayload({
     /*
      * Legacy outport tracking
      */
-    if (menuState.type === "success") {
+    if (menuState.type === "bottomLeft") {
       const existing = node.data.successOutport || [];
 
       updatedData.successOutport = Array.from(
         new Set([...existing, ...directTargets]),
       );
-    } else if (menuState.type === "failure") {
+    } else if (menuState.type === "bottomRight") {
       const existing = node.data.failureOutport || [];
 
       updatedData.failureOutport = Array.from(
@@ -133,7 +133,7 @@ export function getMenuSelectionPayload({
     payload.edgesToAdd.forEach((edge) => {
       if (edge.source !== node.id) return;
 
-      const handleName = edge.sourceHandle || "default";
+      const handleName = edge.sourceHandle || "bottom";
 
       const existingPortIndex = updatedPorts.findIndex(
         (p) => p.in === false && p.name === handleName,
@@ -144,14 +144,12 @@ export function getMenuSelectionPayload({
 
         updatedPorts[existingPortIndex] = {
           ...existingPort,
-          id: edge.id,
           links: Array.from(
             new Set([...(existingPort.links || []), edge.target]),
           ),
         };
       } else {
         updatedPorts.push({
-          id: edge.id,
           in: false,
           name: handleName,
           links: [edge.target],
@@ -164,10 +162,7 @@ export function getMenuSelectionPayload({
       data: {
         ...updatedData,
         ports: updatedPorts,
-        connected:
-          (updatedData.outPorts?.length || 0) > 0 ||
-          (updatedData.successOutport?.length || 0) > 0 ||
-          (updatedData.failureOutport?.length || 0) > 0,
+        connected: updatedPorts.some((p) => !p.in && (p.links?.length ?? 0) > 0),
       },
     };
   });
@@ -259,13 +254,13 @@ export function bulkCreateFromSource({
         /*
          * Legacy outport tracking
          */
-        if (menuState.type === "success") {
+        if (menuState.type === "bottomLeft") {
           const existing = node.data.successOutport || [];
 
           updatedData.successOutport = Array.from(
             new Set([...existing, ...directTargets]),
           );
-        } else if (menuState.type === "failure") {
+        } else if (menuState.type === "bottomRight") {
           const existing = node.data.failureOutport || [];
 
           updatedData.failureOutport = Array.from(
@@ -287,7 +282,7 @@ export function bulkCreateFromSource({
         (payload.edgesToAdd || []).forEach((edge) => {
           if (edge.source !== node.id) return;
 
-          const handleName = edge.sourceHandle || "default";
+          const handleName = edge.sourceHandle || "bottom";
 
           const existingPortIndex = updatedPorts.findIndex(
             (p) => p.in === false && p.name === handleName,
@@ -298,14 +293,12 @@ export function bulkCreateFromSource({
 
             updatedPorts[existingPortIndex] = {
               ...existingPort,
-              id: edge.id,
               links: Array.from(
                 new Set([...(existingPort.links || []), edge.target]),
               ),
             };
           } else {
             updatedPorts.push({
-              id: edge.id,
               in: false,
               name: handleName,
               links: [edge.target],
@@ -318,10 +311,7 @@ export function bulkCreateFromSource({
           data: {
             ...updatedData,
             ports: updatedPorts,
-            connected:
-              (updatedData.outPorts?.length || 0) > 0 ||
-              (updatedData.successOutport?.length || 0) > 0 ||
-              (updatedData.failureOutport?.length || 0) > 0,
+            connected: updatedPorts.some((p) => !p.in && (p.links?.length ?? 0) > 0),
           },
         };
       });

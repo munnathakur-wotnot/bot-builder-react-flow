@@ -95,11 +95,20 @@ export function useFlowPaste({
         };
       });
 
-      // Fix groupId for sub-nodes whose parent was remapped in the same paste
-      // (idMap is now fully populated)
+      // Fix groupId and port links for sub-nodes using the fully-populated idMap
       newNodes.forEach((n) => {
+        let dataPatch = {};
         if (n.data?.groupId && idMap[n.data.groupId]) {
-          n.data = { ...n.data, groupId: idMap[n.data.groupId] };
+          dataPatch.groupId = idMap[n.data.groupId];
+        }
+        if (Array.isArray(n.data?.ports)) {
+          dataPatch.ports = n.data.ports.map((port) => ({
+            ...port,
+            links: (port.links ?? []).map((id) => idMap[id] ?? id),
+          }));
+        }
+        if (Object.keys(dataPatch).length) {
+          n.data = { ...n.data, ...dataPatch };
         }
       });
 

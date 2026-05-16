@@ -28,17 +28,18 @@ function Source({
     hidden,
     outPorts,
 }) {
+    console.log("hasOutgoing", hasOutgoing, "hasSuccessOutport", hasSuccessOutport, "hasFailureOutport", hasFailureOutport);
     const hiddenStyle = hidden ? { visibility: "hidden" } : {};
 
-    const success = outPorts?.find((port) => (port.name = "bottomLeft"));
-    const falied = outPorts?.find((port) => (port.name = "bottomRight"));
+    const success = outPorts?.find((port) => port.name === "bottomLeft");
+    const falied = outPorts?.find((port) => port.name === "bottomRight");
 
     if (isDoubleOutport) {
         return (
             <>
                 <Handle
                     type="source"
-                    id={success?.id}
+                    id="bottomLeft"
                     position={Position.Bottom}
                     style={{ left: "30%", ...hiddenStyle }}
                     className={`custom-node__handle custom-node__handle--source
@@ -49,12 +50,12 @@ function Source({
                                 : "custom-node__handle--source-add"
                         }`}
                     isConnectable={!hasSuccessOutport || isSelfLoop}
-                    onMouseDown={(e) => onMouseDown(e, "success")}
+                    onMouseDown={(e) => onMouseDown(e, "bottomLeft")}
                 />
 
                 <Handle
                     type="source"
-                    id={falied?.id}
+                    id="bottomRight"
                     position={Position.Bottom}
                     style={{ left: "70%", ...hiddenStyle }}
                     className={`custom-node__handle custom-node__handle--source
@@ -63,7 +64,7 @@ function Source({
                             : "custom-node__handle--source-add"
                         }`}
                     isConnectable={!hasFailureOutport}
-                    onMouseDown={(e) => onMouseDown(e, "failure")}
+                    onMouseDown={(e) => onMouseDown(e, "bottomRight")}
                 />
             </>
         );
@@ -72,7 +73,7 @@ function Source({
     return (
         <Handle
             type="source"
-            id="default"
+            id="bottom"
             position={Position.Bottom}
             style={hiddenStyle}
             className={`custom-node__handle custom-node__handle--source

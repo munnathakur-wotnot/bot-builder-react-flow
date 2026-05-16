@@ -1,8 +1,7 @@
 ﻿import React from "react";
 import "./ActionCard.css";
 import PropTypes from "prop-types";
-import { createEdge } from "../canvas/newUtils";
-import useNodeUpdater from "../../shared/hooks/useNodeUpdater";
+import { createEdge, applyConnectionToNodes } from "../canvas/newUtils";
 import { useFlowCallbacks } from "../canvas/FlowCallbacksContext";
 
 export default function AiMenu({
@@ -14,7 +13,6 @@ export default function AiMenu({
 }) {
     const nodeId = menuState?.nodeId;
     const isSelfLoop = menuState?.isSelfLoop;
-    const { updateNode } = useNodeUpdater({ nodeId: nodeId, setNodes });
     const { deleteEdge } = useFlowCallbacks();
 
     const connectedEdge = edges.find(
@@ -27,10 +25,17 @@ export default function AiMenu({
         if (!isSelfLoop) {
             const newEdge = createEdge(nodeId, nodeId, false, menuState.type, true);
             setEdges((edges) => [...edges, newEdge]);
-            updateNode({ successOutport: [nodeId] });
+            // Update the output port's links to include the self-reference
+            setNodes((nds) =>
+                applyConnectionToNodes(nds, {
+                    source: nodeId,
+                    target: nodeId,
+                    sourceHandle: menuState.type,
+                }),
+            );
         } else {
             deleteEdge?.(connectedEdge.id, nodeId, nodeId);
-            updateNode({ successOutport: [] });
+            // removeNodeConnectionsForEdges (called inside deleteEdge) cleans port links
         }
         setMenuState(null);
     };
