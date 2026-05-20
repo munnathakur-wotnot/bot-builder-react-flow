@@ -48,7 +48,7 @@ function ActionNode({ id, data }) {
             tabIndex={isStartNode ? 0 : undefined}
         >
             <NodeBadges data={data} />
-            <NodeTooltips id={id} />
+             {!isStartNode && <NodeTooltips id={id} />}
 
             {hasErrors && (
                 <div className="custom-node__error-badge" title={nodeErrors.join("\n")}>
