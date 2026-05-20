@@ -36,17 +36,21 @@ export function useCanvasIO({
     const t0migrate = performance.now();
     const oldJson = migrateFromReactFlow(rfFlow);
     const t1migrate = performance.now();
-    console.log(`[Export] migrateFromReactFlow: ${(t1migrate - t0migrate).toFixed(2)}ms`);
+    console.log(
+      `[Export] migrateFromReactFlow: ${(t1migrate - t0migrate).toFixed(2)}ms`,
+    );
 
     // ── timed: JSON serialise + download ──────────────────────
     const t0serial = performance.now();
     const jsonString = JSON.stringify(oldJson, null, 2);
     const t1serial = performance.now();
-    console.log(`[Export] JSON.stringify (no migration): ${(t1serial - t0serial).toFixed(2)}ms`);
+    console.log(
+      `[Export] JSON.stringify (no migration): ${(t1serial - t0serial).toFixed(2)}ms`,
+    );
 
     console.log(
       `[Export] Total: ${(t1serial - t0migrate).toFixed(2)}ms` +
-      ` | nodes=${nodes.length} edges=${edges.length}`,
+        ` | nodes=${nodes.length} edges=${edges.length}`,
     );
 
     triggerDownload(jsonString, "flow.json");
@@ -67,13 +71,19 @@ export function useCanvasIO({
 
           if (Array.isArray(parsed.links)) {
             setStartChecking(true);
-            console.log(parsed, "data-p");
 
             const start = performance.now();
 
             // Preserve top-level metadata (id, version, gridSize, extraInfo, etc.)
             // so it can be round-tripped back on export
-            const { nodes: _n, links: _l, offsetX: _ox, offsetY: _oy, zoom: _z, ...meta } = parsed;
+            const {
+              nodes: _n,
+              links: _l,
+              offsetX: _ox,
+              offsetY: _oy,
+              zoom: _z,
+              ...meta
+            } = parsed;
             if (flowMetaRef) flowMetaRef.current = meta;
 
             ({ nodes: nextNodes, edges: nextEdges } =

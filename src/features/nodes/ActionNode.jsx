@@ -32,8 +32,7 @@ function ActionNode({ id, data }) {
     } = useNodeInteractions({ id, data });
 
     const isStartNode = data.type === "start" || data.type === "flowStart";
-
-    const isConnected = data?.connected;
+    const isConnected = !!data?.ports?.find((item) => !item.in && (item.links?.length ?? 0) > 0);
 
     return (
         <div
@@ -115,9 +114,7 @@ function actionNodeEqual(prev, next) {
         pd.isMenuOpenBy === nd.isMenuOpenBy &&
         pd.isMenuOpenByColor === nd.isMenuOpenByColor &&
         // Handle connection state
-        isEqual(pd.outPorts, nd.outPorts) &&
-        isEqual(pd.successOutport, nd.successOutport) &&
-        isEqual(pd.failureOutport, nd.failureOutport)
+        isEqual(pd.ports, nd.ports)
     );
 }
 

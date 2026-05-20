@@ -225,6 +225,8 @@ export default function CanvasFlow() {
     });
   }, [nodes, edges, nextIdRef]);
 
+  console.log(nodes, edges, "Hello-input");
+
   useEffect(() => {
     socket.on(
       "flow-updated",
@@ -587,7 +589,6 @@ export default function CanvasFlow() {
       simulationStore,
     ],
   );
-  console.log(nodes ,edges)
   // ── Render ───────────────────────────────────────────────────
   return (
     <div className="canvas-layout">

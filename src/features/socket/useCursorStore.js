@@ -44,7 +44,6 @@ export const cursorStore = {
   },
 
   init() {
-
     // avoid multiple bindings
     if (this.initialized) return;
 

@@ -3,15 +3,20 @@ import PropTypes from "prop-types";
 import { Handle, Position } from "@xyflow/react";
 import "./CustomNode.css";
 
-function Target() {
+function Target({ isNotConnectable }) {
     return (
         <Handle
             type="target"
             position={Position.Top}
+            isConnectable={!isNotConnectable}
             className="custom-node__handle custom-node__handle--target"
         />
     );
 }
+
+Target.propTypes = {
+    isNotConnectable: PropTypes.bool,
+};
 
 function Source({
     isDoubleOutport,
@@ -21,15 +26,20 @@ function Source({
     isSelfLoop,
     onMouseDown,
     hidden,
+    outPorts,
 }) {
+    console.log("hasOutgoing", hasOutgoing, "hasSuccessOutport", hasSuccessOutport, "hasFailureOutport", hasFailureOutport);
     const hiddenStyle = hidden ? { visibility: "hidden" } : {};
+
+    const success = outPorts?.find((port) => port.name === "bottomLeft");
+    const falied = outPorts?.find((port) => port.name === "bottomRight");
 
     if (isDoubleOutport) {
         return (
             <>
                 <Handle
                     type="source"
-                    id="success"
+                    id="bottomLeft"
                     position={Position.Bottom}
                     style={{ left: "30%", ...hiddenStyle }}
                     className={`custom-node__handle custom-node__handle--source
@@ -40,12 +50,12 @@ function Source({
                                 : "custom-node__handle--source-add"
                         }`}
                     isConnectable={!hasSuccessOutport || isSelfLoop}
-                    onMouseDown={(e) => onMouseDown(e, "success")}
+                    onMouseDown={(e) => onMouseDown(e, "bottomLeft")}
                 />
 
                 <Handle
                     type="source"
-                    id="failure"
+                    id="bottomRight"
                     position={Position.Bottom}
                     style={{ left: "70%", ...hiddenStyle }}
                     className={`custom-node__handle custom-node__handle--source
@@ -54,7 +64,7 @@ function Source({
                             : "custom-node__handle--source-add"
                         }`}
                     isConnectable={!hasFailureOutport}
-                    onMouseDown={(e) => onMouseDown(e, "failure")}
+                    onMouseDown={(e) => onMouseDown(e, "bottomRight")}
                 />
             </>
         );
@@ -63,7 +73,7 @@ function Source({
     return (
         <Handle
             type="source"
-            id="default"
+            id="bottom"
             position={Position.Bottom}
             style={hiddenStyle}
             className={`custom-node__handle custom-node__handle--source
@@ -85,6 +95,7 @@ Source.propTypes = {
     isSelfLoop: PropTypes.bool,
     onMouseDown: PropTypes.func,
     hidden: PropTypes.bool,
+    outPorts: PropTypes.array,
 };
 
 export default {

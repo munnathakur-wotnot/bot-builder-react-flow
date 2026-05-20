@@ -38,8 +38,15 @@ export function useNodeActions({
 
       const idsToRemove = new Set([nodeId]);
       if (isCarousel) {
-        allNodes.forEach((n) => {
-          if (n.data?.groupId === nodeId) idsToRemove.add(n.id);
+        target?.data?.extras?.config?.cardview?.forEach((card) => {
+          if (card?.custom_node_id) {
+            idsToRemove.add(card.custom_node_id);
+          }
+          card?.buttons?.forEach((button) => {
+            if (button?.custom_node_id) {
+              idsToRemove.add(button.custom_node_id);
+            }
+          });
         });
       }
 
@@ -97,7 +104,8 @@ export function useNodeActions({
       navigator.clipboard
         ?.writeText(JSON.stringify(payload, null, 2))
         .then(() => {
-          const label = node.data?.extras?.config?.title ?? node.data?.title ?? "Node";
+          const label =
+            node.data?.extras?.config?.title ?? node.data?.title ?? "Node";
           const extra =
             nodesToCopy.length > 1
               ? ` (+${nodesToCopy.length - 1} sub-nodes)`
@@ -137,10 +145,7 @@ export function useNodeActions({
             data: {
               ...stripEphemeral(node.data),
               id: newId,
-              inPorts: [],
-              outPorts: [],
-              successOutport: [],
-              failureOutport: [],
+              ports: (node.data.ports ?? []).map((port) => ({ ...port, links: [] })),
               connected: false,
               groupId: undefined,
               createdBy: getMeStamp() ?? node.data.createdBy,
@@ -172,10 +177,10 @@ export function useNodeActions({
         data: {
           ...stripEphemeral(node.data),
           id: newCarouselId,
-          inPorts: [],
-          outPorts: (node.data.outPorts ?? []).map((id) => idMap.get(id) ?? id),
-          successOutport: [],
-          failureOutport: [],
+          ports: (node.data.ports ?? []).map((port) => ({
+            ...port,
+            links: (port.links ?? []).map((id) => idMap.get(id) ?? id),
+          })),
           connected: node.data.connected ?? false,
           groupId: undefined,
           cards: (node.data.cards ?? []).map((c) => ({
@@ -201,8 +206,10 @@ export function useNodeActions({
           ...stripEphemeral(m.data),
           id: idMap.get(m.id),
           groupId: newCarouselId,
-          inPorts: (m.data.inPorts ?? []).map((id) => idMap.get(id) ?? id),
-          outPorts: (m.data.outPorts ?? []).map((id) => idMap.get(id) ?? id),
+          ports: (m.data.ports ?? []).map((port) => ({
+            ...port,
+            links: (port.links ?? []).map((id) => idMap.get(id) ?? id),
+          })),
           connected: m.data.connected ?? false,
           ...(m.data.buttons
             ? {
@@ -340,23 +347,15 @@ export function useNodeActions({
             id: newId,
             groupId: newGroupId,
             // Remap ports that point to other selected nodes; drop external connections
-            inPorts: (node.data.inPorts ?? [])
-              .filter((pid) => idMap.has(pid))
-              .map((pid) => idMap.get(pid)),
-            outPorts: (node.data.outPorts ?? [])
-              .filter((pid) => idMap.has(pid))
-              .map((pid) => idMap.get(pid)),
-            successOutport: (node.data.successOutport ?? [])
-              .filter((pid) => idMap.has(pid))
-              .map((pid) => idMap.get(pid)),
-            failureOutport: (node.data.failureOutport ?? [])
-              .filter((pid) => idMap.has(pid))
-              .map((pid) => idMap.get(pid)),
-            connected:
-              (node.data.inPorts ?? []).some((pid) => idMap.has(pid)) ||
-              (node.data.outPorts ?? []).some((pid) => idMap.has(pid)) ||
-              (node.data.successOutport ?? []).some((pid) => idMap.has(pid)) ||
-              (node.data.failureOutport ?? []).some((pid) => idMap.has(pid)),
+            ports: (node.data.ports ?? []).map((port) => ({
+              ...port,
+              links: (port.links ?? [])
+                .filter((pid) => idMap.has(pid))
+                .map((pid) => idMap.get(pid)),
+            })),
+            connected: (node.data.ports ?? []).some((port) =>
+              (port.links ?? []).some((pid) => idMap.has(pid)),
+            ),
             // Remap carousel card/button IDs
             ...(isCarouselRoot && node.data.cards
               ? {

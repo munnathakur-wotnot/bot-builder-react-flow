@@ -14,18 +14,23 @@ export function useNodeInteractions({ id, data }) {
   const nodeErrors = validationErrors?.current?.[id] ?? [];
 
   const hasErrors = data.isErrorShow && nodeErrors.length > 0;
+  const outPorts = data?.ports?.filter((port) => !port.in) ?? [];
+  const isDoubleOutport = outPorts.length > 1;
 
-  const isDoubleOutport = data?.doubleHandler ?? false;
+  const bottomLeftPort = outPorts.find((p) => p.name === "bottomLeft");
+  const bottomRightPort = outPorts.find((p) => p.name === "bottomRight");
+  const singleOutPort = !isDoubleOutport ? outPorts[0] : null;
 
-  const isSelfLoop = data?.successOutport?.[0] === id;
+  const hasSuccessOutport = (bottomLeftPort?.links?.length ?? 0) > 0;
+  const hasFailureOutport = (bottomRightPort?.links?.length ?? 0) > 0;
 
-  const hasSuccessOutport = data?.successOutport?.length > 0;
-
-  const hasFailureOutport = data?.failureOutport?.length > 0;
+  const isSelfLoop = outPorts.some((p) => (p.links ?? []).includes(id));
 
   const hasOutgoing = isDoubleOutport
-    ? hasSuccessOutport && hasFailureOutport
-    : data.outPorts?.length > 0;
+    ? hasSuccessOutport || hasFailureOutport
+    : (singleOutPort?.links?.length ?? 0) > 0;
+
+  console.log(hasOutgoing, data, "HasOutgoing");
 
   const handleOpenMenu = useCallback(
     ({ event, type, isMenuOpen }) => {
@@ -96,7 +101,14 @@ export function useNodeInteractions({ id, data }) {
     ]
       .filter(Boolean)
       .join(" ");
-  }, [data.type, data.isSearchHighlight, hasErrors, isActive, isExecuted, data?.isDraggedBy]);
+  }, [
+    data.type,
+    data.isSearchHighlight,
+    hasErrors,
+    isActive,
+    isExecuted,
+    data?.isDraggedBy,
+  ]);
 
   const borderColor =
     data?.isDraggedByColor || data?.isMenuOpenByColor || data?.selectedByColor;
@@ -114,7 +126,7 @@ export function useNodeInteractions({ id, data }) {
 
     nodeErrors,
     hasErrors,
-
+    outPorts,
     isDoubleOutport,
     isSelfLoop,
 
